@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Commander — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.order-hero{background:var(--black);padding:40px 56px;border-bottom:2px solid var(--green)}
+.order-breadcrumb{font-size:12px;color:var(--gray3);margin-bottom:10px}
+.order-breadcrumb a{color:var(--green3)}
+.order-h1{font-size:34px;font-weight:bold;color:var(--white);margin-bottom:6px}
+.order-sub{font-size:14px;color:var(--gray3);font-style:italic}
+.order-content{display:grid;grid-template-columns:1fr 340px;gap:28px;padding:36px 56px;max-width:1100px;margin:0 auto}
+.form-box{background:var(--white);border:1px solid var(--gray5);padding:44px}
+.type-sel{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--gray5);margin-bottom:28px}
+.type-opt{padding:16px 20px;cursor:pointer;transition:all .2s;border-right:1px solid var(--gray5);text-align:center}
+.type-opt:last-child{border-right:none}
+.type-opt.sel{background:var(--green)}
+.type-opt-name{font-size:14px;font-weight:bold;color:var(--black);margin-bottom:2px}
+.type-opt.sel .type-opt-name{color:var(--white)}
+.type-opt-price{font-size:12px;color:var(--gray3)}
+.type-opt.sel .type-opt-price{color:rgba(255,255,255,.8)}
+.sec-title{font-size:17px;font-weight:bold;color:var(--black);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--gray5);display:flex;align-items:center;gap:10px}
+.step-dot{width:24px;height:24px;background:var(--green);color:var(--white);font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-solo{grid-template-columns:1fr}
+.pay-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.pay-opt{border:1px solid var(--gray5);padding:14px;text-align:center;cursor:pointer;transition:all .2s;border-radius:2px}
+.pay-opt:hover{border-color:var(--green)}
+.pay-opt.sel{border:2px solid var(--green);background:var(--green-light)}
+.pay-icon{font-size:22px;margin-bottom:4px}
+.pay-name{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px}
+.submit-btn{width:100%;margin-top:28px;padding:17px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:14px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .25s;border-radius:2px}
+.submit-btn:hover{background:var(--green)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.sum-box{background:var(--white);border:1px solid var(--gray5);padding:28px;position:sticky;top:80px}
+.sum-title{font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--black)}
+.sum-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dotted var(--gray5);font-size:13px}
+.sum-label{color:var(--gray2)}.sum-val{font-weight:bold}
+.sum-total{display:flex;justify-content:space-between;padding:14px 0 0;margin-top:4px;border-top:2px solid var(--black)}
+.sum-total-label{font-size:16px;font-weight:bold}
+.sum-total-val{font-size:22px;font-weight:bold;color:var(--green)}
+.delivery-box{background:var(--green-pale);border:1px solid var(--green-light);padding:16px;margin-top:16px;font-size:12px;color:var(--gray2);line-height:1.8}
+.delivery-box strong{color:var(--green)}
+@media(max-width:900px){.order-content{grid-template-columns:1fr;padding:20px}.order-hero{padding:28px 20px}.form-box{padding:24px}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="main-nav">
+  <a class="nav-logo" href="/">Lead<em>Wase</em></a>
+  <div class="nav-items">
+    <a class="nav-item" href="/">Accueil</a>
+    <a class="nav-item" href="offres.html">Offres</a>
+    <a class="nav-item" href="connexion.html">Connexion</a>
+  </div>
+</nav>
+<div style="background:var(--off);min-height:calc(100vh - 64px)">
+  <div class="order-hero">
+    <div class="order-breadcrumb"><a href="/">Accueil</a> / Commander ma carte</div>
+    <div class="order-h1">Commander ma carte LeadWase</div>
+    <div class="order-sub">Livraison sous 48h · Identifiants de connexion inclus</div>
+  </div>
+  <div class="order-content">
+    <div class="form-box">
+      <div class="sec-title"><span class="step-dot">1</span>Type de carte</div>
+      <div class="type-sel">
+        <div class="type-opt sel" id="t-classic" onclick="selType('classic')"><div class="type-opt-name">Carte Classique</div><div class="type-opt-price">2 500 FCFA · Particuliers</div></div>
+        <div class="type-opt" id="t-b2b" onclick="selType('b2b')"><div class="type-opt-name">Carte B2B</div><div class="type-opt-price">Sur devis · Entreprises</div></div>
+      </div>
+      <div id="form-classic">
+        <div class="sec-title"><span class="step-dot">2</span>Vos informations</div>
+        <div class="form-row"><div class="f-group"><label class="f-label">Prénom *</label><input class="f-input" id="firstName" placeholder="Ex : Kofi"></div><div class="f-group"><label class="f-label">Nom *</label><input class="f-input" id="lastName" placeholder="Ex : Mensah"></div></div>
+        <div class="form-row"><div class="f-group"><label class="f-label">Titre / Poste *</label><input class="f-input" id="jobTitle" placeholder="Ex : Directeur Commercial"></div><div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="company" placeholder="Ex : AMANI Corp"></div></div>
+        <div class="form-row"><div class="f-group"><label class="f-label">Téléphone *</label><input class="f-input" id="phone" type="tel" placeholder="+225 07 00 00 00 00"></div><div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="email" type="email" placeholder="kofi@amani.com"></div></div>
+        <div class="form-row form-solo"><div class="f-group"><label class="f-label">Adresse de livraison *</label><input class="f-input" id="address" placeholder="Quartier, commune, ville, pays"></div></div>
+        <div style="height:1px;background:var(--gray5);margin:24px 0"></div>
+        <div class="sec-title"><span class="step-dot">3</span>Mode de paiement</div>
+        <div class="pay-row">
+          <div class="pay-opt sel" onclick="selPay(this)"><div class="pay-icon">📱</div><div class="pay-name">Mobile Money</div></div>
+          <div class="pay-opt" onclick="selPay(this)"><div class="pay-icon">💳</div><div class="pay-name">Carte bancaire</div></div>
+          <div class="pay-opt" onclick="selPay(this)"><div class="pay-icon">🏦</div><div class="pay-name">Virement</div></div>
+        </div>
+        <button class="submit-btn" id="submit-btn" onclick="submitOrder()">Valider ma commande →</button>
+        <p style="text-align:center;font-size:11px;color:var(--gray3);margin-top:10px;font-style:italic">🔒 Paiement sécurisé · Livraison 48h</p>
+      </div>
+      <div id="form-b2b" style="display:none">
+        <div class="sec-title"><span class="step-dot">2</span>Informations entreprise</div>
+        <div class="form-row"><div class="f-group"><label class="f-label">Nom de l'entreprise *</label><input class="f-input" id="b2b-company" placeholder="Ex : AMANI Consulting"></div><div class="f-group"><label class="f-label">Nombre de cartes *</label><select class="f-input"><option>10 – 25 cartes</option><option>26 – 50 cartes</option><option>51 – 100 cartes</option><option>100+ cartes</option></select></div></div>
+        <div class="form-row"><div class="f-group"><label class="f-label">Responsable *</label><input class="f-input" id="b2b-name" placeholder="Nom du responsable"></div><div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="b2b-email" type="email" placeholder="contact@entreprise.com"></div></div>
+        <div class="form-row form-solo"><div class="f-group"><label class="f-label">Description du besoin</label><textarea class="f-textarea" id="b2b-desc" placeholder="Couleurs, logo, besoins spécifiques..."></textarea></div></div>
+        <button class="submit-btn" onclick="submitB2B()">Envoyer ma demande de devis →</button>
+      </div>
+    </div>
+    <div>
+      <div class="sum-box">
+        <div class="sum-title">Récapitulatif</div>
+        <div class="sum-row"><span class="sum-label">Carte Classique</span><span class="sum-val">2 500 FCFA</span></div>
+        <div class="sum-row"><span class="sum-label">Profil digital</span><span class="sum-val" style="color:var(--green)">Offert</span></div>
+        <div class="sum-row"><span class="sum-label">Livraison</span><span class="sum-val" style="color:var(--green)">Incluse</span></div>
+        <div class="sum-total"><span class="sum-total-label">Total</span><span class="sum-total-val">2 500 FCFA</span></div>
+      </div>
+      <div class="delivery-box"><strong>Ce que vous recevrez :</strong><br>✦ Votre carte physique sous 48h<br>✦ Identifiant unique (LW-XXXXX)<br>✦ Mot de passe de connexion<br>✦ Accès profil digital Free</div>
+    </div>
+  </div>
+</div>
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Lead<em>Wase</em></div><p class="footer-tagline">Votre identité digitale professionnelle.</p></div>
+    <div><div class="footer-col-title">Produit</div><ul class="footer-links"><li><a href="commander.html">Carte Classique</a></li><li><a href="commander.html?type=b2b">Carte B2B</a></li><li><a href="offres.html">Offres</a></li></ul></div>
+    <div><div class="footer-col-title">Informations</div><ul class="footer-links"><li><a href="/">Accueil</a></li><li><a href="connexion.html">Connexion</a></li><li><a href="mailto:supportleadwase@gmail.com">Contact</a></li></ul></div>
+    <div><div class="footer-col-title">Légal</div><ul class="footer-links"><li><a href="cgu.html">CGU</a></li><li><a href="confidentialite.html">Confidentialité</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span class="footer-copy">© 2026 LeadWase</span><div class="footer-legal"><a href="cgu.html">CGU</a><a href="confidentialite.html">Confidentialité</a><a href="mailto:supportleadwase@gmail.com">Contact</a></div></div>
+</footer>
+<script type="module">
+import { auth } from './js/firebase-config.js';
+import { getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+const p = new URLSearchParams(window.location.search);
+if (p.get('type') === 'b2b') selType('b2b');
+window.selType = t => {
+  document.getElementById('t-classic').classList.toggle('sel', t==='classic');
+  document.getElementById('t-b2b').classList.toggle('sel', t==='b2b');
+  document.getElementById('form-classic').style.display = t==='classic'?'block':'none';
+  document.getElementById('form-b2b').style.display     = t==='b2b'?'block':'none';
+};
+window.selPay = el => { document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); };
+window.submitOrder = async () => {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled=true; btn.innerHTML='<span class="loader"></span> Traitement...';
+  const user = auth.currentUser;
+  if (!user) { sessionStorage.setItem('pendingOrder','1'); window.location.href='/connexion.html?redirect=commander'; return; }
+  try {
+    const token = await getIdToken(user);
+    const r = await fetch('/api/orders/create', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify({ cardType:'classic', firstName:document.getElementById('firstName').value, lastName:document.getElementById('lastName').value, jobTitle:document.getElementById('jobTitle').value, company:document.getElementById('company').value, phone:document.getElementById('phone').value, email:document.getElementById('email').value, address:document.getElementById('address').value }) });
+    const d = await r.json();
+    if (d.payUrl) window.location.href = d.payUrl;
+    else { alert('Erreur : '+(d.error||'Commande non traitée')); btn.disabled=false; btn.textContent='Valider ma commande →'; }
+  } catch(e) { alert('Erreur réseau'); btn.disabled=false; btn.textContent='Valider ma commande →'; }
+};
+window.submitB2B = () => alert('Demande envoyée. Notre équipe vous contacte sous 24h.');
+</script>
+</body>
+</html>

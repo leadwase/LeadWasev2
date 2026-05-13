@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Profil — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.profile-page{background:var(--off);min-height:100vh}
+.brand-bar{background:var(--black);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--green)}
+.pb-logo{font-size:14px;font-weight:bold;color:var(--white);letter-spacing:2px;text-transform:uppercase}
+.pb-logo em{color:var(--green3);font-style:normal}
+.pb-verified{font-size:11px;color:var(--green3);display:flex;align-items:center;gap:6px}
+.pb-verified::before{content:'●'}
+.cover{background:var(--black);height:120px;position:relative;overflow:hidden}
+.cover-ticker{position:absolute;bottom:14px;left:0;white-space:nowrap;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.05);animation:ticker 22s linear infinite}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.cover-line{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green3))}
+.pf-main{max-width:620px;margin:0 auto;padding:0 20px 60px}
+.pf-av-wrap{width:88px;margin-top:-44px;margin-bottom:14px;position:relative}
+.pf-av{width:88px;height:88px;border-radius:50%;background:var(--green);border:4px solid var(--white);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;color:var(--white);box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.pf-plan-tag{position:absolute;bottom:2px;right:-4px;background:var(--black);color:var(--green3);font-size:8px;font-weight:bold;letter-spacing:1.5px;padding:3px 7px;text-transform:uppercase}
+.pf-name{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:3px}
+.pf-job{font-size:14px;color:var(--gray2);font-style:italic;margin-bottom:2px}
+.pf-co{font-size:12px;color:var(--green);font-weight:bold;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.pf-bio{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic;margin-bottom:18px}
+.save-btn{display:block;width:100%;padding:13px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:14px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;margin-bottom:14px;text-align:center;transition:background .2s}
+.save-btn:hover{background:var(--green)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.c-tile{background:var(--white);border:1px solid var(--gray5);padding:14px;display:flex;align-items:center;gap:10px;transition:border-color .2s;text-decoration:none}
+.c-tile:hover{border-color:var(--green)}
+.c-tile-icon{width:34px;height:34px;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.c-tile-label{font-size:9px;color:var(--gray3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.c-tile-val{font-size:12px;font-weight:bold;color:var(--black)}
+.social-links{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.social-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--white);border:1px solid var(--gray5);font-size:13px;color:var(--black);transition:all .2s;border-radius:2px;text-decoration:none}
+.social-btn:hover{border-color:var(--green);color:var(--green)}
+.pf-footer{text-align:center;padding-top:24px;border-top:1px solid var(--gray5);margin-top:24px}
+.pf-footer p{font-size:11px;color:var(--gray3);font-style:italic;margin-bottom:6px}
+.pf-footer a{color:var(--green);font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase}
+@media(max-width:600px){.contact-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="profile-page">
+  <div class="brand-bar">
+    <a class="pb-logo" href="/">Lead<em>Wase</em></a>
+    <div class="pb-verified">Profil vérifié LeadWase</div>
+  </div>
+  <div class="cover">
+    <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
+    <div class="cover-line"></div>
+  </div>
+  <div class="pf-main" id="pf-loading" style="text-align:center;padding-top:60px">
+    <div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div>
+    <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+  </div>
+  <div class="pf-main" id="pf-content" style="display:none">
+    <div class="pf-av-wrap"><div class="pf-av" id="pf-av">?</div><div class="pf-plan-tag" id="pf-plan">FREE</div></div>
+    <div class="pf-name" id="pf-name">–</div>
+    <div class="pf-job" id="pf-job">–</div>
+    <div class="pf-co" id="pf-co"></div>
+    <div class="pf-bio" id="pf-bio"></div>
+    <button class="save-btn" id="vcf-btn">📲 Enregistrer le contact</button>
+    <div class="contact-grid">
+      <a class="c-tile" id="tile-phone" href="#"><div class="c-tile-icon">📞</div><div><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div></a>
+      <a class="c-tile" id="tile-email" href="#"><div class="c-tile-icon">✉️</div><div><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div></a>
+      <a class="c-tile" id="tile-co"><div class="c-tile-icon">🏢</div><div><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div></a>
+      <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none"><div class="c-tile-icon">🌐</div><div><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div></a>
+    </div>
+    <div class="social-links" id="pf-socials" style="display:none"></div>
+    <div class="pf-footer"><p>Profil créé avec</p><a href="/">Lead<span style="color:var(--green)">Wase</span> — Créez le vôtre</a></div>
+  </div>
+  <div class="pf-main" id="pf-error" style="display:none;text-align:center;padding-top:60px">
+    <div style="font-size:48px;margin-bottom:14px">😕</div>
+    <h2 style="font-size:22px;font-weight:bold;margin-bottom:8px">Profil introuvable</h2>
+    <p style="color:var(--gray3);font-style:italic;margin-bottom:20px">Ce profil n'existe pas ou a été supprimé.</p>
+    <a class="btn-green" href="/">Retour à l'accueil</a>
+  </div>
+</div>
+<script type="module">
+import { db } from './js/firebase-config.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+const id = new URLSearchParams(window.location.search).get('id');
+if (!id) showErr(); else load(id.toUpperCase());
+async function load(id) {
+  try {
+    const snap = await getDoc(doc(db,'profiles',id));
+    if (!snap.exists()) { showErr(); return; }
+    const p = snap.data();
+    const ini = ((p.firstName||'?')[0]+(p.lastName||'?')[0]).toUpperCase();
+    document.title = (p.firstName||'')+' '+(p.lastName||'')+' — LeadWase';
+    document.getElementById('pf-av').textContent   = ini;
+    document.getElementById('pf-plan').textContent = (p.plan||'free').toUpperCase();
+    document.getElementById('pf-name').textContent = (p.firstName||'')+' '+(p.lastName||'');
+    document.getElementById('pf-job').textContent  = p.jobTitle||'';
+    document.getElementById('pf-co').textContent   = p.company||'';
+    document.getElementById('pf-co2').textContent  = p.company||'–';
+    document.getElementById('pf-bio').textContent  = p.bio||'';
+    document.getElementById('pf-phone').textContent= p.phone||'–';
+    document.getElementById('pf-email').textContent= p.email||'–';
+    document.getElementById('tile-phone').href = p.phone?'tel:'+p.phone:'#';
+    document.getElementById('tile-email').href = p.email?'mailto:'+p.email:'#';
+    if (p.website) { const tw=document.getElementById('tile-web'); tw.style.display='flex'; tw.href=p.website; document.getElementById('pf-web').textContent=p.website.replace(/https?:\\/\\//,''); }
+    if (p.plan!=='free') {
+      const sc=[{k:'linkedin',i:'💼',l:'LinkedIn'},{k:'instagram',i:'📷',l:'Instagram'},{k:'twitter',i:'🐦',l:'Twitter/X'},{k:'facebook',i:'📘',l:'Facebook'}];
+      const box=document.getElementById('pf-socials'); let has=false;
+      sc.forEach(s=>{ if(p[s.k]){has=true;box.insertAdjacentHTML('beforeend',`<a class="social-btn" href="${p[s.k]}" target="_blank">${s.i} ${s.l}</a>`);} });
+      if(has) box.style.display='flex';
+    }
+    document.getElementById('vcf-btn').onclick = () => {
+      const v=`BEGIN:VCARD\\nVERSION:3.0\\nFN:${p.firstName} ${p.lastName}\\nTITLE:${p.jobTitle||''}\\nORG:${p.company||''}\\nTEL;TYPE=CELL:${p.phone||''}\\nEMAIL:${p.email||''}\\nURL:${p.website||''}\\nNOTE:LeadWase — leadwase.com/profil/${id}\\nEND:VCARD`;
+      Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([v],{type:'text/vcard'})),download:`${p.firstName}_${p.lastName}.vcf`}).click();
+    };
+    document.getElementById('pf-loading').style.display='none';
+    document.getElementById('pf-content').style.display='block';
+  } catch { showErr(); }
+}
+function showErr(){document.getElementById('pf-loading').style.display='none';document.getElementById('pf-error').style.display='block';}
+</script>
+</body>
+</html>

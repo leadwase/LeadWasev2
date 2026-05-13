@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Administration — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.adm{padding:28px;max-width:1100px}
+.adm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.adm-h1{font-size:22px;font-weight:bold;color:var(--black)}
+.adm-date{font-size:12px;color:var(--gray3);font-style:italic}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-card{background:var(--white);border:1px solid var(--gray5);padding:20px;border-top:3px solid transparent}
+.kpi-card.g{border-top-color:var(--green)}.kpi-card.b{border-top-color:var(--black)}.kpi-card.go{border-top-color:var(--gold)}.kpi-card.r{border-top-color:var(--red)}
+.kpi-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);margin-bottom:6px}
+.kpi-num{font-size:32px;font-weight:bold;color:var(--black);line-height:1;margin-bottom:3px}
+.kpi-trend{font-size:11px;color:var(--green);font-style:italic}
+.kpi-trend.down{color:var(--red)}
+.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.a-card{background:var(--white);border:1px solid var(--gray5)}
+.a-header{padding:14px 18px;border-bottom:1px solid var(--gray5);display:flex;align-items:center;justify-content:space-between}
+.a-title{font-size:14px;font-weight:bold;color:var(--black)}
+.a-action{font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;font-style:italic}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray3);padding:9px 12px;border-bottom:1px solid var(--gray5);text-align:left;background:var(--off)}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--gray5);font-size:12px;color:var(--gray2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--green-pale)}
+.act-btn{padding:4px 10px;border:1px solid var(--gray5);background:var(--white);font-family:var(--serif);font-size:11px;cursor:pointer;border-radius:2px;color:var(--black);transition:all .2s}
+.act-btn:hover{background:var(--green);color:var(--white);border-color:var(--green)}
+.gen-box{padding:16px}
+.gen-info{font-size:12px;color:var(--gray2);font-style:italic;margin-bottom:12px;background:var(--green-pale);padding:10px;border-left:2px solid var(--green);line-height:1.7}
+.gen-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.gen-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--black);margin-bottom:4px;font-weight:bold}
+.gen-input{width:100%;padding:9px 12px;border:1px solid var(--gray5);font-family:var(--serif);font-size:13px;background:var(--white);color:var(--black);outline:none;border-radius:2px}
+.gen-input:focus{border-color:var(--green)}
+.gen-btn{padding:9px 20px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:11px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
+.gen-btn:hover{background:var(--green)}
+.gen-out{margin-top:12px;padding:14px;background:var(--black);display:none}
+.gen-out.show{display:block}
+.gen-out-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);margin-bottom:5px}
+.gen-out-id{font-family:'Courier New',monospace;font-size:17px;color:var(--green3);letter-spacing:3px;margin-bottom:4px}
+.gen-out-pwd{font-family:'Courier New',monospace;font-size:13px;color:var(--gray4);letter-spacing:2px}
+.sub-row{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;border-bottom:1px solid var(--gray5)}
+.sub-row:last-child{border-bottom:none}
+.sub-name{font-size:14px;font-weight:bold}
+.sub-price{font-size:11px;color:var(--gray3);margin-top:1px}
+.sub-count{font-size:26px;font-weight:bold}
+@media(max-width:900px){.kpi-row{grid-template-columns:1fr 1fr}.adm-grid{grid-template-columns:1fr}.adm{padding:14px}.gen-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Administration</div></a>
+    <div class="sidebar-user"><div class="sidebar-avatar">A</div><div><div class="sidebar-user-name">Administrateur</div><div class="sidebar-user-plan" style="color:var(--gold)">ADMIN</div></div></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item active" href="admin.html"><span class="s-icon">📊</span>Tableau de bord</a>
+      <a class="sidebar-item" href="admin.html"><span class="s-icon">🛒</span>Commandes <span class="s-badge" id="sb-pending">–</span></a>
+      <a class="sidebar-item" href="admin.html"><span class="s-icon">👥</span>Utilisateurs</a>
+      <a class="sidebar-item" href="admin.html"><span class="s-icon">🔑</span>Générer accès</a>
+      <div class="sidebar-section-label" style="margin-top:8px">Finances</div>
+      <a class="sidebar-item" href="admin.html"><span class="s-icon">📈</span>Abonnements</a>
+      <a class="sidebar-item" href="admin.html"><span class="s-icon">📋</span>Devis B2B</a>
+      <div class="sidebar-section-label" style="margin-top:8px">Navigation</div>
+      <a class="sidebar-item" href="/"><span class="s-icon">🌐</span>Voir le site</a>
+      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item" href="cgu.html"><span class="s-icon">📄</span>CGU</a>
+      <a class="sidebar-item" href="confidentialite.html"><span class="s-icon">🔒</span>Confidentialité</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+  <main class="app-content">
+    <div class="adm">
+      <div class="adm-header"><div class="adm-h1">Tableau de bord</div><div class="adm-date" id="adm-date"></div></div>
+      <div class="kpi-row">
+        <div class="kpi-card g"><div class="kpi-label">Total commandes</div><div class="kpi-num" id="kpi-orders">–</div><div class="kpi-trend">Toutes périodes</div></div>
+        <div class="kpi-card b"><div class="kpi-label">Revenus totaux</div><div class="kpi-num" id="kpi-rev">–</div><div class="kpi-trend">FCFA encaissés</div></div>
+        <div class="kpi-card go"><div class="kpi-label">Abonnements actifs</div><div class="kpi-num" id="kpi-subs">–</div><div class="kpi-trend">Pro + Business</div></div>
+        <div class="kpi-card r"><div class="kpi-label">En attente</div><div class="kpi-num" id="kpi-pending">–</div><div class="kpi-trend down">À traiter</div></div>
+      </div>
+      <div class="adm-grid">
+        <div class="a-card" style="grid-column:1/-1">
+          <div class="a-header"><div class="a-title">Dernières commandes</div><div class="a-action">Actualiser</div></div>
+          <div id="orders-wrap"><div style="padding:20px;text-align:center;color:var(--gray3);font-style:italic">Chargement...</div></div>
+        </div>
+        <div class="a-card">
+          <div class="a-header"><div class="a-title">🔑 Générer des accès</div></div>
+          <div class="gen-box">
+            <div class="gen-info">Renseignez l'ID Firestore de la commande pour générer les credentials du client.</div>
+            <div class="gen-row">
+              <div><div class="gen-label">Nom complet</div><input class="gen-input" id="g-name" placeholder="Nom du client"></div>
+              <div><div class="gen-label">ID commande (Firestore)</div><input class="gen-input" id="g-cmd" placeholder="ID de la commande"></div>
+            </div>
+            <div class="gen-row">
+              <div><div class="gen-label">Email</div><input class="gen-input" id="g-email" type="email" placeholder="email@client.com"></div>
+              <div><div class="gen-label">Type</div><select class="gen-input" id="g-type"><option>Classique</option><option>B2B</option></select></div>
+            </div>
+            <button class="gen-btn" onclick="genCreds()">Générer les accès</button>
+            <div class="gen-out" id="gen-out">
+              <div class="gen-out-label">Identifiant généré</div>
+              <div class="gen-out-id" id="out-id">–</div>
+              <div class="gen-out-label" style="margin-top:10px">Mot de passe temporaire</div>
+              <div class="gen-out-pwd" id="out-pwd">–</div>
+            </div>
+          </div>
+        </div>
+        <div class="a-card">
+          <div class="a-header"><div class="a-title">📈 Abonnements actifs</div><div class="a-action">Gérer</div></div>
+          <div class="sub-row"><div><div class="sub-name">Free</div><div class="sub-price">Gratuit</div></div><div class="sub-count" id="cnt-free">–</div></div>
+          <div class="sub-row"><div><div class="sub-name">Pro</div><div class="sub-price">2 999 XOF/mois</div></div><div class="sub-count" style="color:var(--green)" id="cnt-pro">–</div></div>
+          <div class="sub-row"><div><div class="sub-name">Business</div><div class="sub-price">4 566 XOF/mois</div></div><div class="sub-count" id="cnt-biz">–</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { onAuthStateChanged, signOut, getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+document.getElementById('adm-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href='/connexion.html'; return; }
+  const ud=(await getDoc(doc(db,'users',user.uid))).data();
+  if (!ud||ud.role!=='admin') { window.location.href='/dashboard.html'; return; }
+  await load(user);
+});
+async function load(user) {
+  try {
+    const token=await getIdToken(user);
+    const [sRes,oRes]=await Promise.all([fetch('/api/admin/stats',{headers:{'Authorization':'Bearer '+token}}),fetch('/api/admin/orders',{headers:{'Authorization':'Bearer '+token}})]);
+    const {stats}=await sRes.json(), {orders}=await oRes.json();
+    if(stats){ document.getElementById('kpi-orders').textContent=stats.totalOrders; document.getElementById('kpi-rev').textContent=(stats.totalRevenue||0).toLocaleString()+' F'; document.getElementById('kpi-subs').textContent=stats.activeSubscriptions; document.getElementById('kpi-pending').textContent=stats.pendingOrders; document.getElementById('sb-pending').textContent=stats.pendingOrders; }
+    renderOrders(orders||[]);
+    const [fp,pp,bp]=await Promise.all([getDocs(query(collection(db,'profiles'),where('plan','==','free'))),getDocs(query(collection(db,'users'),where('plan','==','pro'))),getDocs(query(collection(db,'users'),where('plan','==','business')))]);
+    document.getElementById('cnt-free').textContent=fp.size; document.getElementById('cnt-pro').textContent=pp.size; document.getElementById('cnt-biz').textContent=bp.size;
+  } catch(e){console.error(e);}
+}
+function renderOrders(orders) {
+  if(!orders.length){document.getElementById('orders-wrap').innerHTML='<div style="padding:20px;text-align:center;color:var(--gray3);font-style:italic">Aucune commande</div>';return;}
+  const pm={pending:'pill-pending',paid:'pill-paid',delivered:'pill-delivered',failed:'pill-failed'};
+  const lm={pending:'En attente',paid:'Payé',delivered:'Livré',failed:'Échoué'};
+  const rows=orders.map(o=>{
+    const date=o.createdAt?.seconds?new Date(o.createdAt.seconds*1000).toLocaleDateString('fr-FR'):'–';
+    const action=o.leadwaseId?`<span style="font-family:monospace;font-size:11px;color:var(--green)">${o.leadwaseId}</span>`:`<button class="act-btn" onclick="genForOrder('${o.id}')">Générer accès</button>`;
+    return `<tr><td>${o.id.slice(0,8)}…</td><td>${o.firstName||''} ${o.lastName||''}</td><td>${o.cardType==='classic'?'Classique':'B2B'}</td><td>${o.amount?o.amount.toLocaleString()+' FCFA':'Devis'}</td><td>${date}</td><td><span class="pill ${pm[o.status]||'pill-pending'}">${lm[o.status]||o.status}</span></td><td>${action}</td></tr>`;
+  }).join('');
+  document.getElementById('orders-wrap').innerHTML=`<table class="tbl"><thead><tr><th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+window.genForOrder = async orderId => {
+  const user=auth.currentUser, token=await getIdToken(user);
+  const r=await fetch('/api/admin/generate-credentials',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({orderId})});
+  const d=await r.json();
+  if(d.leadwaseId){document.getElementById('out-id').textContent=d.leadwaseId;document.getElementById('out-pwd').textContent=d.password||'(déjà créé)';document.getElementById('gen-out').classList.add('show');await load(user);}
+};
+window.genCreds = async () => { const id=document.getElementById('g-cmd').value.trim(); if(!id){alert('Renseignez un ID de commande');return;} await genForOrder(id); };
+window.doLogout = async () => { await signOut(auth); window.location.href='/'; };
+</script>
+</body>
+</html>

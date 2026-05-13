@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mon profil — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.dash{padding:28px;max-width:860px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.dash-h1{font-size:22px;font-weight:bold;color:var(--black)}
+.dash-pub{font-size:13px;color:var(--green);text-decoration:underline;font-style:italic}
+.card{background:var(--white);border:1px solid var(--gray5);padding:32px;margin-bottom:18px}
+.profile-top{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px}
+.pf-av{width:68px;height:68px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;color:var(--white);flex-shrink:0}
+.pf-name{font-size:20px;font-weight:bold;color:var(--black);margin-bottom:3px}
+.pf-job{font-size:13px;color:var(--gray2);font-style:italic;margin-bottom:2px}
+.pf-co{font-size:11px;color:var(--green);font-weight:bold;letter-spacing:.5px;text-transform:uppercase}
+.pf-id{font-size:10px;color:var(--gray3);font-family:'Courier New',monospace;margin-top:4px}
+.edit-sec{border-top:1px solid var(--gray5);padding-top:22px}
+.edit-sec h3{font-size:14px;font-weight:bold;margin-bottom:14px}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edit-solo{grid-template-columns:1fr}
+.save-btn{padding:10px 26px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px;margin-top:12px}
+.save-btn:hover{background:var(--green)}
+.locked-card{background:var(--white);border:1px solid var(--gray5);padding:22px;margin-bottom:18px}
+.locked-title{font-size:12px;font-weight:bold;color:var(--gray3);margin-bottom:12px}
+.locked-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dotted var(--gray5);font-size:12px;color:var(--gray4);font-style:italic}
+.locked-item:last-child{border-bottom:none}
+.links-card{background:var(--white);border:1px solid var(--gray5);padding:22px;margin-bottom:18px}
+.links-card h3{font-size:14px;font-weight:bold;margin-bottom:12px}
+.link-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.link-icon{font-size:16px;width:28px;text-align:center;flex-shrink:0}
+.upgrade{background:var(--black);padding:24px;position:relative;overflow:hidden;margin-bottom:18px}
+.upgrade::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green3))}
+.upgrade h3{font-size:17px;font-weight:bold;color:var(--white);margin-bottom:8px}
+.upgrade p{font-size:13px;color:var(--gray3);line-height:1.7;font-style:italic;margin-bottom:16px}
+.upgrade-btns{display:flex;gap:10px}
+.ucta{flex:1;padding:11px;font-family:var(--serif);font-size:12px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;text-decoration:none;text-align:center;display:block;transition:all .2s}
+.ucta-pro{background:var(--green);color:var(--white);border:none}.ucta-pro:hover{background:var(--green2)}
+.ucta-biz{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.2)}.ucta-biz:hover{border-color:var(--white)}
+@media(max-width:900px){.dash{padding:14px}.edit-grid{grid-template-columns:1fr}.upgrade-btns{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
+    <div class="sidebar-user"><div class="sidebar-avatar" id="sb-av">?</div><div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">FREE</div></div></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item active" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item" href="offres.html"><span class="s-icon">⭐</span>Offres</a>
+      <a class="sidebar-item" href="#" id="sb-pub"><span class="s-icon">🔗</span>Profil public</a>
+      <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
+      <a class="sidebar-item" href="commander.html"><span class="s-icon">🛒</span>Commander une carte</a>
+      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+      <div class="sidebar-section-label" style="margin-top:8px">Légal</div>
+      <a class="sidebar-item" href="cgu.html"><span class="s-icon">📄</span>CGU</a>
+      <a class="sidebar-item" href="confidentialite.html"><span class="s-icon">🔒</span>Confidentialité</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+  <main class="app-content">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh"><div style="text-align:center"><div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div><p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p></div></div>
+    <div class="dash" id="content" style="display:none">
+      <div class="dash-header"><div class="dash-h1">Mon profil</div><a class="dash-pub" href="#" id="pub-link">Voir mon profil public →</a></div>
+      <div class="card">
+        <div class="profile-top">
+          <div class="pf-av" id="pf-av">?</div>
+          <div><div class="pf-name" id="pf-name">–</div><div class="pf-job" id="pf-job">–</div><div class="pf-co" id="pf-co"></div><div class="pf-id" id="pf-id">–</div><div class="plan-badge" id="pf-plan">FREE</div></div>
+        </div>
+        <div class="edit-sec">
+          <h3>✏️ Modifier mes informations</h3>
+          <div class="edit-grid">
+            <div class="f-group"><label class="f-label">Prénom</label><input class="f-input" id="e-first"></div>
+            <div class="f-group"><label class="f-label">Nom</label><input class="f-input" id="e-last"></div>
+            <div class="f-group"><label class="f-label">Titre / Poste</label><input class="f-input" id="e-job"></div>
+            <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="e-co"></div>
+            <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" type="tel" id="e-phone"></div>
+            <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="e-email"></div>
+          </div>
+          <div class="edit-grid edit-solo">
+            <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
+            <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
+          </div>
+          <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
+        </div>
+      </div>
+      <div class="locked-card" id="locked-sec">
+        <div class="locked-title">🔒 Fonctionnalités non disponibles sur Free</div>
+        <div class="locked-item">🔒 Liens réseaux sociaux</div>
+        <div class="locked-item">🔒 Photo de profil</div>
+        <div class="locked-item">🔒 Analytics — statistiques de visites</div>
+        <div class="locked-item">🔒 Formulaire de contact</div>
+        <div class="locked-item">🔒 CRM et export des contacts</div>
+      </div>
+      <div class="links-card" id="links-sec" style="display:none">
+        <h3>🔗 Réseaux sociaux &amp; liens</h3>
+        <div class="link-row"><div class="link-icon">💼</div><div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div></div>
+        <div class="link-row"><div class="link-icon">📷</div><div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div></div>
+        <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
+        <div class="link-row"><div class="link-icon">📘</div><div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div></div>
+        <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
+      </div>
+      <div class="upgrade" id="upgrade-sec">
+        <h3>🚀 Passez à Pro ou Business</h3>
+        <p>Débloquez les réseaux sociaux, la photo de profil, les analytics et plus encore.</p>
+        <div class="upgrade-btns"><a class="ucta ucta-pro" href="offres.html">Passer à Pro — 2 999 XOF/mois</a><a class="ucta ucta-biz" href="offres.html">Voir Business — 4 566 XOF/mois</a></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+let lwId = null;
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href='/connexion.html'; return; }
+  const uDoc = await getDoc(doc(db,'users',user.uid));
+  if (!uDoc.exists()) { window.location.href='/commander.html'; return; }
+  const ud = uDoc.data();
+  if (ud.role==='admin') document.querySelector('.sidebar-nav').insertAdjacentHTML('afterbegin','<a class="sidebar-item" href="admin.html"><span class="s-icon">⚙️</span>Administration</a>');
+  lwId = ud.leadwaseId;
+  if (!lwId) { window.location.href='/commander.html'; return; }
+  const pDoc = await getDoc(doc(db,'profiles',lwId));
+  if (!pDoc.exists()) return;
+  const p = pDoc.data(), plan = ud.plan||'free';
+  const ini = ((p.firstName||'?')[0]+(p.lastName||'?')[0]).toUpperCase();
+  document.getElementById('sb-av').textContent   = (p.firstName||'?')[0];
+  document.getElementById('sb-name').textContent = (p.firstName||'')+' '+(p.lastName||'');
+  document.getElementById('sb-plan').textContent = plan.toUpperCase();
+  document.getElementById('sb-pub').href         = 'profil.html?id='+lwId;
+  document.getElementById('pf-av').textContent   = ini;
+  document.getElementById('pf-name').textContent = (p.firstName||'')+' '+(p.lastName||'');
+  document.getElementById('pf-job').textContent  = p.jobTitle||'';
+  document.getElementById('pf-co').textContent   = p.company||'';
+  document.getElementById('pf-id').textContent   = lwId;
+  document.getElementById('pub-link').href       = 'profil.html?id='+lwId;
+  const pb = document.getElementById('pf-plan'); pb.textContent=plan.toUpperCase(); pb.className='plan-badge plan-'+plan;
+  ['first','last','job','co','phone','email'].forEach((k,i) => document.getElementById('e-'+k).value = [p.firstName,p.lastName,p.jobTitle,p.company,p.phone,p.email][i]||'');
+  document.getElementById('e-web').value = p.website||'';
+  document.getElementById('e-bio').value = p.bio||'';
+  if (plan!=='free') {
+    document.getElementById('locked-sec').style.display='none';
+    document.getElementById('upgrade-sec').style.display='none';
+    document.getElementById('links-sec').style.display='block';
+    document.getElementById('l-li').value=p.linkedin||''; document.getElementById('l-ig').value=p.instagram||'';
+    document.getElementById('l-tw').value=p.twitter||''; document.getElementById('l-fb').value=p.facebook||'';
+  }
+  document.getElementById('loader').style.display='none';
+  document.getElementById('content').style.display='block';
+});
+window.saveProfile = async () => {
+  try {
+    await updateDoc(doc(db,'profiles',lwId),{firstName:document.getElementById('e-first').value,lastName:document.getElementById('e-last').value,jobTitle:document.getElementById('e-job').value,company:document.getElementById('e-co').value,phone:document.getElementById('e-phone').value,email:document.getElementById('e-email').value,website:document.getElementById('e-web').value,bio:document.getElementById('e-bio').value,updatedAt:new Date()});
+    toast('Profil mis à jour !','success');
+  } catch(e){toast('Erreur : '+e.message,'error');}
+};
+window.saveLinks = async () => {
+  try {
+    await updateDoc(doc(db,'profiles',lwId),{linkedin:document.getElementById('l-li').value,instagram:document.getElementById('l-ig').value,twitter:document.getElementById('l-tw').value,facebook:document.getElementById('l-fb').value,updatedAt:new Date()});
+    toast('Liens mis à jour !','success');
+  } catch(e){toast('Erreur : '+e.message,'error');}
+};
+window.doLogout = async () => { await signOut(auth); window.location.href='/'; };
+function toast(msg,type){const t=Object.assign(document.createElement('div'),{className:'toast '+type,textContent:msg});document.body.appendChild(t);setTimeout(()=>t.remove(),3500);}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Connexion — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.login-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.login-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.login-left::before{content:'"Votre identité,\\A votre réseau."';white-space:pre;position:absolute;font-size:60px;font-weight:bold;color:rgba(255,255,255,.025);line-height:1.1;bottom:40px;left:40px;right:40px;font-family:var(--serif)}
+.login-logo{font-size:24px;font-weight:bold;color:var(--white);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:40px;display:block}
+.login-logo em{color:var(--green3);font-style:normal}
+.login-h{font-size:44px;font-weight:bold;color:var(--white);line-height:1.1;margin-bottom:18px}
+.login-p{font-size:15px;color:var(--gray3);line-height:1.8;font-style:italic}
+.login-right{background:var(--white);padding:80px 64px;display:flex;flex-direction:column;justify-content:center}
+.login-title{font-size:28px;font-weight:bold;color:var(--black);margin-bottom:8px}
+.login-sub{font-size:14px;color:var(--gray2);font-style:italic;margin-bottom:28px;line-height:1.7}
+.hint-box{background:var(--green-pale);border-left:3px solid var(--green);padding:14px 18px;margin-bottom:24px}
+.hint-box p{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic}
+.hint-box strong{color:var(--green);font-style:normal}
+.l-group{margin-bottom:16px}
+.l-label{display:block;font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--black);margin-bottom:7px}
+.l-input{width:100%;padding:13px 17px;border:1px solid var(--gray5);background:var(--off);font-family:var(--serif);font-size:15px;color:var(--black);outline:none;transition:border-color .2s;border-radius:2px}
+.l-input:focus{border-color:var(--green);background:var(--white)}
+.l-input::placeholder{color:var(--gray4);font-style:italic}
+.l-btn{width:100%;margin-top:6px;padding:15px;background:var(--green);color:var(--white);border:none;font-family:var(--serif);font-size:15px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
+.l-btn:hover{background:var(--green2)}
+.l-btn:disabled{opacity:.6;cursor:not-allowed}
+.err-msg{background:rgba(192,57,43,.08);border-left:3px solid var(--red);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;border-radius:2px}
+.l-divider{height:1px;background:var(--gray5);margin:24px 0;position:relative}
+.l-divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);padding:0 12px;font-size:11px;color:var(--gray3);font-style:italic}
+@media(max-width:900px){.login-wrap{grid-template-columns:1fr}.login-left{display:none}.login-right{padding:60px 24px}}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-left">
+    <a class="login-logo" href="/">Lead<em>Wase</em></a>
+    <h2 class="login-h">Bienvenue<br>sur votre<br>espace.</h2>
+    <p class="login-p">Connectez-vous avec les identifiants reçus lors de la livraison de votre carte pour accéder à votre profil digital.</p>
+  </div>
+  <div class="login-right">
+    <div class="login-title">Accéder à mon profil</div>
+    <p class="login-sub">Saisissez vos identifiants de connexion remis avec votre carte LeadWase.</p>
+    <div class="hint-box"><p><strong>Où trouver mes identifiants ?</strong><br>Ils sont indiqués sur le document livré avec votre carte physique. Format : <strong>LW-XXXXX</strong></p></div>
+    <div class="err-msg" id="err"></div>
+    <div class="l-group"><label class="l-label">Identifiant unique</label><input class="l-input" id="lwid" placeholder="Ex : LW-48291"></div>
+    <div class="l-group"><label class="l-label">Mot de passe</label><input class="l-input" id="pwd" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="l-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
+    <p style="text-align:center;margin-top:14px;font-size:13px;font-style:italic"><a href="mailto:supportleadwase@gmail.com" style="color:var(--green)">Mot de passe oublié ? Contacter le support</a></p>
+    <div class="l-divider"><span>Pas encore de carte ?</span></div>
+    <p style="font-size:12px;color:var(--gray3);font-style:italic;text-align:center;line-height:1.6">Commandez votre carte LeadWase et recevez vos accès sous 48h.<br><a href="commander.html" style="color:var(--green);text-decoration:underline">Commander maintenant →</a></p>
+  </div>
+</div>
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+window.doLogin = async () => {
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('err');
+  const id  = document.getElementById('lwid').value.trim().toUpperCase();
+  const pwd = document.getElementById('pwd').value;
+  if (!id||!pwd) { err.textContent='Veuillez remplir tous les champs.'; err.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="loader"></span> Connexion...'; err.style.display='none';
+  const email = id.toLowerCase()+'@leadwase.internal';
+  try {
+    await signInWithEmailAndPassword(auth, email, pwd); redirect();
+  } catch {
+    try {
+      const cDoc = await getDoc(doc(db,'credentials',id));
+      if (!cDoc.exists()) throw new Error('Identifiant introuvable');
+      if (cDoc.data().passwordHash !== pwd) throw new Error('Mot de passe incorrect');
+      try { const nc = await createUserWithEmailAndPassword(auth,email,pwd); await setDoc(doc(db,'users',nc.user.uid),{leadwaseId:id,plan:'free',role:'user',createdAt:new Date()},{merge:true}); } catch {}
+      await signInWithEmailAndPassword(auth, email, pwd); redirect();
+    } catch(e2) { err.textContent=e2.message||'Identifiant ou mot de passe incorrect.'; err.style.display='block'; btn.disabled=false; btn.textContent='Se connecter →'; }
+  }
+};
+function redirect() { const r=new URLSearchParams(window.location.search).get('redirect'); window.location.href=r==='commander'?'/commander.html':'/dashboard.html'; }
+</script>
+</body>
+</html>
