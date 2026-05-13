@@ -112,32 +112,79 @@
   </div>
   <div class="footer-bottom"><span class="footer-copy">© 2026 LeadWase</span><div class="footer-legal"><a href="cgu.html">CGU</a><a href="confidentialite.html">Confidentialité</a><a href="mailto:supportleadwase@gmail.com">Contact</a></div></div>
 </footer>
+
+<!-- ✅ Script classique (non-module) : fonctions globales accessibles depuis les onclick inline -->
+<script>
+  function selType(t) {
+    document.getElementById('t-classic').classList.toggle('sel', t === 'classic');
+    document.getElementById('t-b2b').classList.toggle('sel', t === 'b2b');
+    document.getElementById('form-classic').style.display = t === 'classic' ? 'block' : 'none';
+    document.getElementById('form-b2b').style.display     = t === 'b2b'     ? 'block' : 'none';
+  }
+
+  function selPay(el) {
+    document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  function submitB2B() {
+    alert('Demande envoyée. Notre équipe vous contacte sous 24h.');
+  }
+
+  // Lire le paramètre ?type=b2b dès le chargement
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('type') === 'b2b') selType('b2b');
+  })();
+</script>
+
+<!-- ✅ Script module séparé : uniquement pour Firebase + submitOrder qui nécessite getIdToken -->
 <script type="module">
-import { auth } from './js/firebase-config.js';
-import { getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-const p = new URLSearchParams(window.location.search);
-if (p.get('type') === 'b2b') selType('b2b');
-window.selType = t => {
-  document.getElementById('t-classic').classList.toggle('sel', t==='classic');
-  document.getElementById('t-b2b').classList.toggle('sel', t==='b2b');
-  document.getElementById('form-classic').style.display = t==='classic'?'block':'none';
-  document.getElementById('form-b2b').style.display     = t==='b2b'?'block':'none';
-};
-window.selPay = el => { document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); };
-window.submitOrder = async () => {
-  const btn = document.getElementById('submit-btn');
-  btn.disabled=true; btn.innerHTML='<span class="loader"></span> Traitement...';
-  const user = auth.currentUser;
-  if (!user) { sessionStorage.setItem('pendingOrder','1'); window.location.href='/connexion.html?redirect=commander'; return; }
-  try {
-    const token = await getIdToken(user);
-    const r = await fetch('/api/orders/create', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body: JSON.stringify({ cardType:'classic', firstName:document.getElementById('firstName').value, lastName:document.getElementById('lastName').value, jobTitle:document.getElementById('jobTitle').value, company:document.getElementById('company').value, phone:document.getElementById('phone').value, email:document.getElementById('email').value, address:document.getElementById('address').value }) });
-    const d = await r.json();
-    if (d.payUrl) window.location.href = d.payUrl;
-    else { alert('Erreur : '+(d.error||'Commande non traitée')); btn.disabled=false; btn.textContent='Valider ma commande →'; }
-  } catch(e) { alert('Erreur réseau'); btn.disabled=false; btn.textContent='Valider ma commande →'; }
-};
-window.submitB2B = () => alert('Demande envoyée. Notre équipe vous contacte sous 24h.');
+  import { auth } from './js/firebase-config.js';
+  import { getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+  window.submitOrder = async () => {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span> Traitement...';
+
+    const user = auth.currentUser;
+    if (!user) {
+      sessionStorage.setItem('pendingOrder', '1');
+      window.location.href = '/connexion.html?redirect=commander';
+      return;
+    }
+
+    try {
+      const token = await getIdToken(user);
+      const r = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          cardType:  'classic',
+          firstName: document.getElementById('firstName').value,
+          lastName:  document.getElementById('lastName').value,
+          jobTitle:  document.getElementById('jobTitle').value,
+          company:   document.getElementById('company').value,
+          phone:     document.getElementById('phone').value,
+          email:     document.getElementById('email').value,
+          address:   document.getElementById('address').value
+        })
+      });
+      const d = await r.json();
+      if (d.payUrl) {
+        window.location.href = d.payUrl;
+      } else {
+        alert('Erreur : ' + (d.error || 'Commande non traitée'));
+        btn.disabled = false;
+        btn.textContent = 'Valider ma commande →';
+      }
+    } catch(e) {
+      alert('Erreur réseau');
+      btn.disabled = false;
+      btn.textContent = 'Valider ma commande →';
+    }
+  };
 </script>
 </body>
 </html>
