@@ -22,11 +22,23 @@ async function verifyAdmin(req) {
 export default async function handler(req, res) {
   try {
     await verifyAdmin(req);
+
+    // Sans orderBy pour éviter le besoin d'index — on trie côté serveur
     const snap = await db.collection('orders')
       .where('cardType', '==', 'b2b')
-      .orderBy('createdAt', 'desc')
-      .limit(100)
       .get();
-    res.json({ success: true, orders: snap.docs.map(d => ({ id: d.id, ...d.data() })) });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+
+    const orders = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => {
+        const ta = a.createdAt?._seconds || 0;
+        const tb = b.createdAt?._seconds || 0;
+        return tb - ta;
+      });
+
+    res.json({ success: true, orders });
+  } catch (e) {
+    console.error('[admin/b2b]', e.message);
+    res.status(500).json({ error: e.message });
+  }
 }
