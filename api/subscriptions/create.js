@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   try {
     const user   = await verifyToken(req);
     const { plan } = req.body;
-    const prices = { pro: 2999, business: 4566 };
+    const prices = { pro: 100, business: 4566 };
     const amount = prices[plan];
     if (!amount) return res.status(400).json({ error: 'Plan invalide' });
 
