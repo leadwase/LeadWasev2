@@ -4,378 +4,866 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin — LeadWase</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --black:#0a0a0a;--white:#ffffff;--green:#16a34a;--green2:#15803d;
-  --green-light:#dcfce7;--gray1:#111827;--gray2:#374151;--gray3:#6b7280;
-  --gray4:#9ca3af;--gray5:#e5e7eb;--off:#f9fafb;--red:#dc2626;--orange:#f59e0b;
+  --black:#0f0f0f;--sidebar:#141414;--white:#fff;--off:#f8f9fa;
+  --green:#16a34a;--green2:#15803d;--green-light:#dcfce7;--green-pale:#f0fdf4;
+  --gray1:#1f2937;--gray2:#374151;--gray3:#6b7280;--gray4:#9ca3af;--gray5:#e5e7eb;--gray6:#f3f4f6;
+  --red:#dc2626;--orange:#d97706;--blue:#2563eb;
+  --sidebar-w:220px;
 }
-body{font-family:'Syne',sans-serif;background:var(--black);color:var(--white);min-height:100vh}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);min-height:100vh;font-size:14px}
 
-/* ── LOGIN ─────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════ */
 #login-screen{
   display:flex;align-items:center;justify-content:center;
-  min-height:100vh;padding:20px;
-  background:var(--black);
-  background-image:radial-gradient(ellipse at 20% 50%,rgba(22,163,74,.15) 0%,transparent 60%),
-                   radial-gradient(ellipse at 80% 20%,rgba(22,163,74,.08) 0%,transparent 50%);
+  min-height:100vh;background:var(--black);
+  background-image:radial-gradient(ellipse at 20% 60%,rgba(22,163,74,.12) 0%,transparent 55%);
 }
-.login-box{width:100%;max-width:400px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:48px 40px}
-.login-logo{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+.login-card{width:100%;max-width:380px;background:#1a1a1a;border:1px solid #2a2a2a;padding:44px 36px;margin:20px}
+.login-logo{font-size:26px;font-weight:700;color:var(--white);margin-bottom:4px}
 .login-logo em{color:var(--green);font-style:normal}
-.login-sub{font-size:12px;color:var(--gray4);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
-.login-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);display:block;margin-bottom:8px}
-.login-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);font-family:'Syne',sans-serif;font-size:14px;padding:14px 16px;outline:none;transition:border .2s;margin-bottom:16px}
-.login-input:focus{border-color:var(--green)}
-.login-input::placeholder{color:var(--gray3)}
-.login-btn{width:100%;padding:16px;background:var(--green);color:var(--white);border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:8px}
+.login-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gray4);margin-bottom:36px}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.fl label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray4)}
+.fl input{background:#242424;border:1px solid #333;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border .2s;border-radius:2px}
+.fl input:focus{border-color:var(--green)}
+.fl input::placeholder{color:#555}
+.login-btn{width:100%;margin-top:8px;padding:14px;background:var(--green);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
 .login-btn:hover{background:var(--green2)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
-.login-error{font-size:12px;color:#f87171;margin-top:12px;text-align:center;min-height:18px}
+.login-err{font-size:12px;color:#f87171;margin-top:10px;text-align:center;min-height:16px}
 
-/* ── DASHBOARD ─────────────────────────────────────────────────── */
-#dashboard{display:none}
-.topbar{background:rgba(10,10,10,.95);border-bottom:1px solid rgba(255,255,255,.08);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
-.topbar-logo{font-size:18px;font-weight:800;letter-spacing:-0.5px}
-.topbar-logo em{color:var(--green);font-style:normal}
-.topbar-right{display:flex;align-items:center;gap:16px}
-.topbar-admin{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
-.logout-btn{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,.15);color:var(--gray4);padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
-.logout-btn:hover{border-color:var(--red);color:var(--red)}
-.main{padding:32px;max-width:1200px;margin:0 auto}
+/* ══════════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════════ */
+#app{display:none;min-height:100vh}
+.layout{display:flex;min-height:100vh}
 
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
-.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:24px}
-.stat-val{font-size:32px;font-weight:800;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:4px}
-.stat-label{font-size:11px;color:var(--gray4);letter-spacing:1.5px;text-transform:uppercase}
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--black);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
+  z-index:50;transition:transform .3s;overflow-y:auto;
+}
+.sb-logo{padding:24px 20px 20px;border-bottom:1px solid #1e1e1e}
+.sb-logo-text{font-size:20px;font-weight:700;color:var(--white)}
+.sb-logo-text em{color:var(--green);font-style:normal}
+.sb-logo-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-top:2px}
+.sb-section{padding:20px 12px 8px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;margin:1px 8px;
+  border-radius:4px;cursor:pointer;transition:all .15s;color:#888;font-size:13px;font-weight:500;
+  text-decoration:none;
+}
+.sb-item:hover{background:#1e1e1e;color:var(--white)}
+.sb-item.active{background:var(--green);color:var(--white)}
+.sb-item .ico{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--green);color:var(--white);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sb-item.active .sb-badge{background:rgba(255,255,255,.3)}
+.sb-bottom{margin-top:auto;padding:16px 12px;border-top:1px solid #1e1e1e}
+.sb-user{font-size:11px;color:#555;margin-bottom:10px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-logout{width:100%;padding:9px;background:none;border:1px solid #2a2a2a;color:#666;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s}
+.sb-logout:hover{border-color:var(--red);color:var(--red)}
 
-/* Tabs */
-.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
-.tab{padding:12px 24px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
-.tab.active{color:var(--green);border-bottom-color:var(--green)}
-.tab:hover{color:var(--white)}
+/* ── Overlay mobile ── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49}
 
-/* Table */
+/* ── Main ── */
+.main-wrap{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--gray5);
+  padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--gray2)}
+.hamburger svg{width:20px;height:20px}
+.page-title{font-size:18px;font-weight:700;color:var(--gray1)}
+.topbar-date{font-size:12px;color:var(--gray4)}
+.content{padding:28px;flex:1}
+
+/* ══════════════════════════════════════════════
+   STATS CARDS
+══════════════════════════════════════════════ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border:1px solid var(--gray5);padding:22px 24px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.green::after{background:var(--green)}
+.stat-card.orange::after{background:var(--orange)}
+.stat-card.blue::after{background:var(--blue)}
+.stat-card.red::after{background:var(--red)}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);margin-bottom:10px}
+.stat-val{font-size:36px;font-weight:700;color:var(--gray1);font-family:'Space Mono',monospace;line-height:1}
+.stat-sub{font-size:11px;color:var(--gray4);margin-top:6px}
+.stat-sub.up{color:var(--green)}
+.stat-sub.warn{color:var(--red)}
+
+/* ══════════════════════════════════════════════
+   TABLES
+══════════════════════════════════════════════ */
+.card{background:var(--white);border:1px solid var(--gray5);margin-bottom:20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--gray5)}
+.card-title{font-size:14px;font-weight:700;color:var(--gray1)}
+.card-link{font-size:12px;color:var(--green);cursor:pointer;font-weight:500}
+.card-link:hover{text-decoration:underline}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead tr{border-bottom:1px solid rgba(255,255,255,.1)}
-thead th{padding:12px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4)}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
-tbody tr:hover{background:rgba(255,255,255,.03)}
-tbody td{padding:14px 16px;color:var(--gray5)}
-.badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.badge-pending{background:rgba(245,158,11,.15);color:var(--orange)}
-.badge-paid{background:rgba(22,163,74,.15);color:#4ade80}
-.badge-delivered{background:rgba(22,163,74,.25);color:#86efac}
-.badge-failed{background:rgba(220,38,38,.15);color:#f87171}
-.badge-success{background:rgba(22,163,74,.15);color:#4ade80}
-.action-btn{padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
-.btn-generate{background:var(--green);color:var(--white)}
-.btn-generate:hover{background:var(--green2)}
-.btn-done{background:rgba(255,255,255,.08);color:var(--gray4);cursor:default}
+thead th{padding:11px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);background:var(--gray6);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--gray6);transition:background .1s}
+tbody tr:hover{background:#fafafa}
+tbody td{padding:13px 16px;color:var(--gray2);white-space:nowrap}
+.badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;border-radius:2px}
+.b-new     {background:#fef3c7;color:#92400e}
+.b-paid    {background:#d1fae5;color:#065f46}
+.b-delivered{background:#d1fae5;color:#065f46}
+.b-pending {background:#fef9c3;color:#854d0e}
+.b-failed  {background:#fee2e2;color:#991b1b}
+.b-encours {background:#dbeafe;color:#1e40af}
+.b-success {background:#d1fae5;color:#065f46}
+.act-btn{padding:5px 12px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:all .15s;white-space:nowrap}
+.btn-gen{background:var(--green);color:var(--white)}
+.btn-gen:hover{background:var(--green2)}
+.btn-view{background:var(--gray6);color:var(--gray2);border:1px solid var(--gray5)}
+.btn-view:hover{background:var(--gray5)}
+.btn-done{background:var(--gray6);color:var(--gray4);cursor:default}
+.empty-row td{text-align:center;padding:40px;color:var(--gray4);font-style:italic}
 
-/* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+/* ══════════════════════════════════════════════
+   BOTTOM GRID
+══════════════════════════════════════════════ */
+.bottom-grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
+
+/* ── Générer accès ── */
+.gen-info{background:var(--green-pale);border:1px solid #bbf7d0;padding:14px 18px;margin:20px 24px 0;font-size:12px;color:var(--green2);line-height:1.6;border-radius:2px}
+.gen-form{padding:20px 24px 24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.f-group{display:flex;flex-direction:column;gap:5px}
+.f-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4)}
+.f-input{border:1px solid var(--gray5);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray1);outline:none;transition:border .2s;border-radius:2px;background:var(--white)}
+.f-input:focus{border-color:var(--green)}
+.f-input::placeholder{color:var(--gray4)}
+select.f-input{cursor:pointer}
+.gen-btn{padding:12px 28px;background:var(--black);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
+.gen-btn:hover{background:var(--green)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Résultat identifiants ── */
+.cred-result{display:none;background:var(--green-pale);border:1px solid #bbf7d0;padding:20px 24px;margin:0 24px 24px;border-radius:2px}
+.cred-result.show{display:block}
+.cred-result-title{font-size:12px;font-weight:700;color:var(--green2);margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase}
+.cred-item{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
+.cred-item:last-child{margin-bottom:0}
+.cred-key{font-size:11px;color:var(--gray4);font-weight:600;letter-spacing:.5px;text-transform:uppercase;min-width:80px}
+.cred-val-wrap{display:flex;align-items:center;gap:8px;flex:1}
+.cred-val{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--green2);background:rgba(22,163,74,.08);padding:6px 12px;border-radius:2px;flex:1;word-break:break-all}
+.copy-btn{background:var(--green);color:var(--white);border:none;padding:6px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background .15s;white-space:nowrap}
+.copy-btn:hover{background:var(--green2)}
+.copy-btn.copied{background:#059669}
+
+/* ── Abonnements ── */
+.sub-list{padding:8px 24px 24px}
+.sub-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--gray6)}
+.sub-row:last-child{border-bottom:none}
+.sub-plan{font-size:13px;font-weight:600;color:var(--gray1)}
+.sub-price{font-size:11px;color:var(--gray4);margin-top:2px}
+.sub-count{font-size:22px;font-weight:700;color:var(--green);font-family:'Space Mono',monospace}
+
+/* ══════════════════════════════════════════════
+   PAGES (sections)
+══════════════════════════════════════════════ */
+.page{display:none}
+.page.active{display:block}
+
+/* ══════════════════════════════════════════════
+   MODAL DETAIL
+══════════════════════════════════════════════ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:#111;border:1px solid rgba(255,255,255,.12);padding:40px;width:100%;max-width:440px}
-.modal-title{font-size:20px;font-weight:800;margin-bottom:8px}
-.modal-sub{font-size:13px;color:var(--gray4);margin-bottom:28px}
-.cred-box{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);padding:20px;margin-bottom:24px}
-.cred-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.cred-row:last-child{margin-bottom:0}
-.cred-key{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
-.cred-val{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700}
-.modal-note{font-size:12px;color:var(--gray4);margin-bottom:24px;line-height:1.6}
-.modal-close{width:100%;padding:14px;background:rgba(255,255,255,.08);color:var(--white);border:none;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s}
-.modal-close:hover{background:rgba(255,255,255,.12)}
+.modal{background:var(--white);border:1px solid var(--gray5);padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--gray5)}
+.detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--gray6);font-size:13px}
+.detail-key{color:var(--gray4);font-weight:500}
+.detail-val{font-weight:600;color:var(--gray1);text-align:right;max-width:60%;word-break:break-word}
+.modal-close-btn{width:100%;margin-top:20px;padding:12px;background:var(--gray6);border:1px solid var(--gray5);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px}
+.modal-close-btn:hover{background:var(--gray5)}
 
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.section-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4)}
-.refresh-btn{background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray4);padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
-.refresh-btn:hover{border-color:var(--green);color:var(--green)}
-
-@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.main{padding:16px}.topbar{padding:0 16px}}
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(max-width:1100px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .bottom-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay.open{display:block}
+  .main-wrap{margin-left:0}
+  .hamburger{display:flex}
+  .content{padding:16px}
+  .topbar{padding:0 16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .card-head{padding:14px 16px}
+  .gen-form{padding:14px 16px 16px}
+  .gen-info{margin:14px 16px 0}
+  .cred-result{margin:0 16px 16px}
+  .sub-list{padding:4px 16px 16px}
+  .form-grid{grid-template-columns:1fr}
+  .stat-val{font-size:28px}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN ────────────────────────────────────────────────────── -->
+<!-- ══ LOGIN ══════════════════════════════════════════════════════ -->
 <div id="login-screen">
-  <div class="login-box">
+  <div class="login-card">
     <div class="login-logo">Lead<em>Wase</em></div>
-    <div class="login-sub">Dashboard Admin</div>
-    <label class="login-label">Email</label>
-    <input class="login-input" id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com">
-    <label class="login-label">Mot de passe</label>
-    <input class="login-input" id="l-pwd" type="password" placeholder="••••••••••">
+    <div class="login-badge">Administration</div>
+    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com"></div>
+    <div class="fl"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="••••••••••"></div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
-    <div class="login-error" id="login-error"></div>
+    <div class="login-err" id="login-err"></div>
   </div>
 </div>
 
-<!-- ── DASHBOARD ─────────────────────────────────────────────────── -->
-<div id="dashboard">
-  <div class="topbar">
-    <div class="topbar-logo">Lead<em>Wase</em> <span style="font-size:11px;color:var(--gray4);font-weight:400;margin-left:8px;letter-spacing:2px">ADMIN</span></div>
-    <div class="topbar-right">
-      <span class="topbar-admin" id="admin-email"></span>
-      <button class="logout-btn" onclick="doLogout()">Déconnexion</button>
-    </div>
-  </div>
+<!-- ══ APP ════════════════════════════════════════════════════════ -->
+<div id="app">
+  <div class="layout">
 
-  <div class="main">
-    <div class="stats">
-      <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-label">Commandes total</div></div>
-      <div class="stat"><div class="stat-val" id="s-pending">—</div><div class="stat-label">En attente</div></div>
-      <div class="stat"><div class="stat-val" id="s-revenue">—</div><div class="stat-label">Revenus (FCFA)</div></div>
-      <div class="stat"><div class="stat-val" id="s-subs">—</div><div class="stat-label">Abonnements actifs</div></div>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('orders')">Commandes</div>
-      <div class="tab" onclick="showTab('payments')">Paiements</div>
-    </div>
-
-    <!-- Commandes -->
-    <div id="tab-orders">
-      <div class="section-header">
-        <span class="section-title">Toutes les commandes</span>
-        <button class="refresh-btn" onclick="loadOrders()">↻ Actualiser</button>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-text">Lead<em>Wase</em></div>
+        <div class="sb-logo-sub">Administration</div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Date</th><th>Client</th><th>Email</th><th>Téléphone</th>
-            <th>Type</th><th>Statut</th><th>ID LeadWase</th><th>Action</th>
-          </tr></thead>
-          <tbody id="orders-body">
-            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>
-          </tbody>
-        </table>
+      <div class="sb-section">Principal</div>
+      <a class="sb-item active" onclick="nav('dashboard')" id="nav-dashboard">
+        <span class="ico">📊</span> Tableau de bord
+      </a>
+      <a class="sb-item" onclick="nav('commandes')" id="nav-commandes">
+        <span class="ico">📦</span> Commandes
+        <span class="sb-badge" id="sb-pending-count">0</span>
+      </a>
+      <a class="sb-item" onclick="nav('utilisateurs')" id="nav-utilisateurs">
+        <span class="ico">👤</span> Utilisateurs
+      </a>
+      <a class="sb-item" onclick="nav('generer')" id="nav-generer">
+        <span class="ico">🔑</span> Générer accès
+      </a>
+      <div class="sb-section">Finances</div>
+      <a class="sb-item" onclick="nav('paiements')" id="nav-paiements">
+        <span class="ico">💳</span> Paiements
+      </a>
+      <a class="sb-item" onclick="nav('abonnements')" id="nav-abonnements">
+        <span class="ico">🔄</span> Abonnements
+      </a>
+      <div class="sb-section">Système</div>
+      <a class="sb-item" onclick="nav('parametres')" id="nav-parametres">
+        <span class="ico">⚙️</span> Paramètres
+      </a>
+      <a class="sb-item" onclick="nav('notifications')" id="nav-notifications">
+        <span class="ico">🔔</span> Notifications
+      </a>
+      <div class="sb-bottom">
+        <div class="sb-user" id="sb-user-email">—</div>
+        <button class="sb-logout" onclick="doLogout()">Déconnexion</button>
       </div>
-    </div>
+    </aside>
+    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
-    <!-- Paiements -->
-    <div id="tab-payments" style="display:none">
-      <div class="section-header">
-        <span class="section-title">Historique des paiements</span>
-        <button class="refresh-btn" onclick="loadPayments()">↻ Actualiser</button>
+    <!-- Main -->
+    <div class="main-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <span class="page-title" id="page-title">Tableau de bord</span>
+        </div>
+        <span class="topbar-date" id="topbar-date"></span>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th>
-          </tr></thead>
-          <tbody id="payments-body">
-            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ── MODAL IDENTIFIANTS ─────────────────────────────────────────── -->
-<div class="modal-overlay" id="cred-modal">
+      <div class="content">
+
+        <!-- ════ PAGE : DASHBOARD ════ -->
+        <div class="page active" id="page-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card green">
+              <div class="stat-label">Commandes ce mois</div>
+              <div class="stat-val" id="d-total">—</div>
+              <div class="stat-sub up" id="d-total-sub"></div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-label">Revenus (FCFA)</div>
+              <div class="stat-val" id="d-revenue">—</div>
+              <div class="stat-sub up" id="d-revenue-sub"></div>
+            </div>
+            <div class="stat-card blue">
+              <div class="stat-label">Abonnés Pro / Business</div>
+              <div class="stat-val" id="d-subs">—</div>
+              <div class="stat-sub" id="d-subs-sub"></div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">Commandes en attente</div>
+              <div class="stat-val" id="d-pending">—</div>
+              <div class="stat-sub warn" id="d-pending-sub"></div>
+            </div>
+          </div>
+
+          <!-- Dernières commandes -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Dernières commandes</span>
+              <span class="card-link" onclick="nav('commandes')">Voir tout →</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>Commande</th><th>Client</th><th>Type</th><th>Montant</th>
+                  <th>Date</th><th>Statut</th><th>Action</th>
+                </tr></thead>
+                <tbody id="dash-orders-body">
+                  <tr class="empty-row"><td colspan="7">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Bas de page -->
+          <div class="bottom-grid">
+            <!-- Générer accès rapide -->
+            <div class="card">
+              <div class="card-head"><span class="card-title">🔑 Générer des accès</span></div>
+              <div class="gen-info">Renseignez l'identifiant de commande pour récupérer automatiquement les accès générés par le système.</div>
+              <div class="gen-form">
+                <div class="form-grid">
+                  <div class="f-group">
+                    <label class="f-label">N° de commande</label>
+                    <input class="f-input" id="g-orderid" placeholder="#CMD-XXXXX">
+                  </div>
+                  <div class="f-group">
+                    <label class="f-label">Type de carte</label>
+                    <select class="f-input" id="g-type">
+                      <option value="classic">Classique</option>
+                      <option value="b2b">B2B</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="gen-btn" id="gen-btn" onclick="fetchAccess()">Générer les accès</button>
+              </div>
+              <div class="cred-result" id="cred-result">
+                <div class="cred-result-title">✅ Accès générés — à copier et envoyer au client</div>
+                <div class="cred-item">
+                  <span class="cred-key">Identifiant</span>
+                  <div class="cred-val-wrap">
+                    <span class="cred-val" id="r-id">—</span>
+                    <button class="copy-btn" onclick="copyVal('r-id',this)">Copier</button>
+                  </div>
+                </div>
+                <div class="cred-item">
+                  <span class="cred-key">Mot de passe</span>
+                  <div class="cred-val-wrap">
+                    <span class="cred-val" id="r-pwd">—</span>
+                    <button class="copy-btn" onclick="copyVal('r-pwd',this)">Copier</button>
+                  </div>
+                </div>
+                <div class="cred-item">
+                  <span class="cred-key">Email</span>
+                  <div class="cred-val-wrap">
+                    <span class="cred-val" id="r-email" style="font-size:12px">—</span>
+                    <button class="copy-btn" onclick="copyVal('r-email',this)">Copier</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Abonnements actifs -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">☑️ Abonnements actifs</span>
+                <span class="card-link" onclick="nav('abonnements')">Gérer →</span>
+              </div>
+              <div class="sub-list">
+                <div class="sub-row">
+                  <div><div class="sub-plan">Offre Free</div><div class="sub-price">Sans abonnement</div></div>
+                  <div class="sub-count" id="sub-free">—</div>
+                </div>
+                <div class="sub-row">
+                  <div><div class="sub-plan">Offre Pro</div><div class="sub-price">3 500 FCFA/mois</div></div>
+                  <div class="sub-count" id="sub-pro">—</div>
+                </div>
+                <div class="sub-row">
+                  <div><div class="sub-plan">Offre Business</div><div class="sub-price">9 900 FCFA/mois</div></div>
+                  <div class="sub-count" id="sub-business">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : COMMANDES ════ -->
+        <div class="page" id="page-commandes">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Toutes les commandes</span>
+              <button class="act-btn btn-view" onclick="loadAllOrders()">↻ Actualiser</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>Commande</th><th>Client</th><th>Type</th><th>Montant</th>
+                  <th>Date</th><th>Statut</th><th>ID LeadWase</th><th>Action</th>
+                </tr></thead>
+                <tbody id="all-orders-body">
+                  <tr class="empty-row"><td colspan="8">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : UTILISATEURS ════ -->
+        <div class="page" id="page-utilisateurs">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Profils créés</span>
+              <button class="act-btn btn-view" onclick="loadProfiles()">↻ Actualiser</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>ID LeadWase</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Plan</th><th>Date</th>
+                </tr></thead>
+                <tbody id="profiles-body">
+                  <tr class="empty-row"><td colspan="6">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : GÉNÉRER ACCÈS ════ -->
+        <div class="page" id="page-generer">
+          <div class="card">
+            <div class="card-head"><span class="card-title">🔑 Générer / Récupérer des accès client</span></div>
+            <div class="gen-info">Entrez l'identifiant Firestore de la commande pour récupérer les accès générés automatiquement par le webhook après paiement.</div>
+            <div class="gen-form">
+              <div class="form-grid">
+                <div class="f-group">
+                  <label class="f-label">N° de commande (ID Firestore)</label>
+                  <input class="f-input" id="g2-orderid" placeholder="ex: abc123def456">
+                </div>
+                <div class="f-group">
+                  <label class="f-label">Type de carte</label>
+                  <select class="f-input" id="g2-type">
+                    <option value="classic">Classique</option>
+                    <option value="b2b">B2B</option>
+                  </select>
+                </div>
+              </div>
+              <button class="gen-btn" id="gen-btn2" onclick="fetchAccess2()">Récupérer les accès</button>
+            </div>
+            <div class="cred-result" id="cred-result2">
+              <div class="cred-result-title">✅ Accès disponibles — à copier et envoyer au client</div>
+              <div class="cred-item">
+                <span class="cred-key">Identifiant</span>
+                <div class="cred-val-wrap">
+                  <span class="cred-val" id="r2-id">—</span>
+                  <button class="copy-btn" onclick="copyVal('r2-id',this)">Copier</button>
+                </div>
+              </div>
+              <div class="cred-item">
+                <span class="cred-key">Mot de passe</span>
+                <div class="cred-val-wrap">
+                  <span class="cred-val" id="r2-pwd">—</span>
+                  <button class="copy-btn" onclick="copyVal('r2-pwd',this)">Copier</button>
+                </div>
+              </div>
+              <div class="cred-item">
+                <span class="cred-key">Email client</span>
+                <div class="cred-val-wrap">
+                  <span class="cred-val" id="r2-email" style="font-size:12px">—</span>
+                  <button class="copy-btn" onclick="copyVal('r2-email',this)">Copier</button>
+                </div>
+              </div>
+              <div class="cred-item">
+                <span class="cred-key">Client</span>
+                <div class="cred-val-wrap">
+                  <span class="cred-val" id="r2-name" style="font-size:12px">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : PAIEMENTS ════ -->
+        <div class="page" id="page-paiements">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Historique des paiements</span>
+              <button class="act-btn btn-view" onclick="loadPayments()">↻ Actualiser</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th>
+                </tr></thead>
+                <tbody id="payments-body">
+                  <tr class="empty-row"><td colspan="5">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : ABONNEMENTS ════ -->
+        <div class="page" id="page-abonnements">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Abonnements actifs</span>
+              <button class="act-btn btn-view" onclick="loadSubs()">↻ Actualiser</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>ID LeadWase</th><th>Plan</th><th>Statut</th><th>Début</th><th>Expiration</th>
+                </tr></thead>
+                <tbody id="subs-body">
+                  <tr class="empty-row"><td colspan="5">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : PARAMÈTRES ════ -->
+        <div class="page" id="page-parametres">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Paramètres</span></div>
+            <div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div>
+          </div>
+        </div>
+
+        <!-- ════ PAGE : NOTIFICATIONS ════ -->
+        <div class="page" id="page-notifications">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Notifications</span></div>
+            <div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main-wrap -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- Modal détail commande -->
+<div class="modal-overlay" id="detail-modal">
   <div class="modal">
-    <div class="modal-title">✅ Identifiants générés</div>
-    <div class="modal-sub">Envoyés automatiquement au client par email.</div>
-    <div class="cred-box">
-      <div class="cred-row"><span class="cred-key">Identifiant</span><span class="cred-val" id="m-id">—</span></div>
-      <div class="cred-row"><span class="cred-key">Mot de passe</span><span class="cred-val" id="m-pwd">—</span></div>
-      <div class="cred-row"><span class="cred-key">Email client</span><span class="cred-val" id="m-email" style="font-size:12px">—</span></div>
-    </div>
-    <div class="modal-note">⚠️ Notez ces informations — le mot de passe ne sera plus affiché après fermeture.</div>
-    <button class="modal-close" onclick="closeModal()">Fermer</button>
+    <div class="modal-title" id="modal-title">Détail commande</div>
+    <div id="modal-body"></div>
+    <button class="modal-close-btn" onclick="closeModal()">Fermer</button>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, getIdToken }
-                              from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+                            from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
-// ── Init Firebase via /api/config (même pattern que firebase-config.js) ──
-const config = await fetch('/api/config').then(r => r.json());
-const app    = initializeApp(config);
-const auth   = getAuth(app);
+// ── Firebase init via /api/config ────────────────────────────────
+const cfg  = await fetch('/api/config').then(r => r.json());
+const app  = initializeApp(cfg);
+const auth = getAuth(app);
+let TOKEN  = null;
 
-let TOKEN = null; // token admin conservé en mémoire pour les appels API
+// ── Date topbar ──────────────────────────────────────────────────
+document.getElementById('topbar-date').textContent =
+  new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-// ── Auth state ───────────────────────────────────────────────────
+// ── Auth ─────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (user) {
     TOKEN = await getIdToken(user);
-    showDashboard(user);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('sb-user-email').textContent = user.email;
+    initDashboard();
   } else {
     TOKEN = null;
     document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('dashboard').style.display    = 'none';
+    document.getElementById('app').style.display = 'none';
   }
 });
 
-// ── Login ────────────────────────────────────────────────────────
 window.doLogin = async () => {
   const btn = document.getElementById('login-btn');
-  const err = document.getElementById('login-error');
+  const err = document.getElementById('login-err');
   err.textContent = '';
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
-    const email = document.getElementById('l-email').value.trim();
-    const pwd   = document.getElementById('l-pwd').value;
-    await signInWithEmailAndPassword(auth, email, pwd);
-  } catch(e) {
+    await signInWithEmailAndPassword(auth,
+      document.getElementById('l-email').value.trim(),
+      document.getElementById('l-pwd').value);
+  } catch {
     err.textContent = 'Email ou mot de passe incorrect.';
     btn.disabled = false; btn.textContent = 'Accéder au dashboard';
   }
 };
 document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+window.doLogout = () => signOut(auth);
 
-// ── Logout ───────────────────────────────────────────────────────
-window.doLogout = async () => { await signOut(auth); };
-
-// ── Show dashboard ───────────────────────────────────────────────
-function showDashboard(user) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display    = 'block';
-  document.getElementById('admin-email').textContent    = user.email;
-  loadStats();
-  loadOrders();
-}
-
-// ── Helper : appel API admin avec token ──────────────────────────
-async function adminFetch(url, options = {}) {
-  // Rafraîchir le token si nécessaire
+// ── API helper ───────────────────────────────────────────────────
+async function api(url, opts = {}) {
   TOKEN = await getIdToken(auth.currentUser);
-  return fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + TOKEN,
-      ...(options.headers || {}),
-    },
+  const r = await fetch(url, {
+    ...opts,
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN, ...(opts.headers||{}) },
   });
+  return r.json();
 }
 
-// ── Tabs ─────────────────────────────────────────────────────────
-window.showTab = (tab) => {
-  document.getElementById('tab-orders').style.display   = tab==='orders'   ? 'block' : 'none';
-  document.getElementById('tab-payments').style.display = tab==='payments' ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach((t,i) =>
-    t.classList.toggle('active',(i===0&&tab==='orders')||(i===1&&tab==='payments'))
-  );
-  if (tab === 'payments') loadPayments();
+// ── Navigation ───────────────────────────────────────────────────
+const titles = {
+  dashboard:'Tableau de bord',commandes:'Commandes',utilisateurs:'Utilisateurs',
+  generer:'Générer accès',paiements:'Paiements',abonnements:'Abonnements',
+  parametres:'Paramètres',notifications:'Notifications',
+};
+window.nav = (page) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  document.getElementById('page-title').textContent = titles[page]||page;
+  closeSidebar();
+  if (page==='commandes')   loadAllOrders();
+  if (page==='utilisateurs') loadProfiles();
+  if (page==='paiements')   loadPayments();
+  if (page==='abonnements') loadSubs();
+};
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('open');
+};
+window.closeSidebar = () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
 };
 
 // ── Helpers ──────────────────────────────────────────────────────
 function fmtDate(v) {
   if (!v) return '—';
   const d = v._seconds ? new Date(v._seconds*1000) : new Date(v);
-  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-}
-function badge(s) {
-  const map = {pending:'badge-pending',paid:'badge-paid',delivered:'badge-delivered',
-    failed:'badge-failed',success:'badge-success',payment_failed:'badge-failed',gateway_error:'badge-failed',active:'badge-delivered'};
-  return `<span class="badge ${map[s]||'badge-pending'}">${s||'—'}</span>`;
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 function fmtNum(n) { return (n||0).toLocaleString('fr-FR'); }
-
-// ── Charger stats via /api/admin/stats ───────────────────────────
-async function loadStats() {
-  try {
-    const r = await adminFetch('/api/admin/stats');
-    const d = await r.json();
-    if (!d.success) return;
-    const s = d.stats;
-    document.getElementById('s-total').textContent   = s.totalOrders   || 0;
-    document.getElementById('s-pending').textContent = s.pendingOrders  || 0;
-    document.getElementById('s-revenue').textContent = fmtNum(s.totalRevenue);
-    document.getElementById('s-subs').textContent    = s.activeSubscriptions || 0;
-  } catch(e) { console.error('stats error', e); }
+function badge(s) {
+  const map = {
+    pending:'b-pending',paid:'b-paid',delivered:'b-delivered',
+    failed:'b-failed',success:'b-success',payment_failed:'b-failed',
+    gateway_error:'b-failed',active:'b-paid',free:'b-pending',
+  };
+  const labels = {
+    pending:'EN ATTENTE',paid:'PAYÉ',delivered:'LIVRÉ',failed:'ÉCHOUÉ',
+    success:'SUCCÈS',payment_failed:'ÉCHOUÉ',gateway_error:'ERREUR',
+    active:'ACTIF',free:'FREE',
+  };
+  return `<span class="badge ${map[s]||'b-pending'}">${labels[s]||s||'—'}</span>`;
 }
 
-// ── Charger commandes via /api/admin/orders ──────────────────────
-window.loadOrders = async () => {
-  const tbody = document.getElementById('orders-body');
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
+// ── Init dashboard ───────────────────────────────────────────────
+async function initDashboard() {
+  loadStats();
+  loadDashOrders();
+}
+
+// ── Stats ────────────────────────────────────────────────────────
+async function loadStats() {
   try {
-    const r    = await adminFetch('/api/admin/orders');
-    const data = await r.json();
-    if (!data.success) throw new Error(data.error);
-    const orders = data.orders;
+    const d = await api('/api/admin/stats');
+    if (!d.success) return;
+    const s = d.stats;
+    document.getElementById('d-total').textContent    = s.totalOrders || 0;
+    document.getElementById('d-revenue').textContent  = fmtNum(s.totalRevenue);
+    document.getElementById('d-subs').textContent     = s.activeSubscriptions || 0;
+    document.getElementById('d-pending').textContent  = s.pendingOrders || 0;
+    document.getElementById('d-pending-sub').textContent = s.pendingOrders > 0 ? 'À traiter aujourd\'hui' : '';
+    document.getElementById('sb-pending-count').textContent = s.pendingOrders || 0;
+    // abonnements sidebar
+    document.getElementById('sub-free').textContent     = s.freeProfiles  || '—';
+    document.getElementById('sub-pro').textContent      = s.proPlan       || '—';
+    document.getElementById('sub-business').textContent = s.businessPlan  || '—';
+  } catch(e) { console.error(e); }
+}
 
-    if (!orders.length) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Aucune commande</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = orders.map(o => `
-      <tr>
-        <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
-        <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
-        <td style="color:var(--gray4)">${o.email||'—'}</td>
-        <td style="color:var(--gray4)">${o.phone||'—'}</td>
-        <td style="color:var(--gray4);font-size:11px;text-transform:uppercase">${o.cardType||'—'}</td>
-        <td>${badge(o.status)}</td>
-        <td style="font-family:'Space Mono',monospace;color:var(--green);font-size:12px">${o.leadwaseId||'—'}</td>
-        <td>${
-          o.leadwaseId
-            ? `<button class="action-btn btn-done" disabled>✓ Livré</button>`
-            : o.status === 'paid'
-              ? `<button class="action-btn btn-generate" onclick="generateCreds('${o.id}','${o.email||''}')">Générer</button>`
-              : `<span style="font-size:11px;color:var(--gray4)">—</span>`
-        }</td>
-      </tr>
-    `).join('');
+// ── Commandes dashboard (5 dernières) ────────────────────────────
+async function loadDashOrders() {
+  const tbody = document.getElementById('dash-orders-body');
+  try {
+    const d = await api('/api/admin/orders');
+    if (!d.success) throw new Error(d.error);
+    const orders = d.orders.slice(0, 5);
+    if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune commande</td></tr>'; return; }
+    tbody.innerHTML = orders.map((o,i) => orderRow(o, i, 7)).join('');
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#f87171">Erreur : ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
+  }
+}
+
+// ── Toutes les commandes ─────────────────────────────────────────
+window.loadAllOrders = async () => {
+  const tbody = document.getElementById('all-orders-body');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Chargement...</td></tr>';
+  try {
+    const d = await api('/api/admin/orders');
+    if (!d.success) throw new Error(d.error);
+    if (!d.orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucune commande</td></tr>'; return; }
+    tbody.innerHTML = d.orders.map((o,i) => orderRow(o, i, 8, true)).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
 
-// ── Charger paiements ────────────────────────────────────────────
+function orderRow(o, i, cols, showId = false) {
+  const shortId = o.id ? '#CMD-' + o.id.slice(-4).toUpperCase() : '—';
+  const action = o.leadwaseId
+    ? (showId ? `<button class="act-btn btn-view" onclick="showDetail('${o.id}')">Voir profil</button>` : `<button class="act-btn btn-done" disabled>✓ Livré</button>`)
+    : o.status === 'paid'
+      ? `<button class="act-btn btn-gen" onclick="prefillOrder('${o.id}')">Générer accès</button>`
+      : `<span style="color:var(--gray4);font-size:11px">—</span>`;
+  const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:11px">${o.leadwaseId||'—'}</td>` : '';
+  return `<tr>
+    <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">${shortId}</td>
+    <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
+    <td>${o.cardType==='b2b'?'B2B':'Classique'}</td>
+    <td style="font-weight:600;color:var(--green)">${o.amount ? fmtNum(o.amount)+' FCFA' : 'Sur devis'}</td>
+    <td style="color:var(--gray4)">${fmtDate(o.createdAt)}</td>
+    <td>${badge(o.status)}</td>
+    ${idCell}
+    <td>${action}</td>
+  </tr>`;
+}
+
+// ── Profils utilisateurs ─────────────────────────────────────────
+window.loadProfiles = async () => {
+  const tbody = document.getElementById('profiles-body');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Chargement...</td></tr>';
+  try {
+    const d = await api('/api/admin/orders');
+    if (!d.success) throw new Error(d.error);
+    const delivered = d.orders.filter(o => o.leadwaseId);
+    if (!delivered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun profil créé</td></tr>'; return; }
+    tbody.innerHTML = delivered.map(o => `<tr>
+      <td style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700">${o.leadwaseId}</td>
+      <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
+      <td style="color:var(--gray4)">${o.email||'—'}</td>
+      <td style="color:var(--gray4)">${o.phone||'—'}</td>
+      <td>${badge('free')}</td>
+      <td style="color:var(--gray4)">${fmtDate(o.paidAt||o.createdAt)}</td>
+    </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
+  }
+};
+
+// ── Paiements ────────────────────────────────────────────────────
 window.loadPayments = async () => {
   const tbody = document.getElementById('payments-body');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Chargement...</td></tr>';
   try {
-    // Réutilise la route orders et lit les payments depuis Firestore côté API
-    // On appelle directement stats pour les paiements (ou on peut créer /api/admin/payments)
-    // Pour l'instant on affiche un message d'attente
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Consultez Firestore pour le détail des paiements.</td></tr>';
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#f87171">Erreur : ${e.message}</td></tr>`;
-  }
+    const d = await api('/api/admin/orders');
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → payments pour le détail complet.</td></tr>';
+  } catch(e) {}
 };
 
-// ── Générer identifiants via /api/admin/deliver ──────────────────
-window.generateCreds = async (orderId, email) => {
-  const btn = document.querySelector(`button[onclick="generateCreds('${orderId}','${email}')"]`);
-  if (btn) { btn.disabled = true; btn.textContent = 'En cours...'; }
-  try {
-    const r = await adminFetch('/api/admin/deliver', {
-      method: 'POST',
-      body: JSON.stringify({ orderId }),
-    });
-    const d = await r.json();
-    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
-
-    document.getElementById('m-id').textContent    = d.leadwaseId;
-    document.getElementById('m-pwd').textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : d.password;
-    document.getElementById('m-email').textContent = email || '—';
-    document.getElementById('cred-modal').classList.add('open');
-    loadOrders();
-    loadStats();
-  } catch(e) {
-    alert('Erreur : ' + e.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'Générer'; }
-  }
+// ── Abonnements ──────────────────────────────────────────────────
+window.loadSubs = async () => {
+  const tbody = document.getElementById('subs-body');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Chargement...</td></tr>';
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → subscriptions pour le détail.</td></tr>';
 };
 
-// ── Fermer modal ─────────────────────────────────────────────────
-window.closeModal = () => document.getElementById('cred-modal').classList.remove('open');
-document.getElementById('cred-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+// ── Générer / récupérer accès (dashboard) ────────────────────────
+window.fetchAccess = async () => {
+  const orderId = document.getElementById('g-orderid').value.trim();
+  if (!orderId) { alert('Entrez un ID de commande'); return; }
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.textContent = 'Récupération...';
+  try {
+    const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
+    if (!d.success) throw new Error(d.error || 'Erreur');
+    showCreds('cred-result','r-id','r-pwd','r-email', d, '');
+  } catch(e) { alert('Erreur : ' + e.message); }
+  btn.disabled = false; btn.textContent = 'Générer les accès';
+};
+
+// ── Générer / récupérer accès (page dédiée) ──────────────────────
+window.fetchAccess2 = async () => {
+  const orderId = document.getElementById('g2-orderid').value.trim();
+  if (!orderId) { alert('Entrez un ID de commande'); return; }
+  const btn = document.getElementById('gen-btn2');
+  btn.disabled = true; btn.textContent = 'Récupération...';
+  try {
+    const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
+    if (!d.success) throw new Error(d.error || 'Erreur');
+    showCreds('cred-result2','r2-id','r2-pwd','r2-email', d, 'r2-name');
+  } catch(e) { alert('Erreur : ' + e.message); }
+  btn.disabled = false; btn.textContent = 'Récupérer les accès';
+};
+
+function showCreds(resultId, idEl, pwdEl, emailEl, d, nameEl) {
+  document.getElementById(idEl).textContent    = d.leadwaseId || '—';
+  document.getElementById(pwdEl).textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : (d.password || '—');
+  document.getElementById(emailEl).textContent = d.email || '—';
+  if (nameEl && document.getElementById(nameEl)) document.getElementById(nameEl).textContent = d.clientName || '—';
+  document.getElementById(resultId).classList.add('show');
+}
+
+// Pré-remplir depuis le bouton "Générer accès" du tableau
+window.prefillOrder = (orderId) => {
+  nav('generer');
+  document.getElementById('g2-orderid').value = orderId;
+};
+
+// ── Copier valeur ────────────────────────────────────────────────
+window.copyVal = (elId, btn) => {
+  const val = document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(val).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+};
+
+// ── Modal détail ─────────────────────────────────────────────────
+window.showDetail = async (orderId) => {
+  try {
+    const d = await api('/api/admin/orders');
+    const o = d.orders?.find(x => x.id === orderId);
+    if (!o) return;
+    document.getElementById('modal-title').textContent = 'Commande #CMD-' + orderId.slice(-4).toUpperCase();
+    document.getElementById('modal-body').innerHTML = [
+      ['Client', `${o.firstName||''} ${o.lastName||''}`],
+      ['Email', o.email||'—'], ['Téléphone', o.phone||'—'],
+      ['Entreprise', o.company||'—'], ['Poste', o.jobTitle||'—'],
+      ['Type', o.cardType||'—'], ['Montant', o.amount ? fmtNum(o.amount)+' FCFA' : '—'],
+      ['Statut', o.status||'—'], ['ID LeadWase', o.leadwaseId||'—'],
+      ['Date', fmtDate(o.createdAt)], ['Adresse', o.address||'—'],
+    ].map(([k,v]) => `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`).join('');
+    document.getElementById('detail-modal').classList.add('open');
+  } catch(e) { alert(e.message); }
+};
+window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
+document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 </script>
 </body>
 </html>
