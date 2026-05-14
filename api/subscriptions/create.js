@@ -45,9 +45,32 @@ export default async function handler(req, res) {
         metadata: { transactionId: payRef.id, subscriptionId: subRef.id, plan, uid: user.uid, origin: SITE, sendWebhook: true },
       }),
     });
-    const gData = await gRes.json();
+
+    // Log du statut HTTP brut pour détecter les erreurs 4xx/5xx de la gateway
+    console.log('[gateway http status]', gRes.status);
+
+    // Lire le body en texte brut d'abord — même en cas d'erreur HTTP
+    const gRaw = await gRes.text();
+    console.log('[gateway response raw]', gRaw);
+
+    // Parser en JSON, avec fallback si le body n'est pas du JSON valide
+    let gData;
+    try { gData = JSON.parse(gRaw); }
+    catch { gData = { raw: gRaw }; }
+
+    // Vérifier que la gateway a bien renvoyé pid et url avant tout update()
+    // Firestore interdit les valeurs undefined dans update() — erreur si pid/url absent
+    if (!gRes.ok || !gData.pid || !gData.url) {
+      await subRef.update({ status: 'gateway_error', gatewayResponse: gRaw.slice(0, 500) });
+      return res.status(502).json({
+        error: `Gateway ${gRes.status} — ${gData.message || gData.error || 'réponse invalide'}`,
+        detail: gData,
+      });
+    }
+
     await payRef.update({ pid: gData.pid });
     await subRef.update({ paymentId: payRef.id, pid: gData.pid });
     res.json({ success: true, payUrl: gData.url });
+
   } catch (e) { res.status(500).json({ error: e.message }); }
 }
