@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Analytics — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.analytics-wrap{padding:28px;max-width:960px}
+.an-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.an-h1{font-size:22px;font-weight:bold;color:var(--black)}
+.an-period{display:flex;gap:8px}
+.period-btn{padding:6px 14px;font-size:11px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--gray5);background:var(--white);color:var(--gray3);cursor:pointer;border-radius:2px;transition:all .15s}
+.period-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+
+/* Stats cards */
+.an-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.an-card{background:var(--white);border:1px solid var(--gray5);padding:20px 22px}
+.an-card-val{font-size:32px;font-weight:bold;color:var(--black);font-family:'Courier New',monospace;margin-bottom:4px}
+.an-card-label{font-size:10px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4)}
+.an-card-sub{font-size:11px;color:var(--green);margin-top:4px}
+
+/* Chart section */
+.chart-box{background:var(--white);border:1px solid var(--gray5);padding:24px;margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:bold;color:var(--black);margin-bottom:18px}
+.chart-area{height:180px;display:flex;align-items:flex-end;gap:6px;padding-bottom:24px;position:relative;border-bottom:1px solid var(--gray5)}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bar{width:100%;background:var(--green);border-radius:2px 2px 0 0;transition:height .4s;min-height:2px;cursor:pointer;position:relative}
+.bar:hover{background:var(--green2)}
+.bar-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);font-size:10px;padding:4px 8px;border-radius:2px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.bar:hover .bar-tooltip{opacity:1}
+.bar-label{font-size:9px;color:var(--gray4);margin-top:6px;text-align:center}
+.chart-labels{display:flex;gap:6px}
+.chart-labels span{flex:1;font-size:9px;color:var(--gray4);text-align:center}
+
+/* Sources & recent */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.section-box{background:var(--white);border:1px solid var(--gray5);padding:22px}
+.section-title{font-size:13px;font-weight:bold;color:var(--black);margin-bottom:16px}
+.source-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dotted var(--gray5);font-size:12px}
+.source-row:last-child{border-bottom:none}
+.source-name{color:var(--gray2);font-weight:500}
+.source-bar-wrap{flex:1;margin:0 12px;height:6px;background:var(--gray5);border-radius:3px;overflow:hidden}
+.source-bar-fill{height:100%;background:var(--green);border-radius:3px}
+.source-count{color:var(--black);font-weight:bold;font-size:13px}
+
+/* Visites récentes */
+.visit-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px dotted var(--gray5);font-size:12px}
+.visit-row:last-child{border-bottom:none}
+.visit-date{color:var(--gray4);font-size:11px}
+.visit-src{color:var(--green);font-size:11px;font-weight:bold}
+
+/* Accès bloqué */
+#access-denied{position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:32px;text-align:center}
+#access-denied h2{font-size:22px;font-weight:bold;color:var(--black)}
+#access-denied p{font-size:14px;color:var(--gray3);max-width:400px;line-height:1.7}
+#access-denied a{padding:12px 28px;background:var(--green);color:var(--white);text-decoration:none;font-weight:bold;font-size:13px;letter-spacing:1px;text-transform:uppercase;border-radius:2px}
+
+@media(max-width:900px){
+  .analytics-wrap{padding:14px}
+  .an-stats{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .an-stats{grid-template-columns:1fr}
+  .an-period{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- Accès refusé -->
+<div id="access-denied">
+  <div style="font-size:48px">📊</div>
+  <h2>Analytics réservé aux abonnés Pro & Business</h2>
+  <p>Passez à un plan supérieur pour accéder aux statistiques de visites de votre profil.</p>
+  <a href="offres.html">Voir les offres</a>
+</div>
+
+<div class="app-layout" id="app-layout" style="display:none">
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-av">?</div>
+      <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">PRO</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item active" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>
+      <a class="sidebar-item" href="offres.html"><span class="s-icon">⭐</span>Offres</a>
+      <a class="sidebar-item" href="#" id="sb-pub"><span class="s-icon">🔗</span>Profil public</a>
+      <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
+      <a class="sidebar-item" href="commander.html"><span class="s-icon">🛒</span>Commander une carte</a>
+      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+
+  <main class="app-content">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div style="text-align:center">
+        <div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div>
+        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+      </div>
+    </div>
+
+    <div class="analytics-wrap" id="content" style="display:none">
+      <div class="an-header">
+        <div class="an-h1">📊 Analytics</div>
+        <div class="an-period">
+          <button class="period-btn active" onclick="setPeriod(7,this)">7 jours</button>
+          <button class="period-btn" onclick="setPeriod(30,this)">30 jours</button>
+          <button class="period-btn" onclick="setPeriod(90,this)">90 jours</button>
+        </div>
+      </div>
+
+      <!-- Stats cards -->
+      <div class="an-stats">
+        <div class="an-card">
+          <div class="an-card-val" id="stat-total">—</div>
+          <div class="an-card-label">Visites totales</div>
+          <div class="an-card-sub" id="stat-total-sub"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-val" id="stat-unique">—</div>
+          <div class="an-card-label">Visiteurs uniques</div>
+          <div class="an-card-sub" id="stat-unique-sub"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-val" id="stat-contacts">—</div>
+          <div class="an-card-label">Clics contact</div>
+          <div class="an-card-sub" id="stat-contacts-sub"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-val" id="stat-shares">—</div>
+          <div class="an-card-label">Partages profil</div>
+          <div class="an-card-sub" id="stat-shares-sub"></div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-box">
+        <div class="chart-title">Visites par jour</div>
+        <div class="chart-area" id="chart-area"></div>
+        <div class="chart-labels" id="chart-labels"></div>
+      </div>
+
+      <!-- Sources & visites récentes -->
+      <div class="two-col">
+        <div class="section-box">
+          <div class="section-title">Sources de trafic</div>
+          <div id="sources-list">
+            <div style="color:var(--gray4);font-style:italic;font-size:12px">Chargement...</div>
+          </div>
+        </div>
+        <div class="section-box">
+          <div class="section-title">Visites récentes</div>
+          <div id="visits-list">
+            <div style="color:var(--gray4);font-style:italic;font-size:12px">Chargement...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp }
+  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+let lwId = null;
+let currentPeriod = 7;
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = '/connexion.html'; return; }
+
+  const uDoc = await getDoc(doc(db, 'users', user.uid));
+  if (!uDoc.exists()) { window.location.href = '/connexion.html'; return; }
+
+  const ud   = uDoc.data();
+  const plan = ud.plan || 'free';
+
+  // ── Bloquer si pas Pro/Business ──────────────────────────────────
+  if (!['pro','business'].includes(plan)) {
+    document.getElementById('access-denied').style.display = 'flex';
+    return;
+  }
+
+  lwId = ud.leadwaseId;
+  if (!lwId) { window.location.href = '/dashboard.html'; return; }
+
+  const pDoc = await getDoc(doc(db, 'profiles', lwId));
+  if (!pDoc.exists()) { window.location.href = '/dashboard.html'; return; }
+  const p = pDoc.data();
+
+  // Sidebar
+  document.getElementById('sb-av').textContent   = (p.firstName||'?')[0];
+  document.getElementById('sb-name').textContent = (p.firstName||'') + ' ' + (p.lastName||'');
+  document.getElementById('sb-plan').textContent = plan.toUpperCase();
+  document.getElementById('sb-pub').href         = 'profil.html?id=' + lwId;
+
+  document.getElementById('app-layout').style.display = '';
+  document.getElementById('loader').style.display     = 'none';
+  document.getElementById('content').style.display    = 'block';
+
+  loadAnalytics(7);
+});
+
+// ── Changer période ──────────────────────────────────────────────
+window.setPeriod = (days, btn) => {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPeriod = days;
+  loadAnalytics(days);
+};
+
+// ── Charger analytics depuis Firestore ───────────────────────────
+async function loadAnalytics(days) {
+  if (!lwId) return;
+
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const sinceTs = Timestamp.fromDate(since);
+
+  try {
+    // Requête sur la collection analytics/{lwId}/visits
+    const visitsRef  = collection(db, 'analytics', lwId, 'visits');
+    const visitsQ    = query(visitsRef, where('visitedAt', '>=', sinceTs), orderBy('visitedAt', 'desc'), limit(200));
+    const visitsSnap = await getDocs(visitsQ);
+    const visits     = visitsSnap.docs.map(d => d.data());
+
+    // Totaux
+    const total   = visits.length;
+    const unique  = new Set(visits.map(v => v.ip || v.visitorId || Math.random())).size;
+    const contacts = visits.filter(v => v.type === 'contact_click').length;
+    const shares   = visits.filter(v => v.type === 'share').length;
+
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-unique').textContent   = unique;
+    document.getElementById('stat-contacts').textContent = contacts;
+    document.getElementById('stat-shares').textContent   = shares;
+
+    document.getElementById('stat-total-sub').textContent    = total > 0   ? `sur ${days} jours` : 'aucune visite';
+    document.getElementById('stat-unique-sub').textContent   = unique > 0  ? 'visiteurs distincts' : '';
+    document.getElementById('stat-contacts-sub').textContent = contacts > 0 ? 'clics sur contact' : '';
+    document.getElementById('stat-shares-sub').textContent   = shares > 0  ? 'partages' : '';
+
+    buildChart(visits, days);
+    buildSources(visits);
+    buildRecentVisits(visits.slice(0, 10));
+
+  } catch(e) {
+    console.error('analytics error', e);
+    // Afficher état vide proprement
+    ['stat-total','stat-unique','stat-contacts','stat-shares'].forEach(id =>
+      document.getElementById(id).textContent = '0');
+    buildChart([], days);
+    buildSources([]);
+    buildRecentVisits([]);
+  }
+}
+
+// ── Graphe en barres ─────────────────────────────────────────────
+function buildChart(visits, days) {
+  const area   = document.getElementById('chart-area');
+  const labels = document.getElementById('chart-labels');
+  area.innerHTML = ''; labels.innerHTML = '';
+
+  // Grouper par jour
+  const map = {};
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    map[key] = 0;
+  }
+  visits.forEach(v => {
+    const d = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
+    const key = d.toISOString().slice(0,10);
+    if (map[key] !== undefined) map[key]++;
+  });
+
+  const vals  = Object.values(map);
+  const keys  = Object.keys(map);
+  const maxV  = Math.max(...vals, 1);
+  const shown = days <= 14 ? keys : keys.filter((_,i) => i % Math.ceil(days/14) === 0);
+
+  keys.forEach((key, i) => {
+    const pct  = (map[key] / maxV) * 100;
+    const date = new Date(key);
+    const lbl  = date.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    wrap.innerHTML = `
+      <div class="bar" style="height:${Math.max(pct,1)}%">
+        <span class="bar-tooltip">${map[key]} visite${map[key]>1?'s':''} — ${lbl}</span>
+      </div>
+      <span class="bar-label">${shown.includes(key) ? lbl : ''}</span>`;
+    area.appendChild(wrap);
+  });
+}
+
+// ── Sources ──────────────────────────────────────────────────────
+function buildSources(visits) {
+  const map = {};
+  visits.forEach(v => {
+    const src = v.source || 'Direct';
+    map[src] = (map[src]||0) + 1;
+  });
+  const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const max    = sorted[0]?.[1] || 1;
+  const el     = document.getElementById('sources-list');
+  if (!sorted.length) { el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune donnée</div>'; return; }
+  el.innerHTML = sorted.map(([name,count]) => `
+    <div class="source-row">
+      <span class="source-name">${name}</span>
+      <div class="source-bar-wrap"><div class="source-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></div></div>
+      <span class="source-count">${count}</span>
+    </div>`).join('');
+}
+
+// ── Visites récentes ─────────────────────────────────────────────
+function buildRecentVisits(visits) {
+  const el = document.getElementById('visits-list');
+  if (!visits.length) { el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune visite</div>'; return; }
+  el.innerHTML = visits.map(v => {
+    const d   = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
+    const lbl = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="visit-row">
+      <span>${v.country||'Inconnu'} — ${v.device||'Web'}</span>
+      <span class="visit-src">${v.source||'Direct'}</span>
+      <span class="visit-date">${lbl}</span>
+    </div>`;
+  }).join('');
+}
+
+window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
+</script>
+</body>
+</html>
