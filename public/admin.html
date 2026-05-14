@@ -22,51 +22,28 @@ body{font-family:'Syne',sans-serif;background:var(--black);color:var(--white);mi
   background-image:radial-gradient(ellipse at 20% 50%,rgba(22,163,74,.15) 0%,transparent 60%),
                    radial-gradient(ellipse at 80% 20%,rgba(22,163,74,.08) 0%,transparent 50%);
 }
-.login-box{
-  width:100%;max-width:400px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.1);
-  padding:48px 40px;
-}
+.login-box{width:100%;max-width:400px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:48px 40px}
 .login-logo{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
 .login-logo em{color:var(--green);font-style:normal}
 .login-sub{font-size:12px;color:var(--gray4);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
 .login-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);display:block;margin-bottom:8px}
-.login-input{
-  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  color:var(--white);font-family:'Syne',sans-serif;font-size:14px;
-  padding:14px 16px;outline:none;transition:border .2s;margin-bottom:16px;
-}
+.login-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);font-family:'Syne',sans-serif;font-size:14px;padding:14px 16px;outline:none;transition:border .2s;margin-bottom:16px}
 .login-input:focus{border-color:var(--green)}
 .login-input::placeholder{color:var(--gray3)}
-.login-btn{
-  width:100%;padding:16px;background:var(--green);color:var(--white);
-  border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;
-  margin-top:8px;
-}
+.login-btn{width:100%;padding:16px;background:var(--green);color:var(--white);border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:8px}
 .login-btn:hover{background:var(--green2)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
 .login-error{font-size:12px;color:#f87171;margin-top:12px;text-align:center;min-height:18px}
 
 /* ── DASHBOARD ─────────────────────────────────────────────────── */
 #dashboard{display:none}
-.topbar{
-  background:rgba(10,10,10,.95);border-bottom:1px solid rgba(255,255,255,.08);
-  padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);
-}
+.topbar{background:rgba(10,10,10,.95);border-bottom:1px solid rgba(255,255,255,.08);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
 .topbar-logo{font-size:18px;font-weight:800;letter-spacing:-0.5px}
 .topbar-logo em{color:var(--green);font-style:normal}
 .topbar-right{display:flex;align-items:center;gap:16px}
 .topbar-admin{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
-.logout-btn{
-  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  background:none;border:1px solid rgba(255,255,255,.15);color:var(--gray4);
-  padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;
-}
+.logout-btn{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,.15);color:var(--gray4);padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
 .logout-btn:hover{border-color:var(--red);color:var(--red)}
-
 .main{padding:32px;max-width:1200px;margin:0 auto}
 
 /* Stats */
@@ -76,11 +53,8 @@ body{font-family:'Syne',sans-serif;background:var(--black);color:var(--white);mi
 .stat-label{font-size:11px;color:var(--gray4);letter-spacing:1.5px;text-transform:uppercase}
 
 /* Tabs */
-.tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
-.tab{
-  padding:12px 24px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  color:var(--gray4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
-}
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
+.tab{padding:12px 24px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
 .tab.active{color:var(--green);border-bottom-color:var(--green)}
 .tab:hover{color:var(--white)}
 
@@ -88,80 +62,42 @@ body{font-family:'Syne',sans-serif;background:var(--black);color:var(--white);mi
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{border-bottom:1px solid rgba(255,255,255,.1)}
-thead th{
-  padding:12px 16px;text-align:left;font-size:10px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);
-}
+thead th{padding:12px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4)}
 tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
 tbody tr:hover{background:rgba(255,255,255,.03)}
 tbody td{padding:14px 16px;color:var(--gray5)}
-.badge{
-  display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;
-  letter-spacing:.5px;text-transform:uppercase;
-}
-.badge-pending {background:rgba(245,158,11,.15);color:var(--orange)}
-.badge-paid    {background:rgba(22,163,74,.15);color:#4ade80}
+.badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.badge-pending{background:rgba(245,158,11,.15);color:var(--orange)}
+.badge-paid{background:rgba(22,163,74,.15);color:#4ade80}
 .badge-delivered{background:rgba(22,163,74,.25);color:#86efac}
-.badge-failed  {background:rgba(220,38,38,.15);color:#f87171}
-.badge-success {background:rgba(22,163,74,.15);color:#4ade80}
-
-.action-btn{
-  padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;
-  text-transform:uppercase;border:none;cursor:pointer;font-family:'Syne',sans-serif;
-  transition:all .2s;
-}
+.badge-failed{background:rgba(220,38,38,.15);color:#f87171}
+.badge-success{background:rgba(22,163,74,.15);color:#4ade80}
+.action-btn{padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
 .btn-generate{background:var(--green);color:var(--white)}
 .btn-generate:hover{background:var(--green2)}
 .btn-done{background:rgba(255,255,255,.08);color:var(--gray4);cursor:default}
 
 /* Modal */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
-  z-index:200;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(4px);
-}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
-.modal{
-  background:#111;border:1px solid rgba(255,255,255,.12);
-  padding:40px;width:100%;max-width:440px;
-}
+.modal{background:#111;border:1px solid rgba(255,255,255,.12);padding:40px;width:100%;max-width:440px}
 .modal-title{font-size:20px;font-weight:800;margin-bottom:8px}
 .modal-sub{font-size:13px;color:var(--gray4);margin-bottom:28px}
-.cred-box{
-  background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);
-  padding:20px;margin-bottom:24px;
-}
+.cred-box{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);padding:20px;margin-bottom:24px}
 .cred-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .cred-row:last-child{margin-bottom:0}
 .cred-key{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
 .cred-val{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700}
 .modal-note{font-size:12px;color:var(--gray4);margin-bottom:24px;line-height:1.6}
-.modal-close{
-  width:100%;padding:14px;background:rgba(255,255,255,.08);color:var(--white);
-  border:none;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;
-}
+.modal-close{width:100%;padding:14px;background:rgba(255,255,255,.08);color:var(--white);border:none;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .modal-close:hover{background:rgba(255,255,255,.12)}
 
-/* Empty / loading */
-.empty{text-align:center;padding:60px;color:var(--gray4);font-size:13px}
-.loading-row td{color:var(--gray4);font-style:italic}
-
-/* Refresh */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .section-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4)}
-.refresh-btn{
-  background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray4);
-  padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;
-}
+.refresh-btn{background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray4);padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s}
 .refresh-btn:hover{border-color:var(--green);color:var(--green)}
 
-@media(max-width:768px){
-  .stats{grid-template-columns:1fr 1fr}
-  .main{padding:16px}
-  .topbar{padding:0 16px}
-}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.main{padding:16px}.topbar{padding:0 16px}}
 </style>
 </head>
 <body>
@@ -191,15 +127,13 @@ tbody td{padding:14px 16px;color:var(--gray5)}
   </div>
 
   <div class="main">
-    <!-- Stats -->
     <div class="stats">
       <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-label">Commandes total</div></div>
-      <div class="stat"><div class="stat-val" id="s-paid">—</div><div class="stat-label">Payées</div></div>
       <div class="stat"><div class="stat-val" id="s-pending">—</div><div class="stat-label">En attente</div></div>
-      <div class="stat"><div class="stat-val" id="s-delivered">—</div><div class="stat-label">Livrées</div></div>
+      <div class="stat"><div class="stat-val" id="s-revenue">—</div><div class="stat-label">Revenus (FCFA)</div></div>
+      <div class="stat"><div class="stat-val" id="s-subs">—</div><div class="stat-label">Abonnements actifs</div></div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <div class="tab active" onclick="showTab('orders')">Commandes</div>
       <div class="tab" onclick="showTab('payments')">Paiements</div>
@@ -217,7 +151,9 @@ tbody td{padding:14px 16px;color:var(--gray5)}
             <th>Date</th><th>Client</th><th>Email</th><th>Téléphone</th>
             <th>Type</th><th>Statut</th><th>ID LeadWase</th><th>Action</th>
           </tr></thead>
-          <tbody id="orders-body"><tr class="loading-row"><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr></tbody>
+          <tbody id="orders-body">
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -233,7 +169,9 @@ tbody td{padding:14px 16px;color:var(--gray5)}
           <thead><tr>
             <th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th>
           </tr></thead>
-          <tbody id="payments-body"><tr class="loading-row"><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr></tbody>
+          <tbody id="payments-body">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -248,6 +186,7 @@ tbody td{padding:14px 16px;color:var(--gray5)}
     <div class="cred-box">
       <div class="cred-row"><span class="cred-key">Identifiant</span><span class="cred-val" id="m-id">—</span></div>
       <div class="cred-row"><span class="cred-key">Mot de passe</span><span class="cred-val" id="m-pwd">—</span></div>
+      <div class="cred-row"><span class="cred-key">Email client</span><span class="cred-val" id="m-email" style="font-size:12px">—</span></div>
     </div>
     <div class="modal-note">⚠️ Notez ces informations — le mot de passe ne sera plus affiché après fermeture.</div>
     <button class="modal-close" onclick="closeModal()">Fermer</button>
@@ -255,25 +194,24 @@ tbody td{padding:14px 16px;color:var(--gray5)}
 </div>
 
 <script type="module">
-import { initializeApp }               from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-                                       from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { getIdToken }                  from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { getFirestore, collection, getDocs, orderBy, query, limit }
-                                       from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, getIdToken }
+                              from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
-// ── Config Firebase (même que firebase-config.js) ────────────────
-// Même pattern que firebase-config.js — config chargée depuis /api/config
+// ── Init Firebase via /api/config (même pattern que firebase-config.js) ──
 const config = await fetch('/api/config').then(r => r.json());
 const app    = initializeApp(config);
 const auth   = getAuth(app);
-const db     = getFirestore(app);
+
+let TOKEN = null; // token admin conservé en mémoire pour les appels API
 
 // ── Auth state ───────────────────────────────────────────────────
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if (user) {
+    TOKEN = await getIdToken(user);
     showDashboard(user);
   } else {
+    TOKEN = null;
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('dashboard').style.display    = 'none';
   }
@@ -294,8 +232,6 @@ window.doLogin = async () => {
     btn.disabled = false; btn.textContent = 'Accéder au dashboard';
   }
 };
-
-// Connexion avec Entrée
 document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
 
 // ── Logout ───────────────────────────────────────────────────────
@@ -306,52 +242,77 @@ function showDashboard(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display    = 'block';
   document.getElementById('admin-email').textContent    = user.email;
+  loadStats();
   loadOrders();
-  loadPayments();
+}
+
+// ── Helper : appel API admin avec token ──────────────────────────
+async function adminFetch(url, options = {}) {
+  // Rafraîchir le token si nécessaire
+  TOKEN = await getIdToken(auth.currentUser);
+  return fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + TOKEN,
+      ...(options.headers || {}),
+    },
+  });
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────
 window.showTab = (tab) => {
   document.getElementById('tab-orders').style.display   = tab==='orders'   ? 'block' : 'none';
   document.getElementById('tab-payments').style.display = tab==='payments' ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='orders')||(i===1&&tab==='payments')));
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active',(i===0&&tab==='orders')||(i===1&&tab==='payments'))
+  );
+  if (tab === 'payments') loadPayments();
 };
 
-// ── Formater date ────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────
 function fmtDate(v) {
   if (!v) return '—';
-  const d = v.toDate ? v.toDate() : new Date(v);
+  const d = v._seconds ? new Date(v._seconds*1000) : new Date(v);
   return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
-
-// ── Badge statut ─────────────────────────────────────────────────
 function badge(s) {
-  const map = {
-    pending:'badge-pending',paid:'badge-paid',delivered:'badge-delivered',
-    failed:'badge-failed',success:'badge-success',payment_failed:'badge-failed',
-    gateway_error:'badge-failed',active:'badge-delivered',
-  };
+  const map = {pending:'badge-pending',paid:'badge-paid',delivered:'badge-delivered',
+    failed:'badge-failed',success:'badge-success',payment_failed:'badge-failed',gateway_error:'badge-failed',active:'badge-delivered'};
   return `<span class="badge ${map[s]||'badge-pending'}">${s||'—'}</span>`;
 }
+function fmtNum(n) { return (n||0).toLocaleString('fr-FR'); }
 
-// ── Charger commandes ────────────────────────────────────────────
+// ── Charger stats via /api/admin/stats ───────────────────────────
+async function loadStats() {
+  try {
+    const r = await adminFetch('/api/admin/stats');
+    const d = await r.json();
+    if (!d.success) return;
+    const s = d.stats;
+    document.getElementById('s-total').textContent   = s.totalOrders   || 0;
+    document.getElementById('s-pending').textContent = s.pendingOrders  || 0;
+    document.getElementById('s-revenue').textContent = fmtNum(s.totalRevenue);
+    document.getElementById('s-subs').textContent    = s.activeSubscriptions || 0;
+  } catch(e) { console.error('stats error', e); }
+}
+
+// ── Charger commandes via /api/admin/orders ──────────────────────
 window.loadOrders = async () => {
   const tbody = document.getElementById('orders-body');
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
   try {
-    const q    = query(collection(db,'orders'), orderBy('createdAt','desc'), limit(100));
-    const snap = await getDocs(q);
-    const docs = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const r    = await adminFetch('/api/admin/orders');
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error);
+    const orders = data.orders;
 
-    // Stats
-    document.getElementById('s-total').textContent     = docs.length;
-    document.getElementById('s-paid').textContent      = docs.filter(d=>['paid','delivered'].includes(d.status)).length;
-    document.getElementById('s-pending').textContent   = docs.filter(d=>d.status==='pending').length;
-    document.getElementById('s-delivered').textContent = docs.filter(d=>d.status==='delivered').length;
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Aucune commande</td></tr>';
+      return;
+    }
 
-    if (!docs.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucune commande</td></tr>'; return; }
-
-    tbody.innerHTML = docs.map(o => `
+    tbody.innerHTML = orders.map(o => `
       <tr>
         <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
         <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
@@ -362,9 +323,9 @@ window.loadOrders = async () => {
         <td style="font-family:'Space Mono',monospace;color:var(--green);font-size:12px">${o.leadwaseId||'—'}</td>
         <td>${
           o.leadwaseId
-            ? `<button class="action-btn btn-done" disabled>Livré</button>`
-            : ['paid'].includes(o.status)
-              ? `<button class="action-btn btn-generate" onclick="generateCreds('${o.id}')">Générer</button>`
+            ? `<button class="action-btn btn-done" disabled>✓ Livré</button>`
+            : o.status === 'paid'
+              ? `<button class="action-btn btn-generate" onclick="generateCreds('${o.id}','${o.email||''}')">Générer</button>`
               : `<span style="font-size:11px;color:var(--gray4)">—</span>`
         }</td>
       </tr>
@@ -379,46 +340,33 @@ window.loadPayments = async () => {
   const tbody = document.getElementById('payments-body');
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
   try {
-    const q    = query(collection(db,'payments'), orderBy('createdAt','desc'), limit(100));
-    const snap = await getDocs(q);
-    const docs = snap.docs.map(d => ({id:d.id,...d.data()}));
-    if (!docs.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Aucun paiement</td></tr>'; return; }
-    tbody.innerHTML = docs.map(p => `
-      <tr>
-        <td style="color:var(--gray4);font-size:11px">${fmtDate(p.createdAt)}</td>
-        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">${p.orderId||p.subscriptionId||'—'}</td>
-        <td style="font-weight:600;color:var(--green)">${p.amount ? p.amount.toLocaleString('fr-FR')+' FCFA' : '—'}</td>
-        <td>${badge(p.status)}</td>
-        <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--gray4)">${p.pid||'—'}</td>
-      </tr>
-    `).join('');
+    // Réutilise la route orders et lit les payments depuis Firestore côté API
+    // On appelle directement stats pour les paiements (ou on peut créer /api/admin/payments)
+    // Pour l'instant on affiche un message d'attente
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Consultez Firestore pour le détail des paiements.</td></tr>';
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#f87171">Erreur : ${e.message}</td></tr>`;
   }
 };
 
-// ── Générer identifiants ─────────────────────────────────────────
-window.generateCreds = async (orderId) => {
-  const btn = document.querySelector(`button[onclick="generateCreds('${orderId}')"]`);
+// ── Générer identifiants via /api/admin/deliver ──────────────────
+window.generateCreds = async (orderId, email) => {
+  const btn = document.querySelector(`button[onclick="generateCreds('${orderId}','${email}')"]`);
   if (btn) { btn.disabled = true; btn.textContent = 'En cours...'; }
   try {
-    const token = await getIdToken(auth.currentUser);
-    const r = await fetch('/api/admin/deliver', {
+    const r = await adminFetch('/api/admin/deliver', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
       body: JSON.stringify({ orderId }),
     });
     const d = await r.json();
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
-    if (d.alreadyCreated) {
-      document.getElementById('m-id').textContent  = d.leadwaseId;
-      document.getElementById('m-pwd').textContent = '(déjà généré — voir email client)';
-    } else {
-      document.getElementById('m-id').textContent  = d.leadwaseId;
-      document.getElementById('m-pwd').textContent = d.password;
-    }
+
+    document.getElementById('m-id').textContent    = d.leadwaseId;
+    document.getElementById('m-pwd').textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : d.password;
+    document.getElementById('m-email').textContent = email || '—';
     document.getElementById('cred-modal').classList.add('open');
-    loadOrders(); // refresh
+    loadOrders();
+    loadStats();
   } catch(e) {
     alert('Erreur : ' + e.message);
     if (btn) { btn.disabled = false; btn.textContent = 'Générer'; }
