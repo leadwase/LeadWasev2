@@ -916,6 +916,17 @@ window.showDetail = async (orderId) => {
 };
 window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
 document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+  // Précharger le compteur B2B dès le dashboard
+async function initB2BCount() {
+  try {
+    const d = await api('/api/admin/b2b');
+    if (d.success) {
+      const count = d.orders.filter(o => o.status === 'b2b_pending').length;
+      document.getElementById('sb-b2b-count').textContent = count;
+    }
+  } catch(e) {}
+}
 </script>
 </body>
 </html>
