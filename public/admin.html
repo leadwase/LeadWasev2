@@ -15,15 +15,7 @@
   --sidebar-w:220px;
 }
 body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);min-height:100vh;font-size:14px}
-
-/* ══════════════════════════════════════════════
-   LOGIN
-══════════════════════════════════════════════ */
-#login-screen{
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;background:var(--black);
-  background-image:radial-gradient(ellipse at 20% 60%,rgba(22,163,74,.12) 0%,transparent 55%);
-}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--black);background-image:radial-gradient(ellipse at 20% 60%,rgba(22,163,74,.12) 0%,transparent 55%)}
 .login-card{width:100%;max-width:380px;background:#1a1a1a;border:1px solid #2a2a2a;padding:44px 36px;margin:20px}
 .login-logo{font-size:26px;font-weight:700;color:var(--white);margin-bottom:4px}
 .login-logo em{color:var(--green);font-style:normal}
@@ -37,29 +29,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);m
 .login-btn:hover{background:var(--green2)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
 .login-err{font-size:12px;color:#f87171;margin-top:10px;text-align:center;min-height:16px}
-
-/* ══════════════════════════════════════════════
-   LAYOUT
-══════════════════════════════════════════════ */
 #app{display:none;min-height:100vh}
 .layout{display:flex;min-height:100vh}
-
-/* ── Sidebar ── */
-.sidebar{
-  width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--black);
-  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
-  z-index:50;transition:transform .3s;overflow-y:auto;
-}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--black);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform .3s;overflow-y:auto}
 .sb-logo{padding:24px 20px 20px;border-bottom:1px solid #1e1e1e}
 .sb-logo-text{font-size:20px;font-weight:700;color:var(--white)}
 .sb-logo-text em{color:var(--green);font-style:normal}
 .sb-logo-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-top:2px}
 .sb-section{padding:20px 12px 8px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333}
-.sb-item{
-  display:flex;align-items:center;gap:10px;padding:10px 16px;margin:1px 8px;
-  border-radius:4px;cursor:pointer;transition:all .15s;color:#888;font-size:13px;font-weight:500;
-  text-decoration:none;
-}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 16px;margin:1px 8px;border-radius:4px;cursor:pointer;transition:all .15s;color:#888;font-size:13px;font-weight:500;text-decoration:none}
 .sb-item:hover{background:#1e1e1e;color:var(--white)}
 .sb-item.active{background:var(--green);color:var(--white)}
 .sb-item .ico{font-size:15px;width:18px;text-align:center;flex-shrink:0}
@@ -69,27 +47,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);m
 .sb-user{font-size:11px;color:#555;margin-bottom:10px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-logout{width:100%;padding:9px;background:none;border:1px solid #2a2a2a;color:#666;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s}
 .sb-logout:hover{border-color:var(--red);color:var(--red)}
-
-/* ── Overlay mobile ── */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49}
-
-/* ── Main ── */
 .main-wrap{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
-.topbar{
-  background:var(--white);border-bottom:1px solid var(--gray5);
-  padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:40;
-}
+.topbar{background:var(--white);border-bottom:1px solid var(--gray5);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
 .topbar-left{display:flex;align-items:center;gap:14px}
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--gray2)}
 .hamburger svg{width:20px;height:20px}
 .page-title{font-size:18px;font-weight:700;color:var(--gray1)}
 .topbar-date{font-size:12px;color:var(--gray4)}
 .content{padding:28px;flex:1}
-
-/* ══════════════════════════════════════════════
-   STATS CARDS
-══════════════════════════════════════════════ */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
 .stat-card{background:var(--white);border:1px solid var(--gray5);padding:22px 24px;position:relative;overflow:hidden}
 .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -102,10 +68,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);m
 .stat-sub{font-size:11px;color:var(--gray4);margin-top:6px}
 .stat-sub.up{color:var(--green)}
 .stat-sub.warn{color:var(--red)}
-
-/* ══════════════════════════════════════════════
-   TABLES
-══════════════════════════════════════════════ */
 .card{background:var(--white);border:1px solid var(--gray5);margin-bottom:20px}
 .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--gray5)}
 .card-title{font-size:14px;font-weight:700;color:var(--gray1)}
@@ -118,13 +80,13 @@ tbody tr{border-bottom:1px solid var(--gray6);transition:background .1s}
 tbody tr:hover{background:#fafafa}
 tbody td{padding:13px 16px;color:var(--gray2);white-space:nowrap}
 .badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;border-radius:2px}
-.b-new     {background:#fef3c7;color:#92400e}
-.b-paid    {background:#d1fae5;color:#065f46}
+.b-new{background:#fef3c7;color:#92400e}
+.b-paid{background:#d1fae5;color:#065f46}
 .b-delivered{background:#d1fae5;color:#065f46}
-.b-pending {background:#fef9c3;color:#854d0e}
-.b-failed  {background:#fee2e2;color:#991b1b}
-.b-encours {background:#dbeafe;color:#1e40af}
-.b-success {background:#d1fae5;color:#065f46}
+.b-pending{background:#fef9c3;color:#854d0e}
+.b-failed{background:#fee2e2;color:#991b1b}
+.b-encours{background:#dbeafe;color:#1e40af}
+.b-success{background:#d1fae5;color:#065f46}
 .act-btn{padding:5px 12px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:all .15s;white-space:nowrap}
 .btn-gen{background:var(--green);color:var(--white)}
 .btn-gen:hover{background:var(--green2)}
@@ -132,13 +94,7 @@ tbody td{padding:13px 16px;color:var(--gray2);white-space:nowrap}
 .btn-view:hover{background:var(--gray5)}
 .btn-done{background:var(--gray6);color:var(--gray4);cursor:default}
 .empty-row td{text-align:center;padding:40px;color:var(--gray4);font-style:italic}
-
-/* ══════════════════════════════════════════════
-   BOTTOM GRID
-══════════════════════════════════════════════ */
 .bottom-grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
-
-/* ── Générer accès ── */
 .gen-info{background:var(--green-pale);border:1px solid #bbf7d0;padding:14px 18px;margin:20px 24px 0;font-size:12px;color:var(--green2);line-height:1.6;border-radius:2px}
 .gen-form{padding:20px 24px 24px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
@@ -151,8 +107,6 @@ select.f-input{cursor:pointer}
 .gen-btn{padding:12px 28px;background:var(--black);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
 .gen-btn:hover{background:var(--green)}
 .gen-btn:disabled{opacity:.5;cursor:not-allowed}
-
-/* ── Résultat identifiants ── */
 .cred-result{display:none;background:var(--green-pale);border:1px solid #bbf7d0;padding:20px 24px;margin:0 24px 24px;border-radius:2px}
 .cred-result.show{display:block}
 .cred-result-title{font-size:12px;font-weight:700;color:var(--green2);margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase}
@@ -164,24 +118,14 @@ select.f-input{cursor:pointer}
 .copy-btn{background:var(--green);color:var(--white);border:none;padding:6px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background .15s;white-space:nowrap}
 .copy-btn:hover{background:var(--green2)}
 .copy-btn.copied{background:#059669}
-
-/* ── Abonnements ── */
 .sub-list{padding:8px 24px 24px}
 .sub-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--gray6)}
 .sub-row:last-child{border-bottom:none}
 .sub-plan{font-size:13px;font-weight:600;color:var(--gray1)}
 .sub-price{font-size:11px;color:var(--gray4);margin-top:2px}
 .sub-count{font-size:22px;font-weight:700;color:var(--green);font-family:'Space Mono',monospace}
-
-/* ══════════════════════════════════════════════
-   PAGES (sections)
-══════════════════════════════════════════════ */
 .page{display:none}
 .page.active{display:block}
-
-/* ══════════════════════════════════════════════
-   MODAL DETAIL
-══════════════════════════════════════════════ */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--white);border:1px solid var(--gray5);padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
@@ -191,39 +135,20 @@ select.f-input{cursor:pointer}
 .detail-val{font-weight:600;color:var(--gray1);text-align:right;max-width:60%;word-break:break-word}
 .modal-close-btn{width:100%;margin-top:20px;padding:12px;background:var(--gray6);border:1px solid var(--gray5);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px}
 .modal-close-btn:hover{background:var(--gray5)}
-
-/* ══════════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════════ */
-@media(max-width:1100px){
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .bottom-grid{grid-template-columns:1fr}
-}
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.bottom-grid{grid-template-columns:1fr}}
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
-  .sb-overlay.open{display:block}
-  .main-wrap{margin-left:0}
-  .hamburger{display:flex}
-  .content{padding:16px}
-  .topbar{padding:0 16px}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .card-head{padding:14px 16px}
-  .gen-form{padding:14px 16px 16px}
-  .gen-info{margin:14px 16px 0}
-  .cred-result{margin:0 16px 16px}
-  .sub-list{padding:4px 16px 16px}
-  .form-grid{grid-template-columns:1fr}
-  .stat-val{font-size:28px}
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sb-overlay.open{display:block}.main-wrap{margin-left:0}.hamburger{display:flex}
+  .content{padding:16px}.topbar{padding:0 16px}.stats-grid{grid-template-columns:1fr 1fr}
+  .card-head{padding:14px 16px}.gen-form{padding:14px 16px 16px}
+  .gen-info{margin:14px 16px 0}.cred-result{margin:0 16px 16px}
+  .sub-list{padding:4px 16px 16px}.form-grid{grid-template-columns:1fr}.stat-val{font-size:28px}
 }
-@media(max-width:480px){
-  .stats-grid{grid-template-columns:1fr}
-}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══════════════════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">Lead<em>Wase</em></div>
@@ -235,48 +160,25 @@ select.f-input{cursor:pointer}
   </div>
 </div>
 
-<!-- ══ APP ════════════════════════════════════════════════════════ -->
 <div id="app">
   <div class="layout">
-
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sb-logo">
         <div class="sb-logo-text">Lead<em>Wase</em></div>
         <div class="sb-logo-sub">Administration</div>
       </div>
       <div class="sb-section">Principal</div>
-      <a class="sb-item active" onclick="nav('dashboard')" id="nav-dashboard">
-        <span class="ico">📊</span> Tableau de bord
-      </a>
-      <a class="sb-item" onclick="nav('commandes')" id="nav-commandes">
-        <span class="ico">📦</span> Commandes
-        <span class="sb-badge" id="sb-pending-count">0</span>
-      </a>
-      <a class="sb-item" onclick="nav('utilisateurs')" id="nav-utilisateurs">
-        <span class="ico">👤</span> Utilisateurs
-      </a>
-      <a class="sb-item" onclick="nav('b2b')" id="nav-b2b">
-        <span class="ico">📋</span> Devis B2B
-        <span class="sb-badge" id="sb-b2b-count">0</span>
-      </a>
-      <a class="sb-item" onclick="nav('generer')" id="nav-generer">
-        <span class="ico">🔑</span> Générer accès
-      </a>
+      <a class="sb-item active" onclick="nav('dashboard')" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
+      <a class="sb-item" onclick="nav('commandes')" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
+      <a class="sb-item" onclick="nav('utilisateurs')" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" onclick="nav('b2b')" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
+      <a class="sb-item" onclick="nav('generer')" id="nav-generer"><span class="ico">🔑</span> Générer accès</a>
       <div class="sb-section">Finances</div>
-      <a class="sb-item" onclick="nav('paiements')" id="nav-paiements">
-        <span class="ico">💳</span> Paiements
-      </a>
-      <a class="sb-item" onclick="nav('abonnements')" id="nav-abonnements">
-        <span class="ico">🔄</span> Abonnements
-      </a>
+      <a class="sb-item" onclick="nav('paiements')" id="nav-paiements"><span class="ico">💳</span> Paiements</a>
+      <a class="sb-item" onclick="nav('abonnements')" id="nav-abonnements"><span class="ico">🔄</span> Abonnements</a>
       <div class="sb-section">Système</div>
-      <a class="sb-item" onclick="nav('parametres')" id="nav-parametres">
-        <span class="ico">⚙️</span> Paramètres
-      </a>
-      <a class="sb-item" onclick="nav('notifications')" id="nav-notifications">
-        <span class="ico">🔔</span> Notifications
-      </a>
+      <a class="sb-item" onclick="nav('parametres')" id="nav-parametres"><span class="ico">⚙️</span> Paramètres</a>
+      <a class="sb-item" onclick="nav('notifications')" id="nav-notifications"><span class="ico">🔔</span> Notifications</a>
       <div class="sb-bottom">
         <div class="sb-user" id="sb-user-email">—</div>
         <button class="sb-logout" onclick="doLogout()">Déconnexion</button>
@@ -284,7 +186,6 @@ select.f-input{cursor:pointer}
     </aside>
     <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
-    <!-- Main -->
     <div class="main-wrap">
       <div class="topbar">
         <div class="topbar-left">
@@ -298,300 +199,154 @@ select.f-input{cursor:pointer}
 
       <div class="content">
 
-        <!-- ════ PAGE : DASHBOARD ════ -->
+        <!-- DASHBOARD -->
         <div class="page active" id="page-dashboard">
           <div class="stats-grid">
-            <div class="stat-card green">
-              <div class="stat-label">Commandes ce mois</div>
-              <div class="stat-val" id="d-total">—</div>
-              <div class="stat-sub up" id="d-total-sub"></div>
-            </div>
-            <div class="stat-card orange">
-              <div class="stat-label">Revenus (FCFA)</div>
-              <div class="stat-val" id="d-revenue">—</div>
-              <div class="stat-sub up" id="d-revenue-sub"></div>
-            </div>
-            <div class="stat-card blue">
-              <div class="stat-label">Abonnés Pro / Business</div>
-              <div class="stat-val" id="d-subs">—</div>
-              <div class="stat-sub" id="d-subs-sub"></div>
-            </div>
-            <div class="stat-card red">
-              <div class="stat-label">Commandes en attente</div>
-              <div class="stat-val" id="d-pending">—</div>
-              <div class="stat-sub warn" id="d-pending-sub"></div>
-            </div>
+            <div class="stat-card green"><div class="stat-label">Commandes ce mois</div><div class="stat-val" id="d-total">—</div><div class="stat-sub up" id="d-total-sub"></div></div>
+            <div class="stat-card orange"><div class="stat-label">Revenus (FCFA)</div><div class="stat-val" id="d-revenue">—</div><div class="stat-sub up"></div></div>
+            <div class="stat-card blue"><div class="stat-label">Abonnés Pro / Business</div><div class="stat-val" id="d-subs">—</div><div class="stat-sub" id="d-subs-sub"></div></div>
+            <div class="stat-card red"><div class="stat-label">Commandes en attente</div><div class="stat-val" id="d-pending">—</div><div class="stat-sub warn" id="d-pending-sub"></div></div>
           </div>
-
-          <!-- Dernières commandes -->
           <div class="card">
-            <div class="card-head">
-              <span class="card-title">Dernières commandes</span>
-              <span class="card-link" onclick="nav('commandes')">Voir tout →</span>
-            </div>
+            <div class="card-head"><span class="card-title">Dernières commandes</span><span class="card-link" onclick="nav('commandes')">Voir tout →</span></div>
             <div class="table-wrap">
               <table>
-                <thead><tr>
-                  <th>Commande</th><th>Client</th><th>Type</th><th>Montant</th>
-                  <th>Date</th><th>Statut</th><th>Action</th>
-                </tr></thead>
-                <tbody id="dash-orders-body">
-                  <tr class="empty-row"><td colspan="7">Chargement...</td></tr>
-                </tbody>
+                <thead><tr><th>Commande</th><th>Client</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+                <tbody id="dash-orders-body"><tr class="empty-row"><td colspan="7">Chargement...</td></tr></tbody>
               </table>
             </div>
           </div>
-
-          <!-- Bas de page -->
           <div class="bottom-grid">
-            <!-- Générer accès rapide -->
             <div class="card">
               <div class="card-head"><span class="card-title">🔑 Générer des accès</span></div>
-              <div class="gen-info">Renseignez l'identifiant de commande pour récupérer automatiquement les accès générés par le système.</div>
+              <div class="gen-info">Renseignez l'identifiant Firestore de la commande pour récupérer les accès générés automatiquement.</div>
               <div class="gen-form">
                 <div class="form-grid">
-                  <div class="f-group">
-                    <label class="f-label">N° de commande</label>
-                    <input class="f-input" id="g-orderid" placeholder="#CMD-XXXXX">
-                  </div>
-                  <div class="f-group">
-                    <label class="f-label">Type de carte</label>
-                    <select class="f-input" id="g-type">
-                      <option value="classic">Classique</option>
-                      <option value="b2b">B2B</option>
-                    </select>
-                  </div>
+                  <div class="f-group"><label class="f-label">N° de commande</label><input class="f-input" id="g-orderid" placeholder="ID Firestore"></div>
+                  <div class="f-group"><label class="f-label">Type</label><select class="f-input" id="g-type"><option value="classic">Classique</option><option value="b2b">B2B</option></select></div>
                 </div>
                 <button class="gen-btn" id="gen-btn" onclick="fetchAccess()">Générer les accès</button>
               </div>
               <div class="cred-result" id="cred-result">
-                <div class="cred-result-title">✅ Accès générés — à copier et envoyer au client</div>
-                <div class="cred-item">
-                  <span class="cred-key">Identifiant</span>
-                  <div class="cred-val-wrap">
-                    <span class="cred-val" id="r-id">—</span>
-                    <button class="copy-btn" onclick="copyVal('r-id',this)">Copier</button>
-                  </div>
-                </div>
-                <div class="cred-item">
-                  <span class="cred-key">Mot de passe</span>
-                  <div class="cred-val-wrap">
-                    <span class="cred-val" id="r-pwd">—</span>
-                    <button class="copy-btn" onclick="copyVal('r-pwd',this)">Copier</button>
-                  </div>
-                </div>
-                <div class="cred-item">
-                  <span class="cred-key">Email</span>
-                  <div class="cred-val-wrap">
-                    <span class="cred-val" id="r-email" style="font-size:12px">—</span>
-                    <button class="copy-btn" onclick="copyVal('r-email',this)">Copier</button>
-                  </div>
-                </div>
+                <div class="cred-result-title">✅ Accès — à copier et envoyer au client</div>
+                <div class="cred-item"><span class="cred-key">Identifiant</span><div class="cred-val-wrap"><span class="cred-val" id="r-id">—</span><button class="copy-btn" onclick="copyVal('r-id',this)">Copier</button></div></div>
+                <div class="cred-item"><span class="cred-key">Mot de passe</span><div class="cred-val-wrap"><span class="cred-val" id="r-pwd">—</span><button class="copy-btn" onclick="copyVal('r-pwd',this)">Copier</button></div></div>
+                <div class="cred-item"><span class="cred-key">Email</span><div class="cred-val-wrap"><span class="cred-val" id="r-email" style="font-size:12px">—</span><button class="copy-btn" onclick="copyVal('r-email',this)">Copier</button></div></div>
               </div>
             </div>
-
-            <!-- Abonnements actifs -->
             <div class="card">
-              <div class="card-head">
-                <span class="card-title">☑️ Abonnements actifs</span>
-                <span class="card-link" onclick="nav('abonnements')">Gérer →</span>
-              </div>
+              <div class="card-head"><span class="card-title">☑️ Abonnements actifs</span><span class="card-link" onclick="nav('abonnements')">Gérer →</span></div>
               <div class="sub-list">
-                <div class="sub-row">
-                  <div><div class="sub-plan">Offre Free</div><div class="sub-price">Sans abonnement</div></div>
-                  <div class="sub-count" id="sub-free">—</div>
-                </div>
-                <div class="sub-row">
-                  <div><div class="sub-plan">Offre Pro</div><div class="sub-price">3 500 FCFA/mois</div></div>
-                  <div class="sub-count" id="sub-pro">—</div>
-                </div>
-                <div class="sub-row">
-                  <div><div class="sub-plan">Offre Business</div><div class="sub-price">9 900 FCFA/mois</div></div>
-                  <div class="sub-count" id="sub-business">—</div>
-                </div>
+                <div class="sub-row"><div><div class="sub-plan">Offre Free</div><div class="sub-price">Sans abonnement</div></div><div class="sub-count" id="sub-free">—</div></div>
+                <div class="sub-row"><div><div class="sub-plan">Offre Pro</div><div class="sub-price">3 500 FCFA/mois</div></div><div class="sub-count" id="sub-pro">—</div></div>
+                <div class="sub-row"><div><div class="sub-plan">Offre Business</div><div class="sub-price">9 900 FCFA/mois</div></div><div class="sub-count" id="sub-business">—</div></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : COMMANDES ════ -->
+        <!-- COMMANDES -->
         <div class="page" id="page-commandes">
           <div class="card">
-            <div class="card-head">
-              <span class="card-title">Toutes les commandes</span>
-              <button class="act-btn btn-view" onclick="loadAllOrders()">↻ Actualiser</button>
-            </div>
+            <div class="card-head"><span class="card-title">Toutes les commandes</span><button class="act-btn btn-view" onclick="loadAllOrders()">↻ Actualiser</button></div>
             <div class="table-wrap">
               <table>
-                <thead><tr>
-                  <th>Commande</th><th>Client</th><th>Type</th><th>Montant</th>
-                  <th>Date</th><th>Statut</th><th>ID LeadWase</th><th>Action</th>
-                </tr></thead>
-                <tbody id="all-orders-body">
-                  <tr class="empty-row"><td colspan="8">Chargement...</td></tr>
-                </tbody>
+                <thead><tr><th>Commande</th><th>Client</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th><th>ID LeadWase</th><th>Action</th></tr></thead>
+                <tbody id="all-orders-body"><tr class="empty-row"><td colspan="8">Chargement...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : UTILISATEURS ════ -->
+        <!-- UTILISATEURS -->
         <div class="page" id="page-utilisateurs">
           <div class="card">
-            <div class="card-head">
-              <span class="card-title">Profils créés</span>
-              <button class="act-btn btn-view" onclick="loadProfiles()">↻ Actualiser</button>
-            </div>
+            <div class="card-head"><span class="card-title">Profils créés</span><button class="act-btn btn-view" onclick="loadProfiles()">↻ Actualiser</button></div>
             <div class="table-wrap">
               <table>
-                <thead><tr>
-                  <th>ID LeadWase</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Plan</th><th>Date</th>
-                </tr></thead>
-                <tbody id="profiles-body">
-                  <tr class="empty-row"><td colspan="6">Chargement...</td></tr>
-                </tbody>
+                <thead><tr><th>ID LeadWase</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Plan</th><th>Date</th></tr></thead>
+                <tbody id="profiles-body"><tr class="empty-row"><td colspan="6">Chargement...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : GÉNÉRER ACCÈS ════ -->
+        <!-- B2B -->
+        <div class="page" id="page-b2b">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Demandes B2B</span><button class="act-btn btn-view" onclick="loadB2B()">↻ Actualiser</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Référence</th><th>Entreprise</th><th>Responsable</th><th>Email</th><th>Téléphone</th><th>Quantité</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+                <tbody id="b2b-body"><tr class="empty-row"><td colspan="9">Chargement...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- GÉNÉRER ACCÈS -->
         <div class="page" id="page-generer">
           <div class="card">
             <div class="card-head"><span class="card-title">🔑 Générer / Récupérer des accès client</span></div>
             <div class="gen-info">Entrez l'identifiant Firestore de la commande pour récupérer les accès générés automatiquement par le webhook après paiement.</div>
             <div class="gen-form">
               <div class="form-grid">
-                <div class="f-group">
-                  <label class="f-label">N° de commande (ID Firestore)</label>
-                  <input class="f-input" id="g2-orderid" placeholder="ex: abc123def456">
-                </div>
-                <div class="f-group">
-                  <label class="f-label">Type de carte</label>
-                  <select class="f-input" id="g2-type">
-                    <option value="classic">Classique</option>
-                    <option value="b2b">B2B</option>
-                  </select>
-                </div>
+                <div class="f-group"><label class="f-label">N° de commande (ID Firestore)</label><input class="f-input" id="g2-orderid" placeholder="ex: abc123def456"></div>
+                <div class="f-group"><label class="f-label">Type de carte</label><select class="f-input" id="g2-type"><option value="classic">Classique</option><option value="b2b">B2B</option></select></div>
               </div>
               <button class="gen-btn" id="gen-btn2" onclick="fetchAccess2()">Récupérer les accès</button>
             </div>
             <div class="cred-result" id="cred-result2">
               <div class="cred-result-title">✅ Accès disponibles — à copier et envoyer au client</div>
-              <div class="cred-item">
-                <span class="cred-key">Identifiant</span>
-                <div class="cred-val-wrap">
-                  <span class="cred-val" id="r2-id">—</span>
-                  <button class="copy-btn" onclick="copyVal('r2-id',this)">Copier</button>
-                </div>
-              </div>
-              <div class="cred-item">
-                <span class="cred-key">Mot de passe</span>
-                <div class="cred-val-wrap">
-                  <span class="cred-val" id="r2-pwd">—</span>
-                  <button class="copy-btn" onclick="copyVal('r2-pwd',this)">Copier</button>
-                </div>
-              </div>
-              <div class="cred-item">
-                <span class="cred-key">Email client</span>
-                <div class="cred-val-wrap">
-                  <span class="cred-val" id="r2-email" style="font-size:12px">—</span>
-                  <button class="copy-btn" onclick="copyVal('r2-email',this)">Copier</button>
-                </div>
-              </div>
-              <div class="cred-item">
-                <span class="cred-key">Client</span>
-                <div class="cred-val-wrap">
-                  <span class="cred-val" id="r2-name" style="font-size:12px">—</span>
-                </div>
-              </div>
+              <div class="cred-item"><span class="cred-key">Identifiant</span><div class="cred-val-wrap"><span class="cred-val" id="r2-id">—</span><button class="copy-btn" onclick="copyVal('r2-id',this)">Copier</button></div></div>
+              <div class="cred-item"><span class="cred-key">Mot de passe</span><div class="cred-val-wrap"><span class="cred-val" id="r2-pwd">—</span><button class="copy-btn" onclick="copyVal('r2-pwd',this)">Copier</button></div></div>
+              <div class="cred-item"><span class="cred-key">Email client</span><div class="cred-val-wrap"><span class="cred-val" id="r2-email" style="font-size:12px">—</span><button class="copy-btn" onclick="copyVal('r2-email',this)">Copier</button></div></div>
+              <div class="cred-item"><span class="cred-key">Client</span><div class="cred-val-wrap"><span class="cred-val" id="r2-name" style="font-size:12px">—</span></div></div>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : B2B ════ -->
-        <div class="page" id="page-b2b">
-          <div class="card">
-            <div class="card-head">
-              <span class="card-title">Demandes B2B en attente</span>
-              <button class="act-btn btn-view" onclick="loadB2B()">↻ Actualiser</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr>
-                  <th>Référence</th><th>Entreprise</th><th>Responsable</th><th>Email</th>
-                  <th>Téléphone</th><th>Quantité</th><th>Date</th><th>Statut</th><th>Action</th>
-                </tr></thead>
-                <tbody id="b2b-body">
-                  <tr class="empty-row"><td colspan="9">Chargement...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ════ PAGE : PAIEMENTS ════ -->
+        <!-- PAIEMENTS -->
         <div class="page" id="page-paiements">
           <div class="card">
-            <div class="card-head">
-              <span class="card-title">Historique des paiements</span>
-              <button class="act-btn btn-view" onclick="loadPayments()">↻ Actualiser</button>
-            </div>
+            <div class="card-head"><span class="card-title">Historique des paiements</span><button class="act-btn btn-view" onclick="loadPayments()">↻ Actualiser</button></div>
             <div class="table-wrap">
               <table>
-                <thead><tr>
-                  <th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th>
-                </tr></thead>
-                <tbody id="payments-body">
-                  <tr class="empty-row"><td colspan="5">Chargement...</td></tr>
-                </tbody>
+                <thead><tr><th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th></tr></thead>
+                <tbody id="payments-body"><tr class="empty-row"><td colspan="5">Chargement...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : ABONNEMENTS ════ -->
+        <!-- ABONNEMENTS -->
         <div class="page" id="page-abonnements">
           <div class="card">
-            <div class="card-head">
-              <span class="card-title">Abonnements actifs</span>
-              <button class="act-btn btn-view" onclick="loadSubs()">↻ Actualiser</button>
-            </div>
+            <div class="card-head"><span class="card-title">Abonnements actifs</span><button class="act-btn btn-view" onclick="loadSubs()">↻ Actualiser</button></div>
             <div class="table-wrap">
               <table>
-                <thead><tr>
-                  <th>ID LeadWase</th><th>Plan</th><th>Statut</th><th>Début</th><th>Expiration</th>
-                </tr></thead>
-                <tbody id="subs-body">
-                  <tr class="empty-row"><td colspan="5">Chargement...</td></tr>
-                </tbody>
+                <thead><tr><th>ID LeadWase</th><th>Plan</th><th>Statut</th><th>Début</th><th>Expiration</th></tr></thead>
+                <tbody id="subs-body"><tr class="empty-row"><td colspan="5">Chargement...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ════ PAGE : PARAMÈTRES ════ -->
+        <!-- PARAMÈTRES -->
         <div class="page" id="page-parametres">
-          <div class="card">
-            <div class="card-head"><span class="card-title">Paramètres</span></div>
-            <div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div>
-          </div>
+          <div class="card"><div class="card-head"><span class="card-title">Paramètres</span></div><div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div></div>
         </div>
 
-        <!-- ════ PAGE : NOTIFICATIONS ════ -->
+        <!-- NOTIFICATIONS -->
         <div class="page" id="page-notifications">
-          <div class="card">
-            <div class="card-head"><span class="card-title">Notifications</span></div>
-            <div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div>
-          </div>
+          <div class="card"><div class="card-head"><span class="card-title">Notifications</span></div><div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div></div>
         </div>
 
-      </div><!-- /content -->
-    </div><!-- /main-wrap -->
-  </div><!-- /layout -->
-</div><!-- /app -->
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- Modal détail commande -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal">
     <div class="modal-title" id="modal-title">Détail commande</div>
@@ -605,15 +360,44 @@ import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.0/fire
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, getIdToken }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
-// ── Firebase init via /api/config ────────────────────────────────
 const cfg  = await fetch('/api/config').then(r => r.json());
 const app  = initializeApp(cfg);
 const auth = getAuth(app);
 let TOKEN  = null;
 
-// ── Date topbar ──────────────────────────────────────────────────
 document.getElementById('topbar-date').textContent =
   new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+// ── API helper — déclaré en premier pour être disponible partout ──
+async function api(url, opts = {}) {
+  TOKEN = await getIdToken(auth.currentUser);
+  const r = await fetch(url, {
+    ...opts,
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN, ...(opts.headers||{}) },
+  });
+  return r.json();
+}
+
+// ── Helpers ──────────────────────────────────────────────────────
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = v._seconds ? new Date(v._seconds*1000) : new Date(v);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function fmtNum(n) { return (n||0).toLocaleString('fr-FR'); }
+function badge(s) {
+  const map = {
+    pending:'b-pending',paid:'b-paid',delivered:'b-delivered',failed:'b-failed',
+    success:'b-success',payment_failed:'b-failed',gateway_error:'b-failed',
+    active:'b-paid',free:'b-pending',b2b_pending:'b-encours',b2b_done:'b-delivered',
+  };
+  const labels = {
+    pending:'EN ATTENTE',paid:'PAYÉ',delivered:'LIVRÉ',failed:'ÉCHOUÉ',
+    success:'SUCCÈS',payment_failed:'ÉCHOUÉ',gateway_error:'ERREUR',
+    active:'ACTIF',free:'FREE',b2b_pending:'EN COURS',b2b_done:'TRAITÉ',
+  };
+  return `<span class="badge ${map[s]||'b-pending'}">${labels[s]||s||'—'}</span>`;
+}
 
 // ── Auth ─────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
@@ -645,50 +429,13 @@ window.doLogin = async () => {
   }
 };
 document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
-// ── Charger demandes B2B ────────────────────────────────────────
-window.loadB2B = async () => {
-  const tbody = document.getElementById('b2b-body');
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
-  try {
-    const d = await api('/api/admin/b2b');  // route dédiée B2B
-    if (!d.success) throw new Error(d.error);
-    const b2bOrders = d.orders;
-    const count = b2bOrders.filter(o => o.status === 'b2b_pending').length;
-    document.getElementById('sb-b2b-count').textContent = count;
-    if (!b2bOrders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
-    tbody.innerHTML = b2bOrders.map(o => `<tr>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
-      <td style="font-weight:600">${o.company||'—'}</td>
-      <td>${o.firstName||'—'}</td>
-      <td style="color:var(--gray4)">${o.email||'—'}</td>
-      <td style="color:var(--gray4)">${o.phone||'—'}</td>
-      <td style="color:var(--gray4)">${o.quantity||'—'}</td>
-      <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
-      <td>${badge(o.status)}</td>
-      <td><a href="mailto:${o.email}" class="act-btn btn-gen" style="text-decoration:none">Répondre</a></td>
-    </tr>`).join('');
-  } catch(e) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="9" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
-  }
-};
-
 window.doLogout = () => signOut(auth);
-
-// ── API helper ───────────────────────────────────────────────────
-async function api(url, opts = {}) {
-  TOKEN = await getIdToken(auth.currentUser);
-  const r = await fetch(url, {
-    ...opts,
-    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN, ...(opts.headers||{}) },
-  });
-  return r.json();
-}
 
 // ── Navigation ───────────────────────────────────────────────────
 const titles = {
   dashboard:'Tableau de bord',commandes:'Commandes',utilisateurs:'Utilisateurs',
-  generer:'Générer accès',paiements:'Paiements',abonnements:'Abonnements',
-  b2b:'Demandes B2B',parametres:'Paramètres',notifications:'Notifications',
+  b2b:'Demandes B2B',generer:'Générer accès',paiements:'Paiements',
+  abonnements:'Abonnements',parametres:'Paramètres',notifications:'Notifications',
 };
 window.nav = (page) => {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -697,10 +444,11 @@ window.nav = (page) => {
   document.getElementById('nav-'+page).classList.add('active');
   document.getElementById('page-title').textContent = titles[page]||page;
   closeSidebar();
-  if (page==='commandes')   loadAllOrders();
+  if (page==='commandes')    loadAllOrders();
   if (page==='utilisateurs') loadProfiles();
-  if (page==='paiements')   loadPayments();
-  if (page==='abonnements') loadSubs();
+  if (page==='paiements')    loadPayments();
+  if (page==='abonnements')  loadSubs();
+  if (page==='b2b')          loadB2B();
 };
 window.toggleSidebar = () => {
   document.getElementById('sidebar').classList.toggle('open');
@@ -711,31 +459,9 @@ window.closeSidebar = () => {
   document.getElementById('sb-overlay').classList.remove('open');
 };
 
-// ── Helpers ──────────────────────────────────────────────────────
-function fmtDate(v) {
-  if (!v) return '—';
-  const d = v._seconds ? new Date(v._seconds*1000) : new Date(v);
-  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
-}
-function fmtNum(n) { return (n||0).toLocaleString('fr-FR'); }
-function badge(s) {
-  const map = {
-    pending:'b-pending',paid:'b-paid',delivered:'b-delivered',
-    failed:'b-failed',success:'b-success',payment_failed:'b-failed',
-    gateway_error:'b-failed',active:'b-paid',free:'b-pending',
-  };
-  const labels = {
-    pending:'EN ATTENTE',paid:'PAYÉ',delivered:'LIVRÉ',failed:'ÉCHOUÉ',
-    success:'SUCCÈS',payment_failed:'ÉCHOUÉ',gateway_error:'ERREUR',b2b_pending:'EN COURS',b2b_done:'TRAITÉ',
-    active:'ACTIF',free:'FREE',
-  };
-  return `<span class="badge ${map[s]||'b-pending'}">${labels[s]||s||'—'}</span>`;
-}
-
 // ── Init dashboard ───────────────────────────────────────────────
 async function initDashboard() {
-  loadStats();
-  loadDashOrders();
+  await Promise.allSettled([loadStats(), loadDashOrders(), initB2BCount()]);
 }
 
 // ── Stats ────────────────────────────────────────────────────────
@@ -744,20 +470,30 @@ async function loadStats() {
     const d = await api('/api/admin/stats');
     if (!d.success) return;
     const s = d.stats;
-    document.getElementById('d-total').textContent    = s.totalOrders || 0;
-    document.getElementById('d-revenue').textContent  = fmtNum(s.totalRevenue);
-    document.getElementById('d-subs').textContent     = s.activeSubscriptions || 0;
-    document.getElementById('d-pending').textContent  = s.pendingOrders || 0;
+    document.getElementById('d-total').textContent   = s.totalOrders || 0;
+    document.getElementById('d-revenue').textContent = fmtNum(s.totalRevenue);
+    document.getElementById('d-subs').textContent    = s.activeSubscriptions || 0;
+    document.getElementById('d-pending').textContent = s.pendingOrders || 0;
     document.getElementById('d-pending-sub').textContent = s.pendingOrders > 0 ? 'À traiter aujourd\'hui' : '';
     document.getElementById('sb-pending-count').textContent = s.pendingOrders || 0;
-    // abonnements sidebar
-    document.getElementById('sub-free').textContent     = s.freeProfiles  || '—';
-    document.getElementById('sub-pro').textContent      = s.proPlan       || '—';
-    document.getElementById('sub-business').textContent = s.businessPlan  || '—';
-  } catch(e) { console.error(e); }
+    document.getElementById('sub-free').textContent     = s.freeProfiles || '—';
+    document.getElementById('sub-pro').textContent      = s.proPlan      || '—';
+    document.getElementById('sub-business').textContent = s.businessPlan || '—';
+  } catch(e) { console.error('stats', e); }
 }
 
-// ── Commandes dashboard (5 dernières) ────────────────────────────
+// ── Compteur B2B sidebar au démarrage ────────────────────────────
+async function initB2BCount() {
+  try {
+    const d = await api('/api/admin/b2b');
+    if (d.success) {
+      const count = d.orders.filter(o => o.status === 'b2b_pending').length;
+      document.getElementById('sb-b2b-count').textContent = count;
+    }
+  } catch(e) { console.error('b2b count', e); }
+}
+
+// ── Dashboard — 5 dernières commandes ────────────────────────────
 async function loadDashOrders() {
   const tbody = document.getElementById('dash-orders-body');
   try {
@@ -765,7 +501,7 @@ async function loadDashOrders() {
     if (!d.success) throw new Error(d.error);
     const orders = d.orders.slice(0, 5);
     if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune commande</td></tr>'; return; }
-    tbody.innerHTML = orders.map((o,i) => orderRow(o, i, 7)).join('');
+    tbody.innerHTML = orders.map(o => orderRow(o, false)).join('');
   } catch(e) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="7" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
@@ -779,13 +515,13 @@ window.loadAllOrders = async () => {
     const d = await api('/api/admin/orders');
     if (!d.success) throw new Error(d.error);
     if (!d.orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucune commande</td></tr>'; return; }
-    tbody.innerHTML = d.orders.map((o,i) => orderRow(o, i, 8, true)).join('');
+    tbody.innerHTML = d.orders.map(o => orderRow(o, true)).join('');
   } catch(e) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="8" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
 
-function orderRow(o, i, cols, showId = false) {
+function orderRow(o, showId) {
   const shortId = o.id ? '#CMD-' + o.id.slice(-4).toUpperCase() : '—';
   const action = o.leadwaseId
     ? (showId ? `<button class="act-btn btn-view" onclick="showDetail('${o.id}')">Voir profil</button>` : `<button class="act-btn btn-done" disabled>✓ Livré</button>`)
@@ -805,7 +541,7 @@ function orderRow(o, i, cols, showId = false) {
   </tr>`;
 }
 
-// ── Profils utilisateurs ─────────────────────────────────────────
+// ── Profils ──────────────────────────────────────────────────────
 window.loadProfiles = async () => {
   const tbody = document.getElementById('profiles-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Chargement...</td></tr>';
@@ -827,71 +563,86 @@ window.loadProfiles = async () => {
   }
 };
 
+// ── B2B ──────────────────────────────────────────────────────────
+window.loadB2B = async () => {
+  const tbody = document.getElementById('b2b-body');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
+  try {
+    const d = await api('/api/admin/b2b');
+    if (!d.success) throw new Error(d.error);
+    const orders = d.orders;
+    const count  = orders.filter(o => o.status === 'b2b_pending').length;
+    document.getElementById('sb-b2b-count').textContent = count;
+    if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
+    tbody.innerHTML = orders.map(o => `<tr>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
+      <td style="font-weight:600">${o.company||'—'}</td>
+      <td>${o.firstName||'—'}</td>
+      <td style="color:var(--gray4)">${o.email||'—'}</td>
+      <td style="color:var(--gray4)">${o.phone||'—'}</td>
+      <td style="color:var(--gray4)">${o.quantity||'—'}</td>
+      <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
+      <td>${badge(o.status)}</td>
+      <td><a href="mailto:${o.email}" class="act-btn btn-gen" style="text-decoration:none">Répondre</a></td>
+    </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="9" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
+  }
+};
+
 // ── Paiements ────────────────────────────────────────────────────
 window.loadPayments = async () => {
-  const tbody = document.getElementById('payments-body');
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Chargement...</td></tr>';
-  try {
-    const d = await api('/api/admin/orders');
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → payments pour le détail complet.</td></tr>';
-  } catch(e) {}
+  document.getElementById('payments-body').innerHTML =
+    '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → payments pour le détail complet.</td></tr>';
 };
 
 // ── Abonnements ──────────────────────────────────────────────────
 window.loadSubs = async () => {
-  const tbody = document.getElementById('subs-body');
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Chargement...</td></tr>';
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → subscriptions pour le détail.</td></tr>';
+  document.getElementById('subs-body').innerHTML =
+    '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → subscriptions pour le détail.</td></tr>';
 };
 
-// ── Générer / récupérer accès (dashboard) ────────────────────────
+// ── Générer accès (dashboard) ────────────────────────────────────
 window.fetchAccess = async () => {
   const orderId = document.getElementById('g-orderid').value.trim();
-  if (!orderId) { alert('Entrez un ID de commande'); return; }
+  if (!orderId) return;
   const btn = document.getElementById('gen-btn');
   btn.disabled = true; btn.textContent = 'Récupération...';
   try {
     const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
     if (!d.success) throw new Error(d.error || 'Erreur');
-    showCreds('cred-result','r-id','r-pwd','r-email', d, '');
+    document.getElementById('r-id').textContent    = d.leadwaseId || '—';
+    document.getElementById('r-pwd').textContent   = d.alreadyCreated ? '(déjà généré)' : (d.password || '—');
+    document.getElementById('r-email').textContent = d.email || '—';
+    document.getElementById('cred-result').classList.add('show');
   } catch(e) { alert('Erreur : ' + e.message); }
   btn.disabled = false; btn.textContent = 'Générer les accès';
 };
 
-// ── Générer / récupérer accès (page dédiée) ──────────────────────
+// ── Générer accès (page dédiée) ──────────────────────────────────
 window.fetchAccess2 = async () => {
   const orderId = document.getElementById('g2-orderid').value.trim();
-  if (!orderId) { alert('Entrez un ID de commande'); return; }
+  if (!orderId) return;
   const btn = document.getElementById('gen-btn2');
   btn.disabled = true; btn.textContent = 'Récupération...';
   try {
     const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
     if (!d.success) throw new Error(d.error || 'Erreur');
-    showCreds('cred-result2','r2-id','r2-pwd','r2-email', d, 'r2-name');
+    document.getElementById('r2-id').textContent    = d.leadwaseId || '—';
+    document.getElementById('r2-pwd').textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : (d.password || '—');
+    document.getElementById('r2-email').textContent = d.email || '—';
+    document.getElementById('r2-name').textContent  = d.clientName || '—';
+    document.getElementById('cred-result2').classList.add('show');
   } catch(e) { alert('Erreur : ' + e.message); }
   btn.disabled = false; btn.textContent = 'Récupérer les accès';
 };
 
-function showCreds(resultId, idEl, pwdEl, emailEl, d, nameEl) {
-  document.getElementById(idEl).textContent    = d.leadwaseId || '—';
-  document.getElementById(pwdEl).textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : (d.password || '—');
-  document.getElementById(emailEl).textContent = d.email || '—';
-  if (nameEl && document.getElementById(nameEl)) document.getElementById(nameEl).textContent = d.clientName || '—';
-  document.getElementById(resultId).classList.add('show');
-}
+window.prefillOrder = (orderId) => { nav('generer'); document.getElementById('g2-orderid').value = orderId; };
 
-// Pré-remplir depuis le bouton "Générer accès" du tableau
-window.prefillOrder = (orderId) => {
-  nav('generer');
-  document.getElementById('g2-orderid').value = orderId;
-};
-
-// ── Copier valeur ────────────────────────────────────────────────
+// ── Copier ───────────────────────────────────────────────────────
 window.copyVal = (elId, btn) => {
-  const val = document.getElementById(elId).textContent;
-  navigator.clipboard.writeText(val).then(() => {
-    btn.textContent = '✓ Copié';
-    btn.classList.add('copied');
+  navigator.clipboard.writeText(document.getElementById(elId).textContent).then(() => {
+    btn.textContent = '✓ Copié'; btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
   });
 };
@@ -905,28 +656,17 @@ window.showDetail = async (orderId) => {
     document.getElementById('modal-title').textContent = 'Commande #CMD-' + orderId.slice(-4).toUpperCase();
     document.getElementById('modal-body').innerHTML = [
       ['Client', `${o.firstName||''} ${o.lastName||''}`],
-      ['Email', o.email||'—'], ['Téléphone', o.phone||'—'],
-      ['Entreprise', o.company||'—'], ['Poste', o.jobTitle||'—'],
-      ['Type', o.cardType||'—'], ['Montant', o.amount ? fmtNum(o.amount)+' FCFA' : '—'],
-      ['Statut', o.status||'—'], ['ID LeadWase', o.leadwaseId||'—'],
-      ['Date', fmtDate(o.createdAt)], ['Adresse', o.address||'—'],
+      ['Email', o.email||'—'],['Téléphone', o.phone||'—'],
+      ['Entreprise', o.company||'—'],['Poste', o.jobTitle||'—'],
+      ['Type', o.cardType||'—'],['Montant', o.amount ? fmtNum(o.amount)+' FCFA' : '—'],
+      ['Statut', o.status||'—'],['ID LeadWase', o.leadwaseId||'—'],
+      ['Date', fmtDate(o.createdAt)],['Adresse', o.address||'—'],
     ].map(([k,v]) => `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`).join('');
     document.getElementById('detail-modal').classList.add('open');
-  } catch(e) { alert(e.message); }
+  } catch(e) { console.error(e); }
 };
 window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
 document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
-
-  // Précharger le compteur B2B dès le dashboard
-async function initB2BCount() {
-  try {
-    const d = await api('/api/admin/b2b');
-    if (d.success) {
-      const count = d.orders.filter(o => o.status === 'b2b_pending').length;
-      document.getElementById('sb-b2b-count').textContent = count;
-    }
-  } catch(e) {}
-}
 </script>
 </body>
 </html>
