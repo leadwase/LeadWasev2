@@ -28,47 +28,83 @@ export default async function handler(req, res) {
     let payDoc = null;
     const txId = transaction?.metadata?.transactionId;
     if (txId) { const d = await db.collection('payments').doc(txId).get(); if (d.exists) payDoc = d; }
-
     if (!payDoc) {
       const ref = transaction?.reference || transaction?.id;
       if (ref) { const s = await db.collection('payments').where('pid','==',ref).limit(1).get(); if (!s.empty) payDoc = s.docs[0]; }
     }
-
     if (!payDoc && transaction?.amount) {
       const s = await db.collection('payments')
         .where('status','==','pending').where('amount','==',transaction.amount)
         .orderBy('createdAt','desc').limit(1).get();
       if (!s.empty) payDoc = s.docs[0];
     }
-
     if (!payDoc) return res.json({ received: true });
+
     const pay = payDoc.data();
     if (pay.status === 'success') return res.json({ received: true });
 
     const status = ok ? 'success' : 'failed';
     await payDoc.ref.update({ status, gatewayRef: transaction?.reference, webhookVerified: true, updatedAt: new Date() });
 
+    // ── Création de carte classique ────────────────────────────────────────────
     if (ok && pay.orderId) {
-      const ord  = await db.collection('orders').doc(pay.orderId).get();
+      const ord   = await db.collection('orders').doc(pay.orderId).get();
       const oData = ord.data();
+
       let lwId = genId();
       const ex = await db.collection('profiles').where('leadwaseId','==',lwId).get();
       if (!ex.empty) lwId = genId();
       const pwd = genPwd();
+
       await ord.ref.update({ status: 'paid', leadwaseId: lwId, paidAt: new Date() });
-      await db.collection('profiles').doc(lwId).set({ uid: pay.uid, leadwaseId: lwId, firstName: oData.firstName, lastName: oData.lastName, jobTitle: oData.jobTitle, company: oData.company, phone: oData.phone, email: oData.email, plan: 'free', createdAt: new Date() });
-      await db.collection('credentials').doc(lwId).set({ uid: pay.uid, leadwaseId: lwId, passwordHash: pwd, createdAt: new Date() });
-      await db.collection('users').doc(pay.uid).set({ leadwaseId: lwId, plan: 'free', updatedAt: new Date() }, { merge: true });
+
+      // uid supprimé de la commande — on ne le stocke plus dans profile/credentials
+      // uid: pay.uid  → retiré car pas de connexion obligatoire à la commande
+      await db.collection('profiles').doc(lwId).set({
+        // uid: pay.uid,  // plus de uid puisque pas de connexion obligatoire
+        leadwaseId: lwId,
+        firstName:  oData.firstName,
+        lastName:   oData.lastName,
+        jobTitle:   oData.jobTitle,
+        company:    oData.company,
+        phone:      oData.phone,
+        email:      oData.email,
+        plan:       'free',
+        createdAt:  new Date(),
+      });
+
+      await db.collection('credentials').doc(lwId).set({
+        // uid: pay.uid,  // plus de uid puisque pas de connexion obligatoire
+        leadwaseId:   lwId,
+        passwordHash: pwd,
+        createdAt:    new Date(),
+      });
+
+      // Mise à jour users désactivée — pas de compte Firebase lié à la commande
+      // await db.collection('users').doc(pay.uid).set({ leadwaseId: lwId, plan: 'free', updatedAt: new Date() }, { merge: true });
     }
 
+    // ── Renouvellement d'abonnement ───────────────────────────────────────────
     if (ok && pay.subscriptionId) {
-      const sub  = await db.collection('subscriptions').doc(pay.subscriptionId).get();
+      const sub   = await db.collection('subscriptions').doc(pay.subscriptionId).get();
       const sData = sub.data();
-      const exp  = new Date(); exp.setMonth(exp.getMonth() + 1);
+      const exp   = new Date(); exp.setMonth(exp.getMonth() + 1);
+
       await sub.ref.update({ status: 'active', startDate: new Date(), expiryDate: Timestamp.fromDate(exp) });
-      await db.collection('users').doc(pay.uid).update({ plan: sData.plan, planExpiry: Timestamp.fromDate(exp), updatedAt: new Date() });
-      const uDoc = await db.collection('users').doc(pay.uid).get();
-      if (uDoc.data()?.leadwaseId) await db.collection('profiles').doc(uDoc.data().leadwaseId).update({ plan: sData.plan });
+
+      // pay.uid peut être undefined si la commande a été passée sans connexion
+      // On ne met à jour users/profiles que si un uid est présent
+      if (pay.uid) {
+        await db.collection('users').doc(pay.uid).update({
+          plan:       sData.plan,
+          planExpiry: Timestamp.fromDate(exp),
+          updatedAt:  new Date(),
+        });
+        const uDoc = await db.collection('users').doc(pay.uid).get();
+        if (uDoc.data()?.leadwaseId) {
+          await db.collection('profiles').doc(uDoc.data().leadwaseId).update({ plan: sData.plan });
+        }
+      }
     }
 
     res.json({ received: true, status });
