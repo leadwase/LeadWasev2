@@ -644,50 +644,46 @@ function lwIdFromInternalEmail(email) {
 }
 
 onAuthStateChanged(auth, async user => {
-  if (!user) { window.location.href = '/connexion.html'; return; }
-   log("profileDoc exists =", profileDoc?.exists());
-   log("profile data =", profileDoc?.data());
-   log("lwId final =", lwId);
-  const uDoc = await getDoc(doc(db, 'users', user.uid));
-  const ud   = uDoc.exists() ? uDoc.data() : {};
-  const plan = ud.plan || 'free';
-
-  if (ud.role === 'admin') {
-    document.querySelector('.sidebar-nav').insertAdjacentHTML('afterbegin',
-      '<a class="sidebar-item" href="admin.html"><span class="s-icon">⚙️</span>Administration</a>');
+  if (!user) {
+    window.location.href = '/connexion.html';
+    return;
   }
 
+  const uDoc = await getDoc(doc(db, 'users', user.uid));
+  const ud = uDoc.exists() ? uDoc.data() : {};
+  const plan = ud.plan || 'free';
+
   let profileDoc = null;
-  if (ud.leadwaseId) {
-    lwId = ud.leadwaseId;
+  lwId = ud.leadwaseId || null;
+
+  if (lwId) {
     profileDoc = await getDoc(doc(db, 'profiles', lwId));
     if (!profileDoc.exists()) profileDoc = null;
   }
 
   if (!profileDoc) {
     const lwIdFromEmail = lwIdFromInternalEmail(user.email);
+
     if (lwIdFromEmail) {
       lwId = lwIdFromEmail;
       profileDoc = await getDoc(doc(db, 'profiles', lwId));
+
       if (!profileDoc.exists()) profileDoc = null;
-      if (profileDoc) {
-        try {
-          const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-          await setDoc(doc(db, 'users', user.uid),
-            { leadwaseId: lwId, plan: profileDoc.data().plan || 'free', updatedAt: new Date() },
-            { merge: true });
-        } catch(_) {}
-      }
     }
   }
 
+  // 🔥 DEBUG ICI (après création)
+  console.log("[DEBUG] lwId =", lwId);
+  console.log("[DEBUG] profileDoc exists =", profileDoc?.exists?.());
+  console.log("[DEBUG] profile data =", profileDoc?.data?.());
+
   if (!profileDoc) {
-    try { await signOut(auth); } catch(_) {}
+    await signOut(auth);
     window.location.href = 'connexion.html?msg=identifiants';
     return;
   }
 
-  const p          = profileDoc.data();
+  const p = profileDoc.data();
   const planFinal  = p.plan || plan;
   currentPlan      = planFinal;
   const isPro      = ['pro','business'].includes(planFinal);
