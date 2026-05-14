@@ -46,25 +46,12 @@
 .analytics-btn{padding:10px 20px;background:var(--green);color:var(--white);border:none;font-family:var(--serif);font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px;text-decoration:none;white-space:nowrap}
 .analytics-btn:hover{background:var(--green2)}
 
-/* Blocker overlay */
-#blocker{position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px;text-align:center}
-#blocker h2{font-size:22px;font-weight:bold;color:var(--black)}
-#blocker p{font-size:14px;color:var(--gray3);max-width:400px;line-height:1.7}
-#blocker a{padding:12px 28px;background:var(--black);color:var(--white);text-decoration:none;font-weight:bold;font-size:13px;letter-spacing:1px;text-transform:uppercase;border-radius:2px}
-#blocker a:hover{background:var(--green)}
+/* blocker supprimé — redirection JS vers connexion.html */
 
 @media(max-width:900px){.dash{padding:14px}.edit-grid{grid-template-columns:1fr}.upgrade-btns{flex-direction:column}.analytics-teaser{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
-
-<!-- Blocker — affiché si pas de carte -->
-<div id="blocker" style="display:none">
-  <div style="font-size:48px">🪪</div>
-  <h2>Vous n'avez pas encore de carte LeadWase</h2>
-  <p>Commandez votre carte pour accéder à votre espace profil et partager votre identité digitale.</p>
-  <a href="commander.html">Commander ma carte — 2 500 FCFA</a>
-</div>
 
 <div class="app-layout" id="app-layout" style="display:none">
   <aside class="sidebar">
@@ -237,9 +224,11 @@ onAuthStateChanged(auth, async user => {
     }
   }
 
-  // ── 4. Aucun profil trouvé → bloquer ────────────────────────────────────
+  // ── 4. Aucun profil trouvé → rediriger vers connexion avec message ──────
   if (!profileDoc) {
-    document.getElementById('blocker').style.display = 'flex';
+    // Déconnecter la session Firebase orpheline puis rediriger
+    try { await signOut(auth); } catch(_) {}
+    window.location.href = 'connexion.html?msg=identifiants';
     return;
   }
 
