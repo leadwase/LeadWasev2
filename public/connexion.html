@@ -7,7 +7,7 @@
 <style>
 .login-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
 .login-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.login-left::before{content:'"Votre identité,\\A votre réseau."';white-space:pre;position:absolute;font-size:60px;font-weight:bold;color:rgba(255,255,255,.025);line-height:1.1;bottom:40px;left:40px;right:40px;font-family:var(--serif)}
+.login-left::before{content:'"Votre identité,\A votre réseau."';white-space:pre;position:absolute;font-size:60px;font-weight:bold;color:rgba(255,255,255,.025);line-height:1.1;bottom:40px;left:40px;right:40px;font-family:var(--serif)}
 .login-logo{font-size:24px;font-weight:bold;color:var(--white);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:40px;display:block}
 .login-logo em{color:var(--green3);font-style:normal}
 .login-h{font-size:44px;font-weight:bold;color:var(--white);line-height:1.1;margin-bottom:18px}
@@ -18,6 +18,10 @@
 .hint-box{background:var(--green-pale);border-left:3px solid var(--green);padding:14px 18px;margin-bottom:24px}
 .hint-box p{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic}
 .hint-box strong{color:var(--green);font-style:normal}
+/* Message contextuel quand redirigé depuis dashboard */
+.info-box{background:#fff8e1;border-left:3px solid #f0a500;padding:14px 18px;margin-bottom:24px;display:none}
+.info-box p{font-size:13px;color:#7a5500;line-height:1.7}
+.info-box strong{color:#f0a500}
 .l-group{margin-bottom:16px}
 .l-label{display:block;font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--black);margin-bottom:7px}
 .l-input{width:100%;padding:13px 17px;border:1px solid var(--gray5);background:var(--off);font-family:var(--serif);font-size:15px;color:var(--black);outline:none;transition:border-color .2s;border-radius:2px}
@@ -42,10 +46,19 @@
   <div class="login-right">
     <div class="login-title">Accéder à mon profil</div>
     <p class="login-sub">Saisissez vos identifiants de connexion remis avec votre carte LeadWase.</p>
+
+    <!-- Message affiché si redirection depuis dashboard (compte sans profil lié) -->
+    <div class="info-box" id="info-box">
+      <p>
+        <strong>🔑 Connectez-vous avec vos identifiants de carte.</strong><br>
+        Votre compte email ne correspond à aucun profil LeadWase. Utilisez l'identifiant <strong>LW-XXXXX</strong> et le mot de passe fournis avec votre carte physique.
+      </p>
+    </div>
+
     <div class="hint-box"><p><strong>Où trouver mes identifiants ?</strong><br>Ils sont indiqués sur le document livré avec votre carte physique. Format : <strong>LW-XXXXX</strong></p></div>
     <div class="err-msg" id="err"></div>
-    <div class="l-group"><label class="l-label">Identifiant unique</label><input class="l-input" id="lwid" placeholder="Ex : LW-48291"></div>
-    <div class="l-group"><label class="l-label">Mot de passe</label><input class="l-input" id="pwd" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="l-group"><label class="l-label">Identifiant unique</label><input class="f-input l-input" id="lwid" placeholder="Ex : LW-48291"></div>
+    <div class="l-group"><label class="l-label">Mot de passe</label><input class="f-input l-input" id="pwd" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="l-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
     <p style="text-align:center;margin-top:14px;font-size:13px;font-style:italic"><a href="mailto:supportleadwase@gmail.com" style="color:var(--green)">Mot de passe oublié ? Contacter le support</a></p>
     <div class="l-divider"><span>Pas encore de carte ?</span></div>
@@ -56,27 +69,48 @@
 import { auth, db } from './js/firebase-config.js';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// ── Afficher le message contextuel si redirigé depuis dashboard ──────────────
+const params = new URLSearchParams(window.location.search);
+if (params.get('msg') === 'identifiants') {
+  document.getElementById('info-box').style.display = 'block';
+}
+
 window.doLogin = async () => {
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('err');
   const id  = document.getElementById('lwid').value.trim().toUpperCase();
   const pwd = document.getElementById('pwd').value;
-  if (!id||!pwd) { err.textContent='Veuillez remplir tous les champs.'; err.style.display='block'; return; }
-  btn.disabled=true; btn.innerHTML='<span class="loader"></span> Connexion...'; err.style.display='none';
-  const email = id.toLowerCase()+'@leadwase.internal';
+  if (!id || !pwd) { err.textContent = 'Veuillez remplir tous les champs.'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Connexion...'; err.style.display = 'none';
+  const email = id.toLowerCase() + '@leadwase.internal';
   try {
-    await signInWithEmailAndPassword(auth, email, pwd); redirect();
+    await signInWithEmailAndPassword(auth, email, pwd);
+    redirect();
   } catch {
     try {
-      const cDoc = await getDoc(doc(db,'credentials',id));
+      const cDoc = await getDoc(doc(db, 'credentials', id));
       if (!cDoc.exists()) throw new Error('Identifiant introuvable');
       if (cDoc.data().passwordHash !== pwd) throw new Error('Mot de passe incorrect');
-      try { const nc = await createUserWithEmailAndPassword(auth,email,pwd); await setDoc(doc(db,'users',nc.user.uid),{leadwaseId:id,plan:'free',role:'user',createdAt:new Date()},{merge:true}); } catch {}
-      await signInWithEmailAndPassword(auth, email, pwd); redirect();
-    } catch(e2) { err.textContent=e2.message||'Identifiant ou mot de passe incorrect.'; err.style.display='block'; btn.disabled=false; btn.textContent='Se connecter →'; }
+      try {
+        const nc = await createUserWithEmailAndPassword(auth, email, pwd);
+        await setDoc(doc(db, 'users', nc.user.uid), { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() }, { merge: true });
+      } catch(_) {}
+      await signInWithEmailAndPassword(auth, email, pwd);
+      redirect();
+    } catch(e2) {
+      err.textContent = e2.message || 'Identifiant ou mot de passe incorrect.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Se connecter →';
+    }
   }
 };
-function redirect() { const r=new URLSearchParams(window.location.search).get('redirect'); window.location.href=r==='commander'?'/commander.html':'/dashboard.html'; }
+
+function redirect() {
+  const r = new URLSearchParams(window.location.search).get('redirect');
+  window.location.href = r === 'commander' ? '/commander.html' : '/dashboard.html';
+}
 </script>
 </body>
 </html>
