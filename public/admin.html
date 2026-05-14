@@ -1,162 +1,432 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Administration — LeadWase</title>
-<link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — LeadWase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-.adm{padding:28px;max-width:1100px}
-.adm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.adm-h1{font-size:22px;font-weight:bold;color:var(--black)}
-.adm-date{font-size:12px;color:var(--gray3);font-style:italic}
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.kpi-card{background:var(--white);border:1px solid var(--gray5);padding:20px;border-top:3px solid transparent}
-.kpi-card.g{border-top-color:var(--green)}.kpi-card.b{border-top-color:var(--black)}.kpi-card.go{border-top-color:var(--gold)}.kpi-card.r{border-top-color:var(--red)}
-.kpi-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);margin-bottom:6px}
-.kpi-num{font-size:32px;font-weight:bold;color:var(--black);line-height:1;margin-bottom:3px}
-.kpi-trend{font-size:11px;color:var(--green);font-style:italic}
-.kpi-trend.down{color:var(--red)}
-.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.a-card{background:var(--white);border:1px solid var(--gray5)}
-.a-header{padding:14px 18px;border-bottom:1px solid var(--gray5);display:flex;align-items:center;justify-content:space-between}
-.a-title{font-size:14px;font-weight:bold;color:var(--black)}
-.a-action{font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;font-style:italic}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray3);padding:9px 12px;border-bottom:1px solid var(--gray5);text-align:left;background:var(--off)}
-.tbl td{padding:9px 12px;border-bottom:1px solid var(--gray5);font-size:12px;color:var(--gray2)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--green-pale)}
-.act-btn{padding:4px 10px;border:1px solid var(--gray5);background:var(--white);font-family:var(--serif);font-size:11px;cursor:pointer;border-radius:2px;color:var(--black);transition:all .2s}
-.act-btn:hover{background:var(--green);color:var(--white);border-color:var(--green)}
-.gen-box{padding:16px}
-.gen-info{font-size:12px;color:var(--gray2);font-style:italic;margin-bottom:12px;background:var(--green-pale);padding:10px;border-left:2px solid var(--green);line-height:1.7}
-.gen-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.gen-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--black);margin-bottom:4px;font-weight:bold}
-.gen-input{width:100%;padding:9px 12px;border:1px solid var(--gray5);font-family:var(--serif);font-size:13px;background:var(--white);color:var(--black);outline:none;border-radius:2px}
-.gen-input:focus{border-color:var(--green)}
-.gen-btn{padding:9px 20px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:11px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
-.gen-btn:hover{background:var(--green)}
-.gen-out{margin-top:12px;padding:14px;background:var(--black);display:none}
-.gen-out.show{display:block}
-.gen-out-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);margin-bottom:5px}
-.gen-out-id{font-family:'Courier New',monospace;font-size:17px;color:var(--green3);letter-spacing:3px;margin-bottom:4px}
-.gen-out-pwd{font-family:'Courier New',monospace;font-size:13px;color:var(--gray4);letter-spacing:2px}
-.sub-row{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;border-bottom:1px solid var(--gray5)}
-.sub-row:last-child{border-bottom:none}
-.sub-name{font-size:14px;font-weight:bold}
-.sub-price{font-size:11px;color:var(--gray3);margin-top:1px}
-.sub-count{font-size:26px;font-weight:bold}
-@media(max-width:900px){.kpi-row{grid-template-columns:1fr 1fr}.adm-grid{grid-template-columns:1fr}.adm{padding:14px}.gen-row{grid-template-columns:1fr}}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0a0a0a;--white:#ffffff;--green:#16a34a;--green2:#15803d;
+  --green-light:#dcfce7;--gray1:#111827;--gray2:#374151;--gray3:#6b7280;
+  --gray4:#9ca3af;--gray5:#e5e7eb;--off:#f9fafb;--red:#dc2626;--orange:#f59e0b;
+}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--white);min-height:100vh}
+
+/* ── LOGIN ─────────────────────────────────────────────────────── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;
+  background:var(--black);
+  background-image:radial-gradient(ellipse at 20% 50%,rgba(22,163,74,.15) 0%,transparent 60%),
+                   radial-gradient(ellipse at 80% 20%,rgba(22,163,74,.08) 0%,transparent 50%);
+}
+.login-box{
+  width:100%;max-width:400px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  padding:48px 40px;
+}
+.login-logo{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+.login-logo em{color:var(--green);font-style:normal}
+.login-sub{font-size:12px;color:var(--gray4);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
+.login-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);display:block;margin-bottom:8px}
+.login-input{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:var(--white);font-family:'Syne',sans-serif;font-size:14px;
+  padding:14px 16px;outline:none;transition:border .2s;margin-bottom:16px;
+}
+.login-input:focus{border-color:var(--green)}
+.login-input::placeholder{color:var(--gray3)}
+.login-btn{
+  width:100%;padding:16px;background:var(--green);color:var(--white);
+  border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;
+  margin-top:8px;
+}
+.login-btn:hover{background:var(--green2)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-error{font-size:12px;color:#f87171;margin-top:12px;text-align:center;min-height:18px}
+
+/* ── DASHBOARD ─────────────────────────────────────────────────── */
+#dashboard{display:none}
+.topbar{
+  background:rgba(10,10,10,.95);border-bottom:1px solid rgba(255,255,255,.08);
+  padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);
+}
+.topbar-logo{font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.topbar-logo em{color:var(--green);font-style:normal}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-admin{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
+.logout-btn{
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  background:none;border:1px solid rgba(255,255,255,.15);color:var(--gray4);
+  padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;
+}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+.main{padding:32px;max-width:1200px;margin:0 auto}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:24px}
+.stat-val{font-size:32px;font-weight:800;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--gray4);letter-spacing:1.5px;text-transform:uppercase}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
+.tab{
+  padding:12px 24px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--gray4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.tab:hover{color:var(--white)}
+
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid rgba(255,255,255,.1)}
+thead th{
+  padding:12px 16px;text-align:left;font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4);
+}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody td{padding:14px 16px;color:var(--gray5)}
+.badge{
+  display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.badge-pending {background:rgba(245,158,11,.15);color:var(--orange)}
+.badge-paid    {background:rgba(22,163,74,.15);color:#4ade80}
+.badge-delivered{background:rgba(22,163,74,.25);color:#86efac}
+.badge-failed  {background:rgba(220,38,38,.15);color:#f87171}
+.badge-success {background:rgba(22,163,74,.15);color:#4ade80}
+
+.action-btn{
+  padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;border:none;cursor:pointer;font-family:'Syne',sans-serif;
+  transition:all .2s;
+}
+.btn-generate{background:var(--green);color:var(--white)}
+.btn-generate:hover{background:var(--green2)}
+.btn-done{background:rgba(255,255,255,.08);color:var(--gray4);cursor:default}
+
+/* Modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+  z-index:200;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:#111;border:1px solid rgba(255,255,255,.12);
+  padding:40px;width:100%;max-width:440px;
+}
+.modal-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--gray4);margin-bottom:28px}
+.cred-box{
+  background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);
+  padding:20px;margin-bottom:24px;
+}
+.cred-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cred-row:last-child{margin-bottom:0}
+.cred-key{font-size:11px;color:var(--gray4);letter-spacing:1px;text-transform:uppercase}
+.cred-val{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700}
+.modal-note{font-size:12px;color:var(--gray4);margin-bottom:24px;line-height:1.6}
+.modal-close{
+  width:100%;padding:14px;background:rgba(255,255,255,.08);color:var(--white);
+  border:none;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;
+}
+.modal-close:hover{background:rgba(255,255,255,.12)}
+
+/* Empty / loading */
+.empty{text-align:center;padding:60px;color:var(--gray4);font-size:13px}
+.loading-row td{color:var(--gray4);font-style:italic}
+
+/* Refresh */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4)}
+.refresh-btn{
+  background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray4);
+  padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;
+}
+.refresh-btn:hover{border-color:var(--green);color:var(--green)}
+
+@media(max-width:768px){
+  .stats{grid-template-columns:1fr 1fr}
+  .main{padding:16px}
+  .topbar{padding:0 16px}
+}
 </style>
 </head>
 <body>
-<div class="app-layout">
-  <aside class="sidebar">
-    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Administration</div></a>
-    <div class="sidebar-user"><div class="sidebar-avatar">A</div><div><div class="sidebar-user-name">Administrateur</div><div class="sidebar-user-plan" style="color:var(--gold)">ADMIN</div></div></div>
-    <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Principal</div>
-      <a class="sidebar-item active" href="admin.html"><span class="s-icon">📊</span>Tableau de bord</a>
-      <a class="sidebar-item" href="admin.html"><span class="s-icon">🛒</span>Commandes <span class="s-badge" id="sb-pending">–</span></a>
-      <a class="sidebar-item" href="admin.html"><span class="s-icon">👥</span>Utilisateurs</a>
-      <a class="sidebar-item" href="admin.html"><span class="s-icon">🔑</span>Générer accès</a>
-      <div class="sidebar-section-label" style="margin-top:8px">Finances</div>
-      <a class="sidebar-item" href="admin.html"><span class="s-icon">📈</span>Abonnements</a>
-      <a class="sidebar-item" href="admin.html"><span class="s-icon">📋</span>Devis B2B</a>
-      <div class="sidebar-section-label" style="margin-top:8px">Navigation</div>
-      <a class="sidebar-item" href="/"><span class="s-icon">🌐</span>Voir le site</a>
-      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
-      <a class="sidebar-item" href="cgu.html"><span class="s-icon">📄</span>CGU</a>
-      <a class="sidebar-item" href="confidentialite.html"><span class="s-icon">🔒</span>Confidentialité</a>
-    </nav>
-    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
-  </aside>
-  <main class="app-content">
-    <div class="adm">
-      <div class="adm-header"><div class="adm-h1">Tableau de bord</div><div class="adm-date" id="adm-date"></div></div>
-      <div class="kpi-row">
-        <div class="kpi-card g"><div class="kpi-label">Total commandes</div><div class="kpi-num" id="kpi-orders">–</div><div class="kpi-trend">Toutes périodes</div></div>
-        <div class="kpi-card b"><div class="kpi-label">Revenus totaux</div><div class="kpi-num" id="kpi-rev">–</div><div class="kpi-trend">FCFA encaissés</div></div>
-        <div class="kpi-card go"><div class="kpi-label">Abonnements actifs</div><div class="kpi-num" id="kpi-subs">–</div><div class="kpi-trend">Pro + Business</div></div>
-        <div class="kpi-card r"><div class="kpi-label">En attente</div><div class="kpi-num" id="kpi-pending">–</div><div class="kpi-trend down">À traiter</div></div>
+
+<!-- ── LOGIN ────────────────────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Lead<em>Wase</em></div>
+    <div class="login-sub">Dashboard Admin</div>
+    <label class="login-label">Email</label>
+    <input class="login-input" id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com">
+    <label class="login-label">Mot de passe</label>
+    <input class="login-input" id="l-pwd" type="password" placeholder="••••••••••">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ─────────────────────────────────────────────────── -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">Lead<em>Wase</em> <span style="font-size:11px;color:var(--gray4);font-weight:400;margin-left:8px;letter-spacing:2px">ADMIN</span></div>
+    <div class="topbar-right">
+      <span class="topbar-admin" id="admin-email"></span>
+      <button class="logout-btn" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-label">Commandes total</div></div>
+      <div class="stat"><div class="stat-val" id="s-paid">—</div><div class="stat-label">Payées</div></div>
+      <div class="stat"><div class="stat-val" id="s-pending">—</div><div class="stat-label">En attente</div></div>
+      <div class="stat"><div class="stat-val" id="s-delivered">—</div><div class="stat-label">Livrées</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('orders')">Commandes</div>
+      <div class="tab" onclick="showTab('payments')">Paiements</div>
+    </div>
+
+    <!-- Commandes -->
+    <div id="tab-orders">
+      <div class="section-header">
+        <span class="section-title">Toutes les commandes</span>
+        <button class="refresh-btn" onclick="loadOrders()">↻ Actualiser</button>
       </div>
-      <div class="adm-grid">
-        <div class="a-card" style="grid-column:1/-1">
-          <div class="a-header"><div class="a-title">Dernières commandes</div><div class="a-action">Actualiser</div></div>
-          <div id="orders-wrap"><div style="padding:20px;text-align:center;color:var(--gray3);font-style:italic">Chargement...</div></div>
-        </div>
-        <div class="a-card">
-          <div class="a-header"><div class="a-title">🔑 Générer des accès</div></div>
-          <div class="gen-box">
-            <div class="gen-info">Renseignez l'ID Firestore de la commande pour générer les credentials du client.</div>
-            <div class="gen-row">
-              <div><div class="gen-label">Nom complet</div><input class="gen-input" id="g-name" placeholder="Nom du client"></div>
-              <div><div class="gen-label">ID commande (Firestore)</div><input class="gen-input" id="g-cmd" placeholder="ID de la commande"></div>
-            </div>
-            <div class="gen-row">
-              <div><div class="gen-label">Email</div><input class="gen-input" id="g-email" type="email" placeholder="email@client.com"></div>
-              <div><div class="gen-label">Type</div><select class="gen-input" id="g-type"><option>Classique</option><option>B2B</option></select></div>
-            </div>
-            <button class="gen-btn" onclick="genCreds()">Générer les accès</button>
-            <div class="gen-out" id="gen-out">
-              <div class="gen-out-label">Identifiant généré</div>
-              <div class="gen-out-id" id="out-id">–</div>
-              <div class="gen-out-label" style="margin-top:10px">Mot de passe temporaire</div>
-              <div class="gen-out-pwd" id="out-pwd">–</div>
-            </div>
-          </div>
-        </div>
-        <div class="a-card">
-          <div class="a-header"><div class="a-title">📈 Abonnements actifs</div><div class="a-action">Gérer</div></div>
-          <div class="sub-row"><div><div class="sub-name">Free</div><div class="sub-price">Gratuit</div></div><div class="sub-count" id="cnt-free">–</div></div>
-          <div class="sub-row"><div><div class="sub-name">Pro</div><div class="sub-price">2 999 XOF/mois</div></div><div class="sub-count" style="color:var(--green)" id="cnt-pro">–</div></div>
-          <div class="sub-row"><div><div class="sub-name">Business</div><div class="sub-price">4 566 XOF/mois</div></div><div class="sub-count" id="cnt-biz">–</div></div>
-        </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Client</th><th>Email</th><th>Téléphone</th>
+            <th>Type</th><th>Statut</th><th>ID LeadWase</th><th>Action</th>
+          </tr></thead>
+          <tbody id="orders-body"><tr class="loading-row"><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr></tbody>
+        </table>
       </div>
     </div>
-  </main>
+
+    <!-- Paiements -->
+    <div id="tab-payments" style="display:none">
+      <div class="section-header">
+        <span class="section-title">Historique des paiements</span>
+        <button class="refresh-btn" onclick="loadPayments()">↻ Actualiser</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Commande</th><th>Montant</th><th>Statut</th><th>PID Gateway</th>
+          </tr></thead>
+          <tbody id="payments-body"><tr class="loading-row"><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- ── MODAL IDENTIFIANTS ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="cred-modal">
+  <div class="modal">
+    <div class="modal-title">✅ Identifiants générés</div>
+    <div class="modal-sub">Envoyés automatiquement au client par email.</div>
+    <div class="cred-box">
+      <div class="cred-row"><span class="cred-key">Identifiant</span><span class="cred-val" id="m-id">—</span></div>
+      <div class="cred-row"><span class="cred-key">Mot de passe</span><span class="cred-val" id="m-pwd">—</span></div>
+    </div>
+    <div class="modal-note">⚠️ Notez ces informations — le mot de passe ne sera plus affiché après fermeture.</div>
+    <button class="modal-close" onclick="closeModal()">Fermer</button>
+  </div>
+</div>
+
 <script type="module">
-import { auth, db } from './js/firebase-config.js';
-import { onAuthStateChanged, signOut, getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-document.getElementById('adm-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-onAuthStateChanged(auth, async user => {
-  if (!user) { window.location.href='/connexion.html'; return; }
-  const ud=(await getDoc(doc(db,'users',user.uid))).data();
-  if (!ud||ud.role!=='admin') { window.location.href='/dashboard.html'; return; }
-  await load(user);
+import { initializeApp }               from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+                                       from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getIdToken }                  from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getFirestore, collection, getDocs, orderBy, query, limit }
+                                       from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+// ── Config Firebase (même que firebase-config.js) ────────────────
+import { firebaseConfig } from './js/firebase-config.js';
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── Auth state ───────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (user) {
+    showDashboard(user);
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display    = 'none';
+  }
 });
-async function load(user) {
+
+// ── Login ────────────────────────────────────────────────────────
+window.doLogin = async () => {
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.textContent = '';
+  btn.disabled = true; btn.textContent = 'Connexion...';
   try {
-    const token=await getIdToken(user);
-    const [sRes,oRes]=await Promise.all([fetch('/api/admin/stats',{headers:{'Authorization':'Bearer '+token}}),fetch('/api/admin/orders',{headers:{'Authorization':'Bearer '+token}})]);
-    const {stats}=await sRes.json(), {orders}=await oRes.json();
-    if(stats){ document.getElementById('kpi-orders').textContent=stats.totalOrders; document.getElementById('kpi-rev').textContent=(stats.totalRevenue||0).toLocaleString()+' F'; document.getElementById('kpi-subs').textContent=stats.activeSubscriptions; document.getElementById('kpi-pending').textContent=stats.pendingOrders; document.getElementById('sb-pending').textContent=stats.pendingOrders; }
-    renderOrders(orders||[]);
-    const [fp,pp,bp]=await Promise.all([getDocs(query(collection(db,'profiles'),where('plan','==','free'))),getDocs(query(collection(db,'users'),where('plan','==','pro'))),getDocs(query(collection(db,'users'),where('plan','==','business')))]);
-    document.getElementById('cnt-free').textContent=fp.size; document.getElementById('cnt-pro').textContent=pp.size; document.getElementById('cnt-biz').textContent=bp.size;
-  } catch(e){console.error(e);}
-}
-function renderOrders(orders) {
-  if(!orders.length){document.getElementById('orders-wrap').innerHTML='<div style="padding:20px;text-align:center;color:var(--gray3);font-style:italic">Aucune commande</div>';return;}
-  const pm={pending:'pill-pending',paid:'pill-paid',delivered:'pill-delivered',failed:'pill-failed'};
-  const lm={pending:'En attente',paid:'Payé',delivered:'Livré',failed:'Échoué'};
-  const rows=orders.map(o=>{
-    const date=o.createdAt?.seconds?new Date(o.createdAt.seconds*1000).toLocaleDateString('fr-FR'):'–';
-    const action=o.leadwaseId?`<span style="font-family:monospace;font-size:11px;color:var(--green)">${o.leadwaseId}</span>`:`<button class="act-btn" onclick="genForOrder('${o.id}')">Générer accès</button>`;
-    return `<tr><td>${o.id.slice(0,8)}…</td><td>${o.firstName||''} ${o.lastName||''}</td><td>${o.cardType==='classic'?'Classique':'B2B'}</td><td>${o.amount?o.amount.toLocaleString()+' FCFA':'Devis'}</td><td>${date}</td><td><span class="pill ${pm[o.status]||'pill-pending'}">${lm[o.status]||o.status}</span></td><td>${action}</td></tr>`;
-  }).join('');
-  document.getElementById('orders-wrap').innerHTML=`<table class="tbl"><thead><tr><th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-window.genForOrder = async orderId => {
-  const user=auth.currentUser, token=await getIdToken(user);
-  const r=await fetch('/api/admin/generate-credentials',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({orderId})});
-  const d=await r.json();
-  if(d.leadwaseId){document.getElementById('out-id').textContent=d.leadwaseId;document.getElementById('out-pwd').textContent=d.password||'(déjà créé)';document.getElementById('gen-out').classList.add('show');await load(user);}
+    const email = document.getElementById('l-email').value.trim();
+    const pwd   = document.getElementById('l-pwd').value;
+    await signInWithEmailAndPassword(auth, email, pwd);
+  } catch(e) {
+    err.textContent = 'Email ou mot de passe incorrect.';
+    btn.disabled = false; btn.textContent = 'Accéder au dashboard';
+  }
 };
-window.genCreds = async () => { const id=document.getElementById('g-cmd').value.trim(); if(!id){alert('Renseignez un ID de commande');return;} await genForOrder(id); };
-window.doLogout = async () => { await signOut(auth); window.location.href='/'; };
+
+// Connexion avec Entrée
+document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+// ── Logout ───────────────────────────────────────────────────────
+window.doLogout = async () => { await signOut(auth); };
+
+// ── Show dashboard ───────────────────────────────────────────────
+function showDashboard(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display    = 'block';
+  document.getElementById('admin-email').textContent    = user.email;
+  loadOrders();
+  loadPayments();
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────
+window.showTab = (tab) => {
+  document.getElementById('tab-orders').style.display   = tab==='orders'   ? 'block' : 'none';
+  document.getElementById('tab-payments').style.display = tab==='payments' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='orders')||(i===1&&tab==='payments')));
+};
+
+// ── Formater date ────────────────────────────────────────────────
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = v.toDate ? v.toDate() : new Date(v);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Badge statut ─────────────────────────────────────────────────
+function badge(s) {
+  const map = {
+    pending:'badge-pending',paid:'badge-paid',delivered:'badge-delivered',
+    failed:'badge-failed',success:'badge-success',payment_failed:'badge-failed',
+    gateway_error:'badge-failed',active:'badge-delivered',
+  };
+  return `<span class="badge ${map[s]||'badge-pending'}">${s||'—'}</span>`;
+}
+
+// ── Charger commandes ────────────────────────────────────────────
+window.loadOrders = async () => {
+  const tbody = document.getElementById('orders-body');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
+  try {
+    const q    = query(collection(db,'orders'), orderBy('createdAt','desc'), limit(100));
+    const snap = await getDocs(q);
+    const docs = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    // Stats
+    document.getElementById('s-total').textContent     = docs.length;
+    document.getElementById('s-paid').textContent      = docs.filter(d=>['paid','delivered'].includes(d.status)).length;
+    document.getElementById('s-pending').textContent   = docs.filter(d=>d.status==='pending').length;
+    document.getElementById('s-delivered').textContent = docs.filter(d=>d.status==='delivered').length;
+
+    if (!docs.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucune commande</td></tr>'; return; }
+
+    tbody.innerHTML = docs.map(o => `
+      <tr>
+        <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
+        <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
+        <td style="color:var(--gray4)">${o.email||'—'}</td>
+        <td style="color:var(--gray4)">${o.phone||'—'}</td>
+        <td style="color:var(--gray4);font-size:11px;text-transform:uppercase">${o.cardType||'—'}</td>
+        <td>${badge(o.status)}</td>
+        <td style="font-family:'Space Mono',monospace;color:var(--green);font-size:12px">${o.leadwaseId||'—'}</td>
+        <td>${
+          o.leadwaseId
+            ? `<button class="action-btn btn-done" disabled>Livré</button>`
+            : ['paid'].includes(o.status)
+              ? `<button class="action-btn btn-generate" onclick="generateCreds('${o.id}')">Générer</button>`
+              : `<span style="font-size:11px;color:var(--gray4)">—</span>`
+        }</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#f87171">Erreur : ${e.message}</td></tr>`;
+  }
+};
+
+// ── Charger paiements ────────────────────────────────────────────
+window.loadPayments = async () => {
+  const tbody = document.getElementById('payments-body');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray4)">Chargement...</td></tr>';
+  try {
+    const q    = query(collection(db,'payments'), orderBy('createdAt','desc'), limit(100));
+    const snap = await getDocs(q);
+    const docs = snap.docs.map(d => ({id:d.id,...d.data()}));
+    if (!docs.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Aucun paiement</td></tr>'; return; }
+    tbody.innerHTML = docs.map(p => `
+      <tr>
+        <td style="color:var(--gray4);font-size:11px">${fmtDate(p.createdAt)}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">${p.orderId||p.subscriptionId||'—'}</td>
+        <td style="font-weight:600;color:var(--green)">${p.amount ? p.amount.toLocaleString('fr-FR')+' FCFA' : '—'}</td>
+        <td>${badge(p.status)}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--gray4)">${p.pid||'—'}</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#f87171">Erreur : ${e.message}</td></tr>`;
+  }
+};
+
+// ── Générer identifiants ─────────────────────────────────────────
+window.generateCreds = async (orderId) => {
+  const btn = document.querySelector(`button[onclick="generateCreds('${orderId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'En cours...'; }
+  try {
+    const token = await getIdToken(auth.currentUser);
+    const r = await fetch('/api/admin/deliver', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+      body: JSON.stringify({ orderId }),
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    if (d.alreadyCreated) {
+      document.getElementById('m-id').textContent  = d.leadwaseId;
+      document.getElementById('m-pwd').textContent = '(déjà généré — voir email client)';
+    } else {
+      document.getElementById('m-id').textContent  = d.leadwaseId;
+      document.getElementById('m-pwd').textContent = d.password;
+    }
+    document.getElementById('cred-modal').classList.add('open');
+    loadOrders(); // refresh
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Générer'; }
+  }
+};
+
+// ── Fermer modal ─────────────────────────────────────────────────
+window.closeModal = () => document.getElementById('cred-modal').classList.remove('open');
+document.getElementById('cred-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 </script>
 </body>
 </html>
