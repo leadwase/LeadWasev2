@@ -131,14 +131,26 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .sidebar-overlay.active { display: block; }
 
 /* ══════════════════════════════════════════════
-   MAIN CONTENT
+   MAIN CONTENT - CENTRÉ !
 ══════════════════════════════════════════════ */
-.app-content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+.app-content { 
+  margin-left: var(--sidebar-w); 
+  flex: 1; 
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ══════════════════════════════════════════════
-   DASH
+   DASH - CENTRÉ
 ══════════════════════════════════════════════ */
-.dash { padding: 28px; max-width: 860px; }
+.dash { 
+  padding: 28px; 
+  max-width: 860px; 
+  width: 100%;
+  margin: 0 auto;
+}
 .dash-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 22px; flex-wrap: wrap; gap: 8px;
@@ -330,7 +342,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .ucta-biz:hover { border-color: var(--white); }
 
 /* ══════════════════════════════════════════════
-   LOADER & TOAST
+   LOADER & TOAST - CENTRÉ
 ══════════════════════════════════════════════ */
 .loader {
   width: 32px; height: 32px;
@@ -357,7 +369,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   .topbar { display: flex; }
   .sidebar { transform: translateX(-100%); top: 52px; }
   .sidebar.open { transform: translateX(0); }
-  .app-content { margin-left: 0; padding-top: 52px; }
+  .app-content { margin-left: 0; padding-top: 52px; align-items: flex-start; }
   .dash { padding: 14px; }
   .dash-header { flex-direction: column; align-items: flex-start; gap: 4px; }
   .edit-grid { grid-template-columns: 1fr; }
@@ -620,16 +632,6 @@ window.toggleReviewPreview = (val) => {
 </script>
 
 <script type="module">
-   const DEBUG = true;
-
-function log(...args) {
-  if (DEBUG) console.log("[DEBUG]", ...args);
-}
-
-function logError(...args) {
-  console.error("[ERROR]", ...args);
-}
-   
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -671,11 +673,6 @@ onAuthStateChanged(auth, async user => {
       if (!profileDoc.exists()) profileDoc = null;
     }
   }
-
-  // 🔥 DEBUG ICI (après création)
-  console.log("[DEBUG] lwId =", lwId);
-  console.log("[DEBUG] profileDoc exists =", profileDoc?.exists?.());
-  console.log("[DEBUG] profile data =", profileDoc?.data?.());
 
   if (!profileDoc) {
     await signOut(auth);
@@ -758,9 +755,6 @@ onAuthStateChanged(auth, async user => {
 
 window.saveProfile = async () => {
   try {
-    log("saveProfile lancé");
-    log("lwId =", lwId);
-
     if (!lwId) {
       throw new Error("lwId est null ou undefined");
     }
@@ -781,27 +775,16 @@ window.saveProfile = async () => {
       updatedAt: new Date(),
     };
 
-    log("payload envoyé =", payload);
-
     const ref = fbDoc(db, 'profiles', lwId);
-    log("Firestore path =", `profiles/${lwId}`);
-
     await updateDoc(ref, payload);
-
-    log("updateDoc OK");
-
     toast('Profil mis à jour !', 'success');
-
   } catch (e) {
-    logError("saveProfile FAILED:", e);
     toast('Erreur : ' + e.message, 'error');
   }
 };
 
 window.saveLinks = async () => {
   try {
-    log("saveLinks lancé", lwId);
-
     const { updateDoc, doc: fbDoc } = await import(
       "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
     );
@@ -817,15 +800,9 @@ window.saveLinks = async () => {
       updatedAt: new Date(),
     };
 
-    log("links payload =", payload);
-
     await updateDoc(fbDoc(db, 'profiles', lwId), payload);
-
-    log("links OK");
     toast('Liens mis à jour !', 'success');
-
   } catch (e) {
-    logError("saveLinks FAILED:", e);
     toast('Erreur : ' + e.message, 'error');
   }
 };
