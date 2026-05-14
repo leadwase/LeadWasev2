@@ -71,6 +71,35 @@
   .products-grid{grid-template-columns:1fr}
   .steps-row,.testi-grid{grid-template-columns:1fr}
 }
+  @media (max-width: 900px) {
+  .hero {
+    background: var(--white);
+  }
+  
+  .hero-left {
+    background: var(--white);
+  }
+  
+  .hero-left::before {
+    display: none;
+  }
+  
+  .hero-h1 {
+    color: var(--black);
+  }
+  
+  .hero-p {
+    color: var(--gray2);
+  }
+  
+  .hero-eyebrow {
+    color: var(--green);
+  }
+  
+  .hero-eyebrow::before {
+    background: var(--green);
+  }
+}
 </style>
 </head>
 <body>
@@ -87,9 +116,9 @@
 
 <div class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow">Carte de visite digitale professionnelle</div>
-    <h1 class="hero-h1">Votre identité.<br><em>Digitale.</em><br>Puissante.</h1>
-    <p class="hero-p">Commandez votre carte LeadWase NFC, recevez vos identifiants et activez votre profil digital en quelques minutes.</p>
+    <div class="hero-eyebrow">Partagez vos infos en un instant.</div>
+    <h1 class="hero-h1">Partagez vos <br><em>infos</em><br>en un instant.</h1>
+    <p class="hero-p">LeadWase vous permet de partager vos informations via NFC ou QR Code. Simple, rapide et sans friction.</p>
     <div class="hero-actions">
       <a class="btn-green" href="commander.html">Commander — 2 500 FCFA</a>
       <a class="btn-outline-white" href="#nos-cartes">Nos cartes →</a>
