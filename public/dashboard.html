@@ -164,25 +164,19 @@
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, getDocs, updateDoc, collection, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Cherche le profil dans `profiles` par email de l'utilisateur Firebase Auth.
-// Utilisé en fallback quand users/{uid}.leadwaseId est absent (commandes sans
-// compte lié, webhook qui ne crée pas le doc users).
+// Extrait le LeadWase ID depuis l'email interne Firebase Auth.
+// Connexion via carte → email = "lw-97767@leadwase.internal"
+// On récupère directement "LW-97767" sans requête Firestore supplémentaire.
 // ─────────────────────────────────────────────────────────────────────────────
-async function findProfileByEmail(email) {
+function lwIdFromInternalEmail(email) {
   if (!email) return null;
-  const q = query(
-    collection(db, 'profiles'),
-    where('email', '==', email),
-    limit(1)
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  return snap.docs[0];
+  const match = email.match(/^(lw-\d+)@leadwase\.internal$/i);
+  return match ? match[1].toUpperCase() : null;
 }
 
 onAuthStateChanged(auth, async user => {
@@ -200,33 +194,38 @@ onAuthStateChanged(auth, async user => {
   }
 
   // ── 3. Trouver le leadwaseId ─────────────────────────────────────────────
-  //    Priorité : users/{uid}.leadwaseId → sinon cherche par email dans profiles
+  //    Priorité 1 : users/{uid}.leadwaseId  (cas normal / abonnements)
+  //    Priorité 2 : extrait de l'email interne lw-XXXXX@leadwase.internal
+  //                 (connexion par carte sans doc users créé)
   let profileDoc = null;
 
   if (ud.leadwaseId) {
-    // Cas normal : le doc users contient déjà le leadwaseId
     lwId = ud.leadwaseId;
     profileDoc = await getDoc(doc(db, 'profiles', lwId));
-    if (!profileDoc.exists()) profileDoc = null; // sécurité
+    if (!profileDoc.exists()) profileDoc = null;
   }
 
   if (!profileDoc) {
-    // Fallback : recherche par email (commandes passées sans compte lié)
-    profileDoc = await findProfileByEmail(user.email);
-    if (profileDoc) {
-      lwId = profileDoc.data().leadwaseId;
+    const lwIdFromEmail = lwIdFromInternalEmail(user.email);
+    if (lwIdFromEmail) {
+      lwId = lwIdFromEmail;
+      profileDoc = await getDoc(doc(db, 'profiles', lwId));
+      if (!profileDoc.exists()) profileDoc = null;
 
-      // Rattacher silencieusement le profil au compte Firebase pour les prochaines fois
-      try {
-        const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-        await setDoc(doc(db, 'users', user.uid), { leadwaseId: lwId, plan: profileDoc.data().plan || 'free', updatedAt: new Date() }, { merge: true });
-      } catch(_) { /* non bloquant */ }
+      // Rattacher au doc users pour les prochaines sessions
+      if (profileDoc) {
+        try {
+          const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+          await setDoc(doc(db, 'users', user.uid),
+            { leadwaseId: lwId, plan: profileDoc.data().plan || 'free', updatedAt: new Date() },
+            { merge: true });
+        } catch(_) { /* non bloquant */ }
+      }
     }
   }
 
   // ── 4. Aucun profil trouvé → rediriger vers connexion avec message ──────
   if (!profileDoc) {
-    // Déconnecter la session Firebase orpheline puis rediriger
     try { await signOut(auth); } catch(_) {}
     window.location.href = 'connexion.html?msg=identifiants';
     return;
