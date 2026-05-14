@@ -50,26 +50,54 @@
     <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
     <div class="cover-line"></div>
   </div>
+
+  <!-- Chargement -->
   <div class="pf-main" id="pf-loading" style="text-align:center;padding-top:60px">
     <div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div>
     <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
   </div>
+
+  <!-- Contenu profil -->
   <div class="pf-main" id="pf-content" style="display:none">
-    <div class="pf-av-wrap"><div class="pf-av" id="pf-av">?</div><div class="pf-plan-tag" id="pf-plan">FREE</div></div>
-    <div class="pf-name" id="pf-name">–</div>
-    <div class="pf-job" id="pf-job">–</div>
-    <div class="pf-co" id="pf-co"></div>
-    <div class="pf-bio" id="pf-bio"></div>
-    <button class="save-btn" id="vcf-btn">📲 Enregistrer le contact</button>
-    <div class="contact-grid">
-      <a class="c-tile" id="tile-phone" href="#"><div class="c-tile-icon">📞</div><div><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div></a>
-      <a class="c-tile" id="tile-email" href="#"><div class="c-tile-icon">✉️</div><div><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div></a>
-      <a class="c-tile" id="tile-co"><div class="c-tile-icon">🏢</div><div><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div></a>
-      <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none"><div class="c-tile-icon">🌐</div><div><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div></a>
+    <div class="pf-av-wrap">
+      <div class="pf-av" id="pf-av">?</div>
+      <div class="pf-plan-tag" id="pf-plan">FREE</div>
     </div>
+    <div class="pf-name" id="pf-name">–</div>
+    <div class="pf-job"  id="pf-job">–</div>
+    <div class="pf-co"   id="pf-co"></div>
+    <div class="pf-bio"  id="pf-bio"></div>
+
+    <button class="save-btn" id="vcf-btn">📲 Enregistrer le contact</button>
+
+    <div class="contact-grid">
+      <a class="c-tile" id="tile-phone" href="#">
+        <div class="c-tile-icon">📞</div>
+        <div><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div>
+      </a>
+      <a class="c-tile" id="tile-email" href="#">
+        <div class="c-tile-icon">✉️</div>
+        <div><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div>
+      </a>
+      <a class="c-tile" id="tile-co">
+        <div class="c-tile-icon">🏢</div>
+        <div><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div>
+      </a>
+      <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none">
+        <div class="c-tile-icon">🌐</div>
+        <div><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div>
+      </a>
+    </div>
+
     <div class="social-links" id="pf-socials" style="display:none"></div>
-    <div class="pf-footer"><p>Profil créé avec</p><a href="/">Lead<span style="color:var(--green)">Wase</span> — Créez le vôtre</a></div>
+
+    <div class="pf-footer">
+      <p>Profil créé avec</p>
+      <a href="/">Lead<span style="color:var(--green)">Wase</span> — Créez le vôtre</a>
+    </div>
   </div>
+
+  <!-- Erreur -->
   <div class="pf-main" id="pf-error" style="display:none;text-align:center;padding-top:60px">
     <div style="font-size:48px;margin-bottom:14px">😕</div>
     <h2 style="font-size:22px;font-weight:bold;margin-bottom:8px">Profil introuvable</h2>
@@ -77,45 +105,99 @@
     <a class="btn-green" href="/">Retour à l'accueil</a>
   </div>
 </div>
+
 <script type="module">
 import { db } from './js/firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
 const id = new URLSearchParams(window.location.search).get('id');
 if (!id) showErr(); else load(id.toUpperCase());
+
 async function load(id) {
   try {
-    const snap = await getDoc(doc(db,'profiles',id));
+    const snap = await getDoc(doc(db, 'profiles', id));
     if (!snap.exists()) { showErr(); return; }
-    const p = snap.data();
-    const ini = ((p.firstName||'?')[0]+(p.lastName||'?')[0]).toUpperCase();
-    document.title = (p.firstName||'')+' '+(p.lastName||'')+' — LeadWase';
-    document.getElementById('pf-av').textContent   = ini;
-    document.getElementById('pf-plan').textContent = (p.plan||'free').toUpperCase();
-    document.getElementById('pf-name').textContent = (p.firstName||'')+' '+(p.lastName||'');
-    document.getElementById('pf-job').textContent  = p.jobTitle||'';
-    document.getElementById('pf-co').textContent   = p.company||'';
-    document.getElementById('pf-co2').textContent  = p.company||'–';
-    document.getElementById('pf-bio').textContent  = p.bio||'';
-    document.getElementById('pf-phone').textContent= p.phone||'–';
-    document.getElementById('pf-email').textContent= p.email||'–';
-    document.getElementById('tile-phone').href = p.phone?'tel:'+p.phone:'#';
-    document.getElementById('tile-email').href = p.email?'mailto:'+p.email:'#';
-    if (p.website) { const tw=document.getElementById('tile-web'); tw.style.display='flex'; tw.href=p.website; document.getElementById('pf-web').textContent=p.website.replace(/https?:\\/\\//,''); }
-    if (p.plan!=='free') {
-      const sc=[{k:'linkedin',i:'💼',l:'LinkedIn'},{k:'instagram',i:'📷',l:'Instagram'},{k:'twitter',i:'🐦',l:'Twitter/X'},{k:'facebook',i:'📘',l:'Facebook'}];
-      const box=document.getElementById('pf-socials'); let has=false;
-      sc.forEach(s=>{ if(p[s.k]){has=true;box.insertAdjacentHTML('beforeend',`<a class="social-btn" href="${p[s.k]}" target="_blank">${s.i} ${s.l}</a>`);} });
-      if(has) box.style.display='flex';
+
+    const p   = snap.data();
+    const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
+
+    document.title = (p.firstName || '') + ' ' + (p.lastName || '') + ' — LeadWase';
+
+    document.getElementById('pf-av').textContent    = ini;
+    document.getElementById('pf-plan').textContent  = (p.plan || 'free').toUpperCase();
+    document.getElementById('pf-name').textContent  = (p.firstName || '') + ' ' + (p.lastName || '');
+    document.getElementById('pf-job').textContent   = p.jobTitle || '';
+    document.getElementById('pf-co').textContent    = p.company  || '';
+    document.getElementById('pf-co2').textContent   = p.company  || '–';
+    document.getElementById('pf-bio').textContent   = p.bio      || '';
+    document.getElementById('pf-phone').textContent = p.phone    || '–';
+    document.getElementById('pf-email').textContent = p.email    || '–';
+
+    document.getElementById('tile-phone').href = p.phone ? 'tel:' + p.phone : '#';
+    document.getElementById('tile-email').href = p.email ? 'mailto:' + p.email : '#';
+
+    if (p.website) {
+      const tw = document.getElementById('tile-web');
+      tw.style.display = 'flex';
+      tw.href = p.website;
+      // Regex correctement échappée — pas de double antislash
+      document.getElementById('pf-web').textContent = p.website.replace(/https?:\/\//, '');
     }
+
+    // Réseaux sociaux (Pro / Business uniquement)
+    if (p.plan !== 'free') {
+      const socials = [
+        { k: 'linkedin',  i: '💼', l: 'LinkedIn'   },
+        { k: 'instagram', i: '📷', l: 'Instagram'  },
+        { k: 'twitter',   i: '🐦', l: 'Twitter/X'  },
+        { k: 'facebook',  i: '📘', l: 'Facebook'   },
+      ];
+      const box = document.getElementById('pf-socials');
+      let has = false;
+      socials.forEach(s => {
+        if (p[s.k]) {
+          has = true;
+          box.insertAdjacentHTML('beforeend',
+            `<a class="social-btn" href="${p[s.k]}" target="_blank">${s.i} ${s.l}</a>`);
+        }
+      });
+      if (has) box.style.display = 'flex';
+    }
+
+    // Bouton vCard
     document.getElementById('vcf-btn').onclick = () => {
-      const v=`BEGIN:VCARD\\nVERSION:3.0\\nFN:${p.firstName} ${p.lastName}\\nTITLE:${p.jobTitle||''}\\nORG:${p.company||''}\\nTEL;TYPE=CELL:${p.phone||''}\\nEMAIL:${p.email||''}\\nURL:${p.website||''}\\nNOTE:LeadWase — leadwase.com/profil/${id}\\nEND:VCARD`;
-      Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([v],{type:'text/vcard'})),download:`${p.firstName}_${p.lastName}.vcf`}).click();
+      const vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'FN:'    + (p.firstName || '') + ' ' + (p.lastName || ''),
+        'TITLE:' + (p.jobTitle  || ''),
+        'ORG:'   + (p.company   || ''),
+        'TEL;TYPE=CELL:' + (p.phone   || ''),
+        'EMAIL:' + (p.email   || ''),
+        'URL:'   + (p.website || ''),
+        'NOTE:LeadWase — leadwase.com/profil/' + id,
+        'END:VCARD',
+      ].join('\n');
+
+      const a = document.createElement('a');
+      a.href     = URL.createObjectURL(new Blob([vcard], { type: 'text/vcard' }));
+      a.download = (p.firstName || 'contact') + '_' + (p.lastName || '') + '.vcf';
+      a.click();
     };
-    document.getElementById('pf-loading').style.display='none';
-    document.getElementById('pf-content').style.display='block';
-  } catch { showErr(); }
+
+    document.getElementById('pf-loading').style.display = 'none';
+    document.getElementById('pf-content').style.display = 'block';
+
+  } catch(e) {
+    console.error('Erreur chargement profil:', e);
+    showErr();
+  }
 }
-function showErr(){document.getElementById('pf-loading').style.display='none';document.getElementById('pf-error').style.display='block';}
+
+function showErr() {
+  document.getElementById('pf-loading').style.display = 'none';
+  document.getElementById('pf-error').style.display   = 'block';
+}
 </script>
 </body>
 </html>
