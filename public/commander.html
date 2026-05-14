@@ -42,6 +42,18 @@
 .sum-total-val{font-size:22px;font-weight:bold;color:var(--green)}
 .delivery-box{background:var(--green-pale);border:1px solid var(--green-light);padding:16px;margin-top:16px;font-size:12px;color:var(--gray2);line-height:1.8}
 .delivery-box strong{color:var(--green)}
+
+/* ── Popup confirmation ── */
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:20px}
+.popup-overlay.open{display:flex}
+.popup{background:var(--white);padding:40px 36px;max-width:440px;width:100%;text-align:center;border-top:4px solid var(--green)}
+.popup-icon{font-size:48px;margin-bottom:16px}
+.popup-title{font-size:20px;font-weight:bold;color:var(--black);margin-bottom:10px}
+.popup-msg{font-size:14px;color:var(--gray2);line-height:1.7;margin-bottom:24px}
+.popup-id{font-family:'Courier New',monospace;font-size:13px;background:var(--green-pale);border:1px solid var(--green-light);padding:10px 16px;color:var(--green);font-weight:bold;margin-bottom:20px;display:none}
+.popup-close{padding:12px 32px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .2s}
+.popup-close:hover{background:var(--green)}
+
 @media(max-width:900px){.order-content{grid-template-columns:1fr;padding:20px}.order-hero{padding:28px 20px}.form-box{padding:24px}.form-row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -54,6 +66,7 @@
     <a class="nav-item" href="connexion.html">Connexion</a>
   </div>
 </nav>
+
 <div style="background:var(--off);min-height:calc(100vh - 64px)">
   <div class="order-hero">
     <div class="order-breadcrumb"><a href="/">Accueil</a> / Commander ma carte</div>
@@ -64,15 +77,34 @@
     <div class="form-box">
       <div class="sec-title"><span class="step-dot">1</span>Type de carte</div>
       <div class="type-sel">
-        <div class="type-opt sel" id="t-classic" onclick="selType('classic')"><div class="type-opt-name">Carte Classique</div><div class="type-opt-price">2 500 FCFA · Particuliers</div></div>
-        <div class="type-opt" id="t-b2b" onclick="selType('b2b')"><div class="type-opt-name">Carte B2B</div><div class="type-opt-price">Sur devis · Entreprises</div></div>
+        <div class="type-opt sel" id="t-classic" onclick="selType('classic')">
+          <div class="type-opt-name">Carte Classique</div>
+          <div class="type-opt-price">2 500 FCFA · Particuliers</div>
+        </div>
+        <div class="type-opt" id="t-b2b" onclick="selType('b2b')">
+          <div class="type-opt-name">Carte B2B</div>
+          <div class="type-opt-price">Sur devis · Entreprises</div>
+        </div>
       </div>
+
+      <!-- Formulaire Classique -->
       <div id="form-classic">
         <div class="sec-title"><span class="step-dot">2</span>Vos informations</div>
-        <div class="form-row"><div class="f-group"><label class="f-label">Prénom *</label><input class="f-input" id="firstName" placeholder="Ex : Kofi"></div><div class="f-group"><label class="f-label">Nom *</label><input class="f-input" id="lastName" placeholder="Ex : Mensah"></div></div>
-        <div class="form-row"><div class="f-group"><label class="f-label">Titre / Poste *</label><input class="f-input" id="jobTitle" placeholder="Ex : Directeur Commercial"></div><div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="company" placeholder="Ex : AMANI Corp"></div></div>
-        <div class="form-row"><div class="f-group"><label class="f-label">Téléphone *</label><input class="f-input" id="phone" type="tel" placeholder="+225 07 00 00 00 00"></div><div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="email" type="email" placeholder="kofi@amani.com"></div></div>
-        <div class="form-row form-solo"><div class="f-group"><label class="f-label">Adresse de livraison *</label><input class="f-input" id="address" placeholder="Quartier, commune, ville, pays"></div></div>
+        <div class="form-row">
+          <div class="f-group"><label class="f-label">Prénom *</label><input class="f-input" id="firstName" placeholder="Ex : Kofi"></div>
+          <div class="f-group"><label class="f-label">Nom *</label><input class="f-input" id="lastName" placeholder="Ex : Mensah"></div>
+        </div>
+        <div class="form-row">
+          <div class="f-group"><label class="f-label">Titre / Poste *</label><input class="f-input" id="jobTitle" placeholder="Ex : Directeur Commercial"></div>
+          <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="company" placeholder="Ex : AMANI Corp"></div>
+        </div>
+        <div class="form-row">
+          <div class="f-group"><label class="f-label">Téléphone *</label><input class="f-input" id="phone" type="tel" placeholder="+225 07 00 00 00 00"></div>
+          <div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="email" type="email" placeholder="kofi@amani.com"></div>
+        </div>
+        <div class="form-row form-solo">
+          <div class="f-group"><label class="f-label">Adresse de livraison *</label><input class="f-input" id="address" placeholder="Quartier, commune, ville, pays"></div>
+        </div>
         <div style="height:1px;background:var(--gray5);margin:24px 0"></div>
         <div class="sec-title"><span class="step-dot">3</span>Mode de paiement</div>
         <div class="pay-row">
@@ -83,26 +115,69 @@
         <button class="submit-btn" id="submit-btn" onclick="submitOrder()">Valider ma commande →</button>
         <p style="text-align:center;font-size:11px;color:var(--gray3);margin-top:10px;font-style:italic">🔒 Paiement sécurisé · Livraison 48h</p>
       </div>
+
+      <!-- Formulaire B2B -->
       <div id="form-b2b" style="display:none">
         <div class="sec-title"><span class="step-dot">2</span>Informations entreprise</div>
-        <div class="form-row"><div class="f-group"><label class="f-label">Nom de l'entreprise *</label><input class="f-input" id="b2b-company" placeholder="Ex : AMANI Consulting"></div><div class="f-group"><label class="f-label">Nombre de cartes *</label><select class="f-input"><option>10 – 25 cartes</option><option>26 – 50 cartes</option><option>51 – 100 cartes</option><option>100+ cartes</option></select></div></div>
-        <div class="form-row"><div class="f-group"><label class="f-label">Responsable *</label><input class="f-input" id="b2b-name" placeholder="Nom du responsable"></div><div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="b2b-email" type="email" placeholder="contact@entreprise.com"></div></div>
-        <div class="form-row form-solo"><div class="f-group"><label class="f-label">Description du besoin</label><textarea class="f-textarea" id="b2b-desc" placeholder="Couleurs, logo, besoins spécifiques..."></textarea></div></div>
-        <button class="submit-btn" onclick="submitB2B()">Envoyer ma demande de devis →</button>
+        <div class="form-row">
+          <div class="f-group"><label class="f-label">Nom de l'entreprise *</label><input class="f-input" id="b2b-company" placeholder="Ex : AMANI Consulting"></div>
+          <div class="f-group"><label class="f-label">Nombre de cartes *</label>
+            <select class="f-input" id="b2b-qty">
+              <option>10 – 25 cartes</option>
+              <option>26 – 50 cartes</option>
+              <option>51 – 100 cartes</option>
+              <option>100+ cartes</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="f-group"><label class="f-label">Responsable *</label><input class="f-input" id="b2b-name" placeholder="Nom du responsable"></div>
+          <div class="f-group"><label class="f-label">Téléphone *</label><input class="f-input" id="b2b-phone" type="tel" placeholder="+229 00 00 00 00"></div>
+        </div>
+        <div class="form-row form-solo">
+          <div class="f-group"><label class="f-label">Email *</label><input class="f-input" id="b2b-email" type="email" placeholder="contact@entreprise.com"></div>
+        </div>
+        <div class="form-row form-solo">
+          <div class="f-group"><label class="f-label">Description du besoin</label><textarea class="f-textarea" id="b2b-desc" placeholder="Couleurs, logo, besoins spécifiques..."></textarea></div>
+        </div>
+        <button class="submit-btn" id="b2b-btn" onclick="submitB2B()">Envoyer ma demande de devis →</button>
       </div>
     </div>
+
+    <!-- Récapitulatif -->
     <div>
-      <div class="sum-box">
+      <div class="sum-box" id="sum-classic">
         <div class="sum-title">Récapitulatif</div>
         <div class="sum-row"><span class="sum-label">Carte Classique</span><span class="sum-val">2 500 FCFA</span></div>
         <div class="sum-row"><span class="sum-label">Profil digital</span><span class="sum-val" style="color:var(--green)">Offert</span></div>
         <div class="sum-row"><span class="sum-label">Livraison</span><span class="sum-val" style="color:var(--green)">Incluse</span></div>
         <div class="sum-total"><span class="sum-total-label">Total</span><span class="sum-total-val">2 500 FCFA</span></div>
       </div>
-      <div class="delivery-box"><strong>Ce que vous recevrez :</strong><br>✦ Votre carte physique sous 48h<br>✦ Identifiant unique (LW-XXXXX)<br>✦ Mot de passe de connexion<br>✦ Accès profil digital Free</div>
+      <div class="sum-box" id="sum-b2b" style="display:none">
+        <div class="sum-title">Récapitulatif B2B</div>
+        <div class="sum-row"><span class="sum-label">Type</span><span class="sum-val">Carte B2B</span></div>
+        <div class="sum-row"><span class="sum-label">Tarif</span><span class="sum-val">Sur devis</span></div>
+        <div class="sum-row"><span class="sum-label">Délai réponse</span><span class="sum-val" style="color:var(--green)">24h</span></div>
+        <div class="sum-total"><span class="sum-total-label">Total</span><span class="sum-total-val" style="font-size:16px">À définir</span></div>
+      </div>
+      <div class="delivery-box" id="delivery-classic">
+        <strong>Ce que vous recevrez :</strong><br>
+        ✦ Votre carte physique sous 48h<br>
+        ✦ Identifiant unique (LW-XXXXX)<br>
+        ✦ Mot de passe de connexion<br>
+        ✦ Accès profil digital Free
+      </div>
+      <div class="delivery-box" id="delivery-b2b" style="display:none">
+        <strong>Processus B2B :</strong><br>
+        ✦ Réception de votre demande<br>
+        ✦ Devis personnalisé sous 24h<br>
+        ✦ Validation & production<br>
+        ✦ Livraison groupée
+      </div>
     </div>
   </div>
 </div>
+
 <footer class="footer">
   <div class="footer-grid">
     <div><div class="footer-brand">Lead<em>Wase</em></div><p class="footer-tagline">Votre identité digitale professionnelle.</p></div>
@@ -113,12 +188,27 @@
   <div class="footer-bottom"><span class="footer-copy">© 2026 LeadWase</span><div class="footer-legal"><a href="cgu.html">CGU</a><a href="confidentialite.html">Confidentialité</a><a href="mailto:supportleadwase@gmail.com">Contact</a></div></div>
 </footer>
 
+<!-- ── Popup confirmation ── -->
+<div class="popup-overlay" id="popup">
+  <div class="popup">
+    <div class="popup-icon" id="popup-icon">✅</div>
+    <div class="popup-title" id="popup-title">Demande envoyée !</div>
+    <div class="popup-msg" id="popup-msg">Notre équipe vous contacte sous 24h avec un devis personnalisé.</div>
+    <div class="popup-id" id="popup-ref"></div>
+    <button class="popup-close" onclick="closePopup()">Fermer</button>
+  </div>
+</div>
+
 <script>
   function selType(t) {
     document.getElementById('t-classic').classList.toggle('sel', t === 'classic');
     document.getElementById('t-b2b').classList.toggle('sel', t === 'b2b');
-    document.getElementById('form-classic').style.display = t === 'classic' ? 'block' : 'none';
-    document.getElementById('form-b2b').style.display     = t === 'b2b'     ? 'block' : 'none';
+    document.getElementById('form-classic').style.display  = t === 'classic' ? 'block' : 'none';
+    document.getElementById('form-b2b').style.display      = t === 'b2b'     ? 'block' : 'none';
+    document.getElementById('sum-classic').style.display   = t === 'classic' ? 'block' : 'none';
+    document.getElementById('sum-b2b').style.display       = t === 'b2b'     ? 'block' : 'none';
+    document.getElementById('delivery-classic').style.display = t === 'classic' ? 'block' : 'none';
+    document.getElementById('delivery-b2b').style.display     = t === 'b2b'     ? 'block' : 'none';
   }
 
   function selPay(el) {
@@ -126,29 +216,29 @@
     el.classList.add('sel');
   }
 
-  function submitB2B() {
-    alert('Demande envoyée. Notre équipe vous contacte sous 24h.');
+  function showPopup(icon, title, msg, ref) {
+    document.getElementById('popup-icon').textContent  = icon;
+    document.getElementById('popup-title').textContent = title;
+    document.getElementById('popup-msg').textContent   = msg;
+    const refEl = document.getElementById('popup-ref');
+    if (ref) { refEl.textContent = ref; refEl.style.display = 'block'; }
+    else { refEl.style.display = 'none'; }
+    document.getElementById('popup').classList.add('open');
   }
 
+  function closePopup() {
+    document.getElementById('popup').classList.remove('open');
+  }
+
+  // ── Commande classique ────────────────────────────────────────
   async function submitOrder() {
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="loader"></span> Traitement...';
-
-    // Plus besoin de vérifier si l'utilisateur est connecté
-    // const user = auth.currentUser;
-    // if (!user) { sessionStorage.setItem('pendingOrder','1'); window.location.href='/connexion.html?redirect=commander'; return; }
-
+    btn.textContent = 'Traitement...';
     try {
-      // Plus besoin du token Firebase — la route API n'exige plus d'authentification
-      // const token = await getIdToken(user);
-
       const r = await fetch('/api/orders/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer ' + token,  // plus nécessaire
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardType:  'classic',
           firstName: document.getElementById('firstName').value,
@@ -160,20 +250,74 @@
           address:   document.getElementById('address').value,
         })
       });
-
       const d = await r.json();
       if (d.payUrl) {
         window.location.href = d.payUrl;
       } else {
-        alert('Erreur : ' + (d.error || 'Commande non traitée'));
+        showPopup('❌', 'Erreur', d.error || 'Commande non traitée', null);
         btn.disabled = false;
         btn.textContent = 'Valider ma commande →';
       }
     } catch(e) {
-      alert('Erreur réseau');
+      showPopup('❌', 'Erreur réseau', 'Vérifiez votre connexion et réessayez.', null);
       btn.disabled = false;
       btn.textContent = 'Valider ma commande →';
     }
+  }
+
+  // ── Demande B2B ───────────────────────────────────────────────
+  async function submitB2B() {
+    const company = document.getElementById('b2b-company').value.trim();
+    const name    = document.getElementById('b2b-name').value.trim();
+    const email   = document.getElementById('b2b-email').value.trim();
+    const phone   = document.getElementById('b2b-phone').value.trim();
+    const qty     = document.getElementById('b2b-qty').value;
+    const desc    = document.getElementById('b2b-desc').value.trim();
+
+    if (!company || !name || !email) {
+      showPopup('⚠️', 'Champs manquants', 'Veuillez renseigner l\'entreprise, le responsable et l\'email.', null);
+      return;
+    }
+
+    const btn = document.getElementById('b2b-btn');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours...';
+
+    try {
+      const r = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cardType: 'b2b',
+          company,
+          firstName: name,
+          lastName:  '',
+          phone,
+          email,
+          quantity:  qty,
+          description: desc,
+        })
+      });
+      const d = await r.json();
+      if (d.success) {
+        showPopup(
+          '✅',
+          'Demande B2B envoyée !',
+          'Notre équipe vous contacte sous 24h avec un devis personnalisé pour ' + company + '.',
+          'Référence : ' + (d.orderId ? d.orderId.slice(-6).toUpperCase() : '—')
+        );
+        // Vider le formulaire
+        ['b2b-company','b2b-name','b2b-phone','b2b-email','b2b-desc'].forEach(id =>
+          document.getElementById(id).value = '');
+      } else {
+        showPopup('❌', 'Erreur', d.error || 'Demande non traitée', null);
+      }
+    } catch(e) {
+      showPopup('❌', 'Erreur réseau', 'Vérifiez votre connexion et réessayez.', null);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma demande de devis →';
   }
 
   // Lire le paramètre ?type=b2b dès le chargement
@@ -182,11 +326,5 @@
     if (p.get('type') === 'b2b') selType('b2b');
   })();
 </script>
-
-<!-- Import Firebase conservé mais plus utilisé côté client pour l'instant -->
-<!-- <script type="module">
-  import { auth } from './js/firebase-config.js';
-  import { getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-</script> -->
 </body>
 </html>
