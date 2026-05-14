@@ -1,5 +1,11 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp }       from 'firebase-admin/firestore';
+import {
+  notifyAdminNewOrder,
+  notifyClientPaymentSuccess,
+  notifyClientPaymentFailed,
+  notifyAdminPaymentFailed,
+} from './brevo.js';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -25,6 +31,7 @@ export default async function handler(req, res) {
     const ko  = ['failed','failure','cancelled','rejected','payment.failed'].includes(raw);
     if (!ok && !ko) return res.json({ received: true, status: 'ignored' });
 
+    // ── Retrouver le document payment ─────────────────────────────────────────
     let payDoc = null;
     const txId = transaction?.metadata?.transactionId;
     if (txId) { const d = await db.collection('payments').doc(txId).get(); if (d.exists) payDoc = d; }
@@ -41,12 +48,12 @@ export default async function handler(req, res) {
     if (!payDoc) return res.json({ received: true });
 
     const pay = payDoc.data();
-    if (pay.status === 'success') return res.json({ received: true });
+    if (pay.status === 'success') return res.json({ received: true }); // anti-doublon
 
     const status = ok ? 'success' : 'failed';
     await payDoc.ref.update({ status, gatewayRef: transaction?.reference, webhookVerified: true, updatedAt: new Date() });
 
-    // ── Création de carte classique ────────────────────────────────────────────
+    // ── Création de carte classique ───────────────────────────────────────────
     if (ok && pay.orderId) {
       const ord   = await db.collection('orders').doc(pay.orderId).get();
       const oData = ord.data();
@@ -58,10 +65,10 @@ export default async function handler(req, res) {
 
       await ord.ref.update({ status: 'paid', leadwaseId: lwId, paidAt: new Date() });
 
-      // uid supprimé de la commande — on ne le stocke plus dans profile/credentials
-      // uid: pay.uid  → retiré car pas de connexion obligatoire à la commande
+      // uid retiré — commande passée sans connexion obligatoire
+      // uid: pay.uid  → commenté
       await db.collection('profiles').doc(lwId).set({
-        // uid: pay.uid,  // plus de uid puisque pas de connexion obligatoire
+        // uid: pay.uid,
         leadwaseId: lwId,
         firstName:  oData.firstName,
         lastName:   oData.lastName,
@@ -74,7 +81,7 @@ export default async function handler(req, res) {
       });
 
       await db.collection('credentials').doc(lwId).set({
-        // uid: pay.uid,  // plus de uid puisque pas de connexion obligatoire
+        // uid: pay.uid,
         leadwaseId:   lwId,
         passwordHash: pwd,
         createdAt:    new Date(),
@@ -82,6 +89,46 @@ export default async function handler(req, res) {
 
       // Mise à jour users désactivée — pas de compte Firebase lié à la commande
       // await db.collection('users').doc(pay.uid).set({ leadwaseId: lwId, plan: 'free', updatedAt: new Date() }, { merge: true });
+
+      // Notifications email
+      await Promise.allSettled([
+        notifyAdminNewOrder({
+          orderId:   pay.orderId,
+          firstName: oData.firstName,
+          lastName:  oData.lastName,
+          email:     oData.email,
+          phone:     oData.phone,
+          amount:    pay.amount,
+          plan:      'Carte Classique',
+        }),
+        notifyClientPaymentSuccess({
+          firstName: oData.firstName,
+          email:     oData.email,
+          amount:    pay.amount,
+        }),
+      ]);
+    }
+
+    // ── Paiement échoué (carte classique) ─────────────────────────────────────
+    if (ko && pay.orderId) {
+      const ord   = await db.collection('orders').doc(pay.orderId).get();
+      const oData = ord.data();
+      await ord.ref.update({ status: 'payment_failed' });
+
+      await Promise.allSettled([
+        notifyClientPaymentFailed({
+          firstName: oData.firstName,
+          email:     oData.email,
+          amount:    pay.amount,
+        }),
+        notifyAdminPaymentFailed({
+          orderId:   pay.orderId,
+          firstName: oData.firstName,
+          lastName:  oData.lastName,
+          email:     oData.email,
+          amount:    pay.amount,
+        }),
+      ]);
     }
 
     // ── Renouvellement d'abonnement ───────────────────────────────────────────
@@ -92,8 +139,7 @@ export default async function handler(req, res) {
 
       await sub.ref.update({ status: 'active', startDate: new Date(), expiryDate: Timestamp.fromDate(exp) });
 
-      // pay.uid peut être undefined si la commande a été passée sans connexion
-      // On ne met à jour users/profiles que si un uid est présent
+      // pay.uid présent ici — abonnement nécessite d'être connecté
       if (pay.uid) {
         await db.collection('users').doc(pay.uid).update({
           plan:       sData.plan,
