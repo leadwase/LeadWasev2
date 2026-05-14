@@ -4,47 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mon profil — LeadWase</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
-/* ═══════════════════════════════════════════════════════
-   RESET & VARIABLES
-═══════════════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* ══════════════════════════════════════════════
+   VARIABLES — identiques à l'original
+══════════════════════════════════════════════ */
 :root {
-  --green:    #1a7a3c;
-  --green2:   #15652f;
-  --green3:   #4caf75;
-  --green-lt: #e8f5ee;
-  --black:    #0d0d0d;
-  --white:    #ffffff;
-  --gray1:    #1c1c1e;
-  --gray2:    #48484a;
-  --gray3:    #8e8e93;
-  --gray4:    #aeaeb2;
-  --gray5:    #e5e5ea;
-  --gray6:    #f5f5f7;
-  --sidebar-w: 240px;
-  --serif: 'Syne', sans-serif;
-  --body: 'DM Sans', sans-serif;
-  --radius: 10px;
-  --shadow: 0 2px 12px rgba(0,0,0,.07);
+  --green:  #1a7a3c;
+  --green2: #15652f;
+  --green3: #4caf75;
+  --black:  #0d0d0d;
+  --white:  #ffffff;
+  --gray2:  #48484a;
+  --gray3:  #8e8e93;
+  --gray4:  #aeaeb2;
+  --gray5:  #e5e5ea;
+  --gray6:  #f5f5f7;
+  --serif:  Georgia, 'Times New Roman', serif;
+  --sidebar-w: 190px;
 }
 
-html { scroll-behavior: smooth; }
-body { font-family: var(--body); background: var(--gray6); color: var(--black); min-height: 100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--serif); background: var(--gray6); color: var(--black); min-height: 100vh; }
 
-/* ═══════════════════════════════════════════════════════
-   APP LAYOUT
-═══════════════════════════════════════════════════════ */
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
+/* ══════════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════════ */
+.app-layout { display: flex; min-height: 100vh; }
 
-/* ═══════════════════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   SIDEBAR — identique à l'original
+══════════════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--black);
@@ -53,580 +43,358 @@ body { font-family: var(--body); background: var(--gray6); color: var(--black); 
   position: fixed;
   top: 0; left: 0; bottom: 0;
   z-index: 100;
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
   overflow-y: auto;
+  transition: transform .28s ease;
 }
-
 .sidebar-logo {
-  padding: 22px 20px 18px;
+  padding: 20px 16px 16px;
   border-bottom: 1px solid rgba(255,255,255,.08);
   text-decoration: none;
   display: block;
 }
-.brand {
-  font-family: var(--serif);
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -.3px;
-}
+.brand { font-size: 18px; font-weight: bold; color: var(--white); letter-spacing: -.2px; }
 .brand em { color: var(--green3); font-style: normal; }
-.sub { font-size: 10px; color: var(--gray3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+.sub { font-size: 9px; color: var(--gray3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
 .sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 .sidebar-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
+  width: 34px; height: 34px; border-radius: 50%;
   background: var(--green);
   color: var(--white);
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 14px;
+  font-size: 13px; font-weight: bold;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.sidebar-user-name { font-size: 13px; font-weight: 500; color: var(--white); line-height: 1.2; }
-.sidebar-user-plan { font-size: 10px; color: var(--green3); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.sidebar-user-name { font-size: 12px; font-weight: bold; color: var(--white); line-height: 1.2; }
+.sidebar-user-plan { font-size: 9px; color: var(--green3); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
 
-.sidebar-nav { flex: 1; padding: 14px 0; }
+.sidebar-nav { flex: 1; padding: 12px 0; }
 .sidebar-section-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gray3);
-  padding: 12px 20px 4px;
+  font-size: 8px; font-weight: bold; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gray3);
+  padding: 10px 16px 4px;
 }
 .sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 20px;
-  font-size: 13px;
-  color: rgba(255,255,255,.65);
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  font-size: 12px; color: rgba(255,255,255,.65);
   text-decoration: none;
-  border-radius: 0;
-  transition: all .15s;
   border-left: 3px solid transparent;
+  transition: all .15s;
 }
 .sidebar-item:hover { color: var(--white); background: rgba(255,255,255,.04); }
-.sidebar-item.active { color: var(--white); background: rgba(26,122,60,.2); border-left-color: var(--green3); }
-.s-icon { font-size: 15px; width: 20px; flex-shrink: 0; }
+.sidebar-item.active { color: var(--white); background: rgba(26,122,60,.18); border-left-color: var(--green3); }
+.s-icon { font-size: 14px; width: 18px; flex-shrink: 0; }
 
-.sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.06); }
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,.06); }
 .sidebar-logout {
-  width: 100%;
-  padding: 9px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.12);
-  color: rgba(255,255,255,.5);
-  font-family: var(--body);
-  font-size: 12px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all .2s;
+  width: 100%; padding: 8px;
+  background: transparent; border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.5); font-family: var(--serif); font-size: 11px;
+  cursor: pointer; border-radius: 2px; transition: all .2s;
 }
 .sidebar-logout:hover { border-color: rgba(255,255,255,.3); color: var(--white); }
 
-/* ═══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    MOBILE TOPBAR
-═══════════════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 .topbar {
   display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 56px;
-  background: var(--black);
-  z-index: 200;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  background: var(--black); z-index: 200;
+  align-items: center; justify-content: space-between;
+  padding: 0 14px;
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
-.topbar-brand { font-family: var(--serif); font-size: 18px; font-weight: 800; color: var(--white); }
+.topbar-brand { font-size: 17px; font-weight: bold; color: var(--white); }
 .topbar-brand em { color: var(--green3); font-style: normal; }
 .hamburger {
   background: none; border: none; cursor: pointer;
-  display: flex; flex-direction: column; gap: 5px; padding: 4px;
+  display: flex; flex-direction: column; gap: 4px; padding: 4px;
 }
 .hamburger span {
-  display: block; width: 22px; height: 2px;
-  background: var(--white); border-radius: 2px;
-  transition: all .3s;
+  display: block; width: 20px; height: 2px;
+  background: var(--white); border-radius: 1px; transition: all .3s;
 }
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-/* Overlay */
 .sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 99;
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); z-index: 99;
 }
 .sidebar-overlay.active { display: block; }
 
-/* ═══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    MAIN CONTENT
-═══════════════════════════════════════════════════════ */
-.app-content {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  min-height: 100vh;
-}
-.dash { padding: 28px; max-width: 820px; margin: 0 auto; }
+══════════════════════════════════════════════ */
+.app-content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
 
+/* ══════════════════════════════════════════════
+   DASH
+══════════════════════════════════════════════ */
+.dash { padding: 28px; max-width: 860px; }
 .dash-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px; flex-wrap: wrap; gap: 8px;
 }
-.dash-h1 { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--black); }
-.dash-pub { font-size: 12px; color: var(--green); text-decoration: underline; font-style: italic; }
+.dash-h1 { font-size: 22px; font-weight: bold; color: var(--black); }
+.dash-pub { font-size: 13px; color: var(--green); text-decoration: underline; font-style: italic; }
 
-/* ═══════════════════════════════════════════════════════
-   CARDS
-═══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   CARD
+══════════════════════════════════════════════ */
 .card {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
+  background: var(--white); border: 1px solid var(--gray5);
+  padding: 32px; margin-bottom: 18px;
 }
-
-/* ═══════════════════════════════════════════════════════
-   PROFILE TOP
-═══════════════════════════════════════════════════════ */
-.profile-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 22px;
-}
+.profile-top { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 24px; }
 .pf-av {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--green), var(--green3));
+  width: 68px; height: 68px; border-radius: 50%;
+  background: var(--green);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif);
-  font-size: 22px; font-weight: 700;
-  color: var(--white);
-  flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(26,122,60,.3);
+  font-size: 24px; font-weight: bold; color: var(--white); flex-shrink: 0;
 }
-.pf-name { font-family: var(--serif); font-size: 19px; font-weight: 700; color: var(--black); margin-bottom: 3px; }
-.pf-job { font-size: 13px; color: var(--gray2); font-style: italic; margin-bottom: 2px; }
-.pf-co { font-size: 11px; color: var(--green); font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
-.pf-id { font-size: 10px; color: var(--gray3); font-family: 'Courier New', monospace; margin-top: 4px; }
+.pf-name { font-size: 20px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
+.pf-job  { font-size: 13px; color: var(--gray2); font-style: italic; margin-bottom: 2px; }
+.pf-co   { font-size: 11px; color: var(--green); font-weight: bold; letter-spacing: .5px; text-transform: uppercase; }
+.pf-id   { font-size: 10px; color: var(--gray3); font-family: 'Courier New', monospace; margin-top: 4px; }
 
 .plan-badge {
-  display: inline-block;
-  font-size: 9px; font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 20px;
-  margin-top: 5px;
+  display: inline-block; font-size: 9px; font-weight: bold;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 7px; border: 1px solid var(--gray4);
+  color: var(--gray2); margin-top: 5px;
 }
-.plan-free     { background: var(--gray5); color: var(--gray2); }
-.plan-pro      { background: var(--green); color: var(--white); }
-.plan-business { background: var(--black); color: var(--white); }
+.plan-pro      { background: var(--green); color: var(--white); border-color: var(--green); }
+.plan-business { background: var(--black); color: var(--white); border-color: var(--black); }
 
-/* ═══════════════════════════════════════════════════════
-   EDIT SECTION
-═══════════════════════════════════════════════════════ */
-.edit-sec { border-top: 1px solid var(--gray5); padding-top: 20px; }
-.edit-sec h3 { font-family: var(--serif); font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+/* ══════════════════════════════════════════════
+   FORMS
+══════════════════════════════════════════════ */
+.edit-sec { border-top: 1px solid var(--gray5); padding-top: 22px; }
+.edit-sec h3 { font-size: 14px; font-weight: bold; margin-bottom: 14px; }
 
-.edit-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+.edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .edit-solo { grid-template-columns: 1fr; }
 
 .f-group { display: flex; flex-direction: column; gap: 4px; }
-.f-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray3); }
+.f-label { font-size: 9px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray3); }
 .f-input, .f-textarea {
-  width: 100%;
-  padding: 9px 11px;
-  border: 1.5px solid var(--gray5);
-  border-radius: 7px;
-  font-family: var(--body);
-  font-size: 13px;
-  color: var(--black);
-  background: var(--white);
-  transition: border-color .2s, box-shadow .2s;
-  outline: none;
+  width: 100%; padding: 8px 10px;
+  border: 1px solid var(--gray5); border-radius: 2px;
+  font-family: var(--serif); font-size: 13px; color: var(--black);
+  background: var(--white); outline: none; transition: border-color .2s;
 }
-.f-input:focus, .f-textarea:focus {
-  border-color: var(--green3);
-  box-shadow: 0 0 0 3px rgba(26,122,60,.1);
-}
-.f-textarea { min-height: 80px; resize: vertical; }
+.f-input:focus, .f-textarea:focus { border-color: var(--green3); }
+.f-textarea { min-height: 76px; resize: vertical; }
 
 .save-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 22px;
-  background: var(--black);
-  color: var(--white);
-  border: none;
-  font-family: var(--serif);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background .2s;
-  border-radius: 7px;
-  margin-top: 10px;
+  padding: 10px 26px;
+  background: var(--black); color: var(--white);
+  border: none; font-family: var(--serif);
+  font-size: 12px; font-weight: bold;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: background .2s;
+  border-radius: 2px; margin-top: 12px;
+  display: inline-block; text-decoration: none; text-align: center;
 }
 .save-btn:hover { background: var(--green); }
-.save-btn-green { background: var(--green); }
-.save-btn-green:hover { background: var(--green2); }
 
-/* ═══════════════════════════════════════════════════════
-   PLAN FEATURE CARDS
-═══════════════════════════════════════════════════════ */
-.section-card {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  border-radius: var(--radius);
-  padding: 22px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
+/* ══════════════════════════════════════════════
+   SECTION CARDS
+══════════════════════════════════════════════ */
+.locked-card, .links-card, .extras-card {
+  background: var(--white); border: 1px solid var(--gray5);
+  padding: 22px; margin-bottom: 18px;
 }
-.section-card h3 {
-  font-family: var(--serif);
-  font-size: 14px; font-weight: 700;
-  margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
-}
-
-/* ─── Social Links ─── */
-.link-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.link-icon {
-  font-size: 18px;
-  width: 32px;
-  flex-shrink: 0;
-  text-align: center;
-}
-.link-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .8px;
-  text-transform: uppercase;
-  color: var(--gray3);
-  width: 70px;
-  flex-shrink: 0;
-}
-
-/* ─── Locked Features ─── */
-.locked-card {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 16px;
-}
-.locked-title { font-size: 12px; font-weight: 700; color: var(--gray3); margin-bottom: 12px; letter-spacing: .5px; }
-
-.features-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
+.locked-title { font-size: 12px; font-weight: bold; color: var(--gray3); margin-bottom: 12px; }
 .locked-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background: var(--gray6);
-  border-radius: 8px;
-  font-size: 12px;
-  color: var(--gray3);
-  font-style: italic;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; border-bottom: 1px dotted var(--gray5);
+  font-size: 12px; color: var(--gray4); font-style: italic;
 }
-.lock-icon { font-size: 13px; flex-shrink: 0; }
+.locked-item:last-child { border-bottom: none; }
 
-/* ─── Analytics teaser ─── */
-.analytics-teaser {
-  background: linear-gradient(135deg, #0d1f15 0%, #1a7a3c 100%);
-  border-radius: var(--radius);
-  padding: 22px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.analytics-teaser-info h3 { font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-.analytics-teaser-info p { font-size: 12px; color: rgba(255,255,255,.65); line-height: 1.6; }
-.analytics-btn {
-  padding: 10px 20px;
-  background: rgba(255,255,255,.15);
-  color: var(--white);
-  border: 1px solid rgba(255,255,255,.25);
-  font-family: var(--serif);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .8px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 7px;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: all .2s;
-}
-.analytics-btn:hover { background: rgba(255,255,255,.25); }
+.links-card h3, .extras-card h3 { font-size: 14px; font-weight: bold; margin-bottom: 12px; }
+.link-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.link-icon { font-size: 16px; width: 28px; text-align: center; flex-shrink: 0; }
 
-/* ─── Appointment ─── */
-.rdv-input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+/* ══════════════════════════════════════════════
+   EXTRAS
+══════════════════════════════════════════════ */
+.extras-section { border-top: 1px solid var(--gray5); padding-top: 18px; margin-top: 18px; }
+.extras-section:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+.extras-section h3 { font-size: 14px; font-weight: bold; margin-bottom: 10px; }
 
-/* ─── Location ─── */
 .map-preview {
-  margin-top: 10px;
-  height: 100px;
-  background: var(--gray6);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: var(--gray3);
-  border: 1.5px dashed var(--gray5);
+  margin-top: 8px; height: 72px;
+  background: var(--gray6); border: 1px solid var(--gray5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--gray3); font-style: italic;
 }
-
-/* ─── Reviews ─── */
-.review-link-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.rdv-preview-btn {
+  display: inline-block; margin-top: 8px;
+  padding: 9px 18px; background: var(--black); color: var(--white);
+  font-family: var(--serif); font-size: 11px; font-weight: bold;
+  letter-spacing: 1px; text-transform: uppercase;
 }
 .review-preview {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background: #fef9e7;
-  border-radius: 8px;
-  border: 1px solid #f9e08b;
+  margin-top: 8px; display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border: 1px solid #f9e08b; background: #fef9e7;
+  font-size: 12px; color: var(--gray2);
 }
-.stars { color: #f4b942; font-size: 15px; letter-spacing: 1px; }
+.stars { color: #f4b942; letter-spacing: 2px; }
 
-/* ─── Upgrade ─── */
+.ai-box {
+  margin-top: 10px; padding: 12px;
+  border: 1px dashed var(--gray4); background: var(--gray6);
+}
+.ai-box p { font-size: 11px; color: var(--gray3); font-style: italic; margin: 6px 0 8px; }
+.biz-tag {
+  font-size: 9px; background: var(--black); color: var(--white);
+  padding: 2px 5px; letter-spacing: .5px; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════
+   ANALYTICS TEASER
+══════════════════════════════════════════════ */
+.analytics-teaser {
+  background: var(--white); border: 1px solid var(--gray5);
+  padding: 22px; margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.analytics-teaser-info h3 { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+.analytics-teaser-info p  { font-size: 12px; color: var(--gray3); }
+.analytics-btn {
+  padding: 10px 20px; background: var(--green); color: var(--white);
+  border: none; font-family: var(--serif); font-size: 11px; font-weight: bold;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  border-radius: 2px; text-decoration: none; white-space: nowrap;
+}
+.analytics-btn:hover { background: var(--green2); }
+
+/* ══════════════════════════════════════════════
+   PLAN TABLE
+══════════════════════════════════════════════ */
+.plan-compare {
+  background: var(--white); border: 1px solid var(--gray5);
+  padding: 22px; margin-bottom: 18px;
+}
+.plan-compare h3 { font-size: 14px; font-weight: bold; margin-bottom: 14px; }
+.plan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.plan-table th {
+  padding: 9px 10px; background: var(--gray6);
+  text-align: center; font-size: 10px; font-weight: bold;
+  letter-spacing: .8px; text-transform: uppercase; border-bottom: 1px solid var(--gray5);
+}
+.plan-table th:first-child { text-align: left; }
+.plan-table td {
+  padding: 8px 10px; border-bottom: 1px dotted var(--gray5);
+  text-align: center; color: var(--gray2);
+}
+.plan-table td:first-child { text-align: left; color: var(--black); }
+.plan-table tr:last-child td { border-bottom: none; }
+.check { color: var(--green); font-weight: bold; }
+.cross { color: var(--gray4); }
+
+/* ══════════════════════════════════════════════
+   UPGRADE
+══════════════════════════════════════════════ */
 .upgrade {
-  background: var(--black);
-  border-radius: var(--radius);
-  padding: 26px;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 16px;
+  background: var(--black); padding: 24px;
+  position: relative; overflow: hidden; margin-bottom: 18px;
 }
 .upgrade::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--green), var(--green3));
 }
-.upgrade h3 { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-.upgrade p { font-size: 13px; color: var(--gray4); line-height: 1.7; font-style: italic; margin-bottom: 18px; }
+.upgrade h3 { font-size: 17px; font-weight: bold; color: var(--white); margin-bottom: 8px; }
+.upgrade p  { font-size: 13px; color: var(--gray3); line-height: 1.7; font-style: italic; margin-bottom: 16px; }
 .upgrade-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 .ucta {
-  flex: 1;
-  min-width: 160px;
-  padding: 12px 16px;
-  font-family: var(--serif);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 8px;
-  text-decoration: none;
-  text-align: center;
-  display: block;
-  transition: all .2s;
+  flex: 1; min-width: 150px; padding: 11px;
+  font-family: var(--serif); font-size: 12px; font-weight: bold;
+  letter-spacing: .5px; text-transform: uppercase;
+  cursor: pointer; border-radius: 2px; text-decoration: none;
+  text-align: center; display: block; transition: all .2s;
 }
 .ucta-pro { background: var(--green); color: var(--white); border: none; }
 .ucta-pro:hover { background: var(--green2); }
 .ucta-biz { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,.2); }
-.ucta-biz:hover { border-color: var(--white); background: rgba(255,255,255,.05); }
+.ucta-biz:hover { border-color: var(--white); }
 
-/* ─── Plan comparison table ─── */
-.plan-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-.plan-table th {
-  background: var(--gray6);
-  padding: 10px 12px;
-  text-align: center;
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
-.plan-table th:first-child { text-align: left; }
-.plan-table td {
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--gray5);
-  text-align: center;
-  color: var(--gray2);
-}
-.plan-table td:first-child { text-align: left; color: var(--black); font-weight: 500; }
-.plan-table tr:last-child td { border-bottom: none; }
-.check { color: var(--green); font-size: 16px; }
-.cross { color: var(--gray4); font-size: 16px; }
-.plan-col-pro { background: rgba(26,122,60,.04); }
-.plan-col-biz { background: rgba(26,122,60,.08); }
-
-/* ─── Tabs ─── */
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid var(--gray5);
-  padding-bottom: 0;
-  overflow-x: auto;
-}
-.tab-btn {
-  padding: 8px 16px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  font-family: var(--body);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--gray3);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .2s;
-}
-.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ─── Loader ─── */
+/* ══════════════════════════════════════════════
+   LOADER & TOAST
+══════════════════════════════════════════════ */
 .loader {
   width: 32px; height: 32px;
   border: 3px solid rgba(26,122,60,.2);
   border-top-color: var(--green);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
+  border-radius: 50%; animation: spin .7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── Toast ─── */
 .toast {
-  position: fixed;
-  bottom: 24px; right: 24px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  z-index: 9999;
-  animation: slideUp .3s ease;
-  box-shadow: 0 6px 20px rgba(0,0,0,.15);
+  position: fixed; bottom: 22px; right: 22px;
+  padding: 11px 18px; font-family: var(--serif); font-size: 13px;
+  z-index: 9999; animation: slideUp .25s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
 }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .toast.success { background: var(--green); color: var(--white); }
-.toast.error   { background: #e74c3c; color: var(--white); }
+.toast.error   { background: #c0392b; color: var(--white); }
 
-/* ═══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    RESPONSIVE
-═══════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+══════════════════════════════════════════════ */
+@media (max-width: 800px) {
   .topbar { display: flex; }
-
-  .sidebar {
-    transform: translateX(-100%);
-    top: 56px;
-  }
+  .sidebar { transform: translateX(-100%); top: 52px; }
   .sidebar.open { transform: translateX(0); }
-
-  .app-content {
-    margin-left: 0;
-    padding-top: 56px;
-  }
-
+  .app-content { margin-left: 0; padding-top: 52px; }
   .dash { padding: 14px; }
   .dash-header { flex-direction: column; align-items: flex-start; gap: 4px; }
-
   .edit-grid { grid-template-columns: 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
+  .analytics-teaser { flex-direction: column; align-items: flex-start; }
+  .analytics-btn { width: 100%; text-align: center; }
   .upgrade-btns { flex-direction: column; }
   .ucta { min-width: 0; }
-
-  .analytics-teaser { flex-direction: column; align-items: flex-start; }
-  .analytics-btn { align-self: stretch; text-align: center; }
-
-  .profile-top { flex-direction: column; }
-  .rdv-input-row { flex-direction: column; }
-
-  .plan-table { font-size: 11px; }
-  .plan-table th, .plan-table td { padding: 7px 8px; }
+  .profile-top { flex-direction: column; gap: 12px; }
 }
-
 @media (max-width: 480px) {
   .dash { padding: 10px; }
-  .card, .section-card, .locked-card { padding: 16px; }
+  .card, .locked-card, .links-card, .extras-card, .plan-compare { padding: 14px; }
   .pf-av { width: 54px; height: 54px; font-size: 18px; }
-  .dash-h1 { font-size: 18px; }
+  .plan-table { font-size: 11px; }
+  .plan-table th, .plan-table td { padding: 6px 6px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ MOBILE TOPBAR ═══ -->
+<!-- MOBILE TOPBAR -->
 <header class="topbar" id="topbar">
   <div class="topbar-brand">Lead<em>Wase</em></div>
   <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleSidebar()">
     <span></span><span></span><span></span>
   </button>
 </header>
-
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- ═══ APP LAYOUT ═══ -->
+<!-- APP LAYOUT -->
 <div class="app-layout" id="app-layout" style="display:none">
+
   <aside class="sidebar" id="sidebar">
-    <a class="sidebar-logo" href="/">
-      <div class="brand">Lead<em>Wase</em></div>
-      <div class="sub">Mon espace</div>
-    </a>
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
     <div class="sidebar-user">
       <div class="sidebar-avatar" id="sb-av">?</div>
-      <div>
-        <div class="sidebar-user-name" id="sb-name">Chargement...</div>
-        <div class="sidebar-user-plan" id="sb-plan">FREE</div>
-      </div>
+      <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">FREE</div></div>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
@@ -641,28 +409,25 @@ body { font-family: var(--body); background: var(--gray6); color: var(--black); 
       <a class="sidebar-item" href="cgu.html"><span class="s-icon">📄</span>CGU</a>
       <a class="sidebar-item" href="confidentialite.html"><span class="s-icon">🔒</span>Confidentialité</a>
     </nav>
-    <div class="sidebar-footer">
-      <button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button>
-    </div>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
   </aside>
 
   <main class="app-content">
     <!-- Loader -->
-    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:80vh">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
       <div style="text-align:center">
-        <div class="loader"></div>
-        <p style="margin-top:14px;color:var(--gray3);font-style:italic;font-size:13px">Chargement...</p>
+        <div class="loader" style="margin:0 auto"></div>
+        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
       </div>
     </div>
 
-    <!-- Content -->
     <div class="dash" id="content" style="display:none">
       <div class="dash-header">
         <div class="dash-h1">Mon profil</div>
         <a class="dash-pub" href="#" id="pub-link">Voir mon profil public →</a>
       </div>
 
-      <!-- ── Profil Card ── -->
+      <!-- ── Profil + Infos ── -->
       <div class="card">
         <div class="profile-top">
           <div class="pf-av" id="pf-av">?</div>
@@ -671,217 +436,156 @@ body { font-family: var(--body); background: var(--gray6); color: var(--black); 
             <div class="pf-job"  id="pf-job">–</div>
             <div class="pf-co"   id="pf-co"></div>
             <div class="pf-id"   id="pf-id">–</div>
-            <div class="plan-badge plan-free" id="pf-plan">FREE</div>
+            <div class="plan-badge" id="pf-plan">FREE</div>
           </div>
         </div>
-
-        <!-- Tabs -->
         <div class="edit-sec">
-          <div class="tabs" role="tablist">
-            <button class="tab-btn active" onclick="switchTab('infos',this)">✏️ Infos</button>
-            <button class="tab-btn" onclick="switchTab('social',this)" id="tab-social-btn">🔗 Réseaux</button>
-            <button class="tab-btn" onclick="switchTab('extras',this)" id="tab-extras-btn">📍 Extras</button>
-            <button class="tab-btn" onclick="switchTab('offres',this)">📋 Plans</button>
+          <h3>✏️ Modifier mes informations</h3>
+          <div class="edit-grid">
+            <div class="f-group"><label class="f-label">Prénom</label><input class="f-input" id="e-first"></div>
+            <div class="f-group"><label class="f-label">Nom</label><input class="f-input" id="e-last"></div>
+            <div class="f-group"><label class="f-label">Titre / Poste</label><input class="f-input" id="e-job"></div>
+            <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="e-co"></div>
+            <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" type="tel" id="e-phone"></div>
+            <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="e-email"></div>
           </div>
-
-          <!-- Tab: Infos -->
-          <div class="tab-content active" id="tab-infos">
-            <div class="edit-grid">
-              <div class="f-group"><label class="f-label">Prénom</label><input class="f-input" id="e-first" placeholder="Jean"></div>
-              <div class="f-group"><label class="f-label">Nom</label><input class="f-input" id="e-last" placeholder="Dupont"></div>
-              <div class="f-group"><label class="f-label">Titre / Poste</label><input class="f-input" id="e-job" placeholder="Directeur Commercial"></div>
-              <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="e-co" placeholder="Ma Société"></div>
-              <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" type="tel" id="e-phone" placeholder="+229 XX XXX XXX"></div>
-              <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="e-email" placeholder="vous@exemple.com"></div>
-            </div>
-            <div class="edit-grid edit-solo" style="margin-bottom:0">
-              <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
-              <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
-            </div>
-            <button class="save-btn" onclick="saveProfile()">Enregistrer</button>
+          <div class="edit-grid edit-solo" style="margin-top:12px">
+            <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
+            <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
           </div>
-
-          <!-- Tab: Réseaux Sociaux -->
-          <div class="tab-content" id="tab-social">
-            <div id="social-locked" style="display:none">
-              <div style="text-align:center;padding:28px 0">
-                <div style="font-size:36px;margin-bottom:10px">🔒</div>
-                <p style="font-size:13px;color:var(--gray3);margin-bottom:14px">Les réseaux sociaux sont disponibles à partir du plan <strong>Pro</strong>.</p>
-                <a href="offres.html" class="save-btn" style="display:inline-block;text-decoration:none">Voir les offres →</a>
-              </div>
-            </div>
-            <div id="social-form" style="display:none">
-              <div class="link-row">
-                <div class="link-icon">💼</div>
-                <div class="link-label">LinkedIn</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">📷</div>
-                <div class="link-label">Instagram</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">🎵</div>
-                <div class="link-label">TikTok</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-tk" placeholder="https://tiktok.com/@..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">📘</div>
-                <div class="link-label">Facebook</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">📺</div>
-                <div class="link-label">YouTube</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-yt" placeholder="https://youtube.com/@..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">🐦</div>
-                <div class="link-label">Twitter/X</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div>
-              </div>
-              <div class="link-row">
-                <div class="link-icon">💬</div>
-                <div class="link-label">WhatsApp</div>
-                <div class="f-group" style="flex:1;margin:0"><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div>
-              </div>
-              <button class="save-btn save-btn-green" onclick="saveLinks()">Sauvegarder les liens</button>
-            </div>
-          </div>
-
-          <!-- Tab: Extras (Localisation, RDV, Avis) -->
-          <div class="tab-content" id="tab-extras">
-            <div id="extras-locked" style="display:none">
-              <div style="text-align:center;padding:28px 0">
-                <div style="font-size:36px;margin-bottom:10px">🔒</div>
-                <p style="font-size:13px;color:var(--gray3);margin-bottom:14px">Ces fonctionnalités sont disponibles à partir du plan <strong>Pro</strong>.</p>
-                <a href="offres.html" class="save-btn" style="display:inline-block;text-decoration:none">Voir les offres →</a>
-              </div>
-            </div>
-            <div id="extras-form" style="display:none">
-
-              <!-- Localisation -->
-              <div style="margin-bottom:22px">
-                <h3 style="font-family:var(--serif);font-size:14px;font-weight:700;margin-bottom:10px">📍 Localisation</h3>
-                <div class="f-group">
-                  <label class="f-label">Adresse</label>
-                  <input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin">
-                </div>
-                <div class="map-preview">🗺️ Aperçu de la carte (Google Maps)</div>
-              </div>
-
-              <!-- Prise de rendez-vous -->
-              <div style="margin-bottom:22px;padding-top:16px;border-top:1px solid var(--gray5)">
-                <h3 style="font-family:var(--serif);font-size:14px;font-weight:700;margin-bottom:10px">📅 Prise de rendez-vous</h3>
-                <div class="f-group" style="margin-bottom:10px">
-                  <label class="f-label">Lien Calendly / Cal.com</label>
-                  <input class="f-input" id="e-rdv" placeholder="https://calendly.com/votre-lien">
-                </div>
-                <div class="f-group" style="margin-bottom:10px">
-                  <label class="f-label">Texte du bouton</label>
-                  <input class="f-input" id="e-rdv-label" placeholder="Prendre rendez-vous" value="Prendre rendez-vous">
-                </div>
-                <div style="margin-top:6px">
-                  <span style="font-size:11px;color:var(--gray3)">Aperçu du bouton :</span>
-                  <div style="margin-top:6px">
-                    <a href="#" style="display:inline-block;padding:10px 20px;background:var(--green);color:var(--white);border-radius:8px;font-family:var(--serif);font-size:12px;font-weight:700;text-decoration:none;letter-spacing:.5px">📅 Prendre rendez-vous</a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Avis Google -->
-              <div style="padding-top:16px;border-top:1px solid var(--gray5)" id="google-reviews-section">
-                <h3 style="font-family:var(--serif);font-size:14px;font-weight:700;margin-bottom:10px">⭐ Avis Google</h3>
-                <div class="f-group" style="margin-bottom:10px">
-                  <label class="f-label">Lien vers vos avis Google</label>
-                  <div class="review-link-row">
-                    <input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." style="flex:1">
-                  </div>
-                </div>
-                <div class="review-preview" id="review-preview" style="display:none">
-                  <span class="stars">★★★★★</span>
-                  <span style="font-size:12px;color:var(--gray2)">Voir nos avis sur Google →</span>
-                </div>
-                <!-- Bouton Business uniquement -->
-                <div id="ai-review-section" style="display:none;margin-top:12px;padding:14px;background:var(--gray6);border-radius:8px;border:1px dashed var(--gray4)">
-                  <p style="font-size:12px;font-weight:600;margin-bottom:6px">🤖 Réponse automatique aux avis <span style="font-size:10px;background:var(--black);color:var(--white);padding:2px 6px;border-radius:4px;letter-spacing:.5px">BUSINESS</span></p>
-                  <p style="font-size:11px;color:var(--gray3);margin-bottom:10px">Activez la réponse IA automatique à vos nouveaux avis Google.</p>
-                  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
-                    <input type="checkbox" id="ai-review-toggle" style="width:16px;height:16px;accent-color:var(--green)">
-                    Activer les réponses automatiques
-                  </label>
-                </div>
-              </div>
-
-              <button class="save-btn save-btn-green" onclick="saveExtras()" style="margin-top:16px">Sauvegarder</button>
-            </div>
-          </div>
-
-          <!-- Tab: Plans & Fonctionnalités -->
-          <div class="tab-content" id="tab-offres">
-            <p style="font-size:13px;color:var(--gray3);margin-bottom:16px;font-style:italic">Comparaison des fonctionnalités selon votre abonnement.</p>
-            <div style="overflow-x:auto">
-              <table class="plan-table">
-                <thead>
-                  <tr>
-                    <th>Fonctionnalité</th>
-                    <th>FREE</th>
-                    <th class="plan-col-pro">PRO</th>
-                    <th class="plan-col-biz">BUSINESS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>Profil public (Nom, Poste, Tel, Email)</td><td><span class="check">✓</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Carte NFC & QR Code</td><td><span class="check">✓</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Site web personnel</td><td><span class="check">✓</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Photo de profil</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Réseaux sociaux (LinkedIn, Instagram, TikTok…)</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>WhatsApp direct</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Localisation / Adresse</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Prise de rendez-vous</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Avis Google</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Formulaire de contact</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Analytics de visites</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="check">✓</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Réponses IA aux avis Google</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="cross">✗</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Catalogue produits / services</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="cross">✗</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                  <tr><td>Support prioritaire</td><td><span class="cross">✗</span></td><td class="plan-col-pro"><span class="cross">✗</span></td><td class="plan-col-biz"><span class="check">✓</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-              <a href="offres.html" class="save-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">⭐ Passer à Pro — 2 999 XOF/mois</a>
-              <a href="offres.html" class="save-btn save-btn-green" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">🚀 Business — 4 566 XOF/mois</a>
-            </div>
-          </div>
+          <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
         </div>
       </div>
 
-      <!-- Analytics teaser (Pro/Business) -->
+      <!-- ── Analytics teaser (Pro/Business) ── -->
       <div class="analytics-teaser" id="analytics-teaser" style="display:none">
         <div class="analytics-teaser-info">
           <h3>📊 Analytics — Statistiques de votre profil</h3>
-          <p>Visites, contacts actifs, évolution de votre réseau en temps réel.</p>
+          <p>Consultez vos visites, vos contacts les plus actifs et l'évolution de votre réseau.</p>
         </div>
         <a class="analytics-btn" href="analytics.html">Voir mes stats →</a>
       </div>
 
-      <!-- Locked features (Free) -->
+      <!-- ── Réseaux sociaux (Pro/Business) ── -->
+      <div class="links-card" id="links-sec" style="display:none">
+        <h3>🔗 Réseaux sociaux &amp; liens</h3>
+        <div class="link-row"><div class="link-icon">💼</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">LinkedIn</label><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div></div>
+        <div class="link-row"><div class="link-icon">📷</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Instagram</label><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div></div>
+        <div class="link-row"><div class="link-icon">🎵</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">TikTok</label><input class="f-input" id="l-tk" placeholder="https://tiktok.com/@..."></div></div>
+        <div class="link-row"><div class="link-icon">📘</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Facebook</label><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div></div>
+        <div class="link-row"><div class="link-icon">📺</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">YouTube</label><input class="f-input" id="l-yt" placeholder="https://youtube.com/@..."></div></div>
+        <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Twitter / X</label><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
+        <div class="link-row"><div class="link-icon">💬</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div></div>
+        <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
+      </div>
+
+      <!-- ── Localisation, RDV, Avis, Contact (Pro/Business) ── -->
+      <div class="extras-card" id="extras-sec" style="display:none">
+
+        <!-- Localisation -->
+        <div class="extras-section">
+          <h3>📍 Localisation</h3>
+          <div class="edit-grid edit-solo">
+            <div class="f-group"><label class="f-label">Adresse complète</label><input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin"></div>
+          </div>
+          <div class="map-preview">🗺️ Aperçu carte Google Maps</div>
+        </div>
+
+        <!-- Prise de rendez-vous -->
+        <div class="extras-section">
+          <h3>📅 Prise de rendez-vous</h3>
+          <div class="edit-grid">
+            <div class="f-group"><label class="f-label">Lien Calendly / Cal.com</label><input class="f-input" id="e-rdv" placeholder="https://calendly.com/..."></div>
+            <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
+          </div>
+          <div style="margin-top:10px">
+            <span style="font-size:11px;color:var(--gray3)">Aperçu bouton :</span><br>
+            <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
+          </div>
+        </div>
+
+        <!-- Avis Google -->
+        <div class="extras-section">
+          <h3>⭐ Avis Google</h3>
+          <div class="edit-grid edit-solo">
+            <div class="f-group"><label class="f-label">Lien vers vos avis Google</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
+          </div>
+          <div class="review-preview" id="review-preview" style="display:none">
+            <span class="stars">★★★★★</span>
+            <span>Voir nos avis sur Google →</span>
+          </div>
+          <div class="ai-box" id="ai-review-box" style="display:none">
+            <strong style="font-size:11px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
+            <p>Activez la réponse IA automatique à vos nouveaux avis Google.</p>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+              <input type="checkbox" id="ai-review-toggle" style="accent-color:var(--green);width:13px;height:13px">
+              Activer les réponses automatiques
+            </label>
+          </div>
+        </div>
+
+        <!-- Formulaire de contact -->
+        <div class="extras-section">
+          <h3>📨 Formulaire de contact</h3>
+          <div class="edit-grid">
+            <div class="f-group"><label class="f-label">Email de réception</label><input class="f-input" id="e-contact-email" placeholder="vous@exemple.com"></div>
+            <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi directement..."></div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:10px;cursor:pointer;color:var(--gray2)">
+            <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
+            Afficher le formulaire sur mon profil public
+          </label>
+        </div>
+
+        <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
+      </div>
+
+      <!-- ── Fonctionnalités verrouillées (Free) ── -->
       <div class="locked-card" id="locked-sec">
         <div class="locked-title">🔒 Fonctionnalités non disponibles sur Free</div>
-        <div class="features-grid">
-          <div class="locked-item"><span class="lock-icon">📷</span> Photo de profil</div>
-          <div class="locked-item"><span class="lock-icon">🔗</span> Réseaux sociaux</div>
-          <div class="locked-item"><span class="lock-icon">💬</span> WhatsApp direct</div>
-          <div class="locked-item"><span class="lock-icon">📍</span> Localisation</div>
-          <div class="locked-item"><span class="lock-icon">📅</span> Prise de rendez-vous</div>
-          <div class="locked-item"><span class="lock-icon">⭐</span> Avis Google</div>
-          <div class="locked-item"><span class="lock-icon">📊</span> Analytics</div>
-          <div class="locked-item"><span class="lock-icon">📨</span> Formulaire contact</div>
+        <div class="locked-item">🔒 Liens réseaux sociaux (LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter, WhatsApp)</div>
+        <div class="locked-item">🔒 Photo de profil</div>
+        <div class="locked-item">🔒 Localisation / Adresse</div>
+        <div class="locked-item">🔒 Prise de rendez-vous</div>
+        <div class="locked-item">🔒 Avis Google</div>
+        <div class="locked-item">🔒 Formulaire de contact</div>
+        <div class="locked-item">🔒 Analytics — statistiques de visites</div>
+      </div>
+
+      <!-- ── Tableau comparatif plans ── -->
+      <div class="plan-compare">
+        <h3>📋 Fonctionnalités par abonnement</h3>
+        <div style="overflow-x:auto">
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th>Fonctionnalité</th>
+                <th>FREE</th>
+                <th>PRO</th>
+                <th>BUSINESS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Profil public (Nom, Poste, Tel, Email)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Carte NFC &amp; QR Code</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Site web personnel</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Photo de profil</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>WhatsApp direct</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Localisation / Adresse</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Prise de rendez-vous</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Avis Google</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Formulaire de contact</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Analytics de visites</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Réponses IA aux avis Google</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Catalogue produits / services</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+              <tr><td>Support prioritaire</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Upgrade CTA (Free) -->
+      <!-- ── Upgrade (Free) ── -->
       <div class="upgrade" id="upgrade-sec">
         <h3>🚀 Passez à Pro ou Business</h3>
         <p>Débloquez les réseaux sociaux, WhatsApp, la localisation, les rendez-vous, les avis Google, les analytics et bien plus encore.</p>
@@ -890,9 +594,30 @@ body { font-family: var(--body); background: var(--gray6); color: var(--black); 
           <a class="ucta ucta-biz" href="offres.html">Voir Business — 4 566 XOF/mois</a>
         </div>
       </div>
+
     </div><!-- /.dash -->
   </main>
 </div><!-- /.app-layout -->
+
+<script>
+// ── Mobile sidebar ────────────────────────────────────────────────────────────
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
+  document.getElementById('hamburger').classList.toggle('open');
+};
+window.closeSidebar = () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('hamburger').classList.remove('open');
+};
+document.querySelectorAll('.sidebar-item').forEach(a =>
+  a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));
+
+window.toggleReviewPreview = (val) => {
+  document.getElementById('review-preview').style.display = val.trim() ? 'flex' : 'none';
+};
+</script>
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
@@ -902,38 +627,12 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-
 let lwId = null;
 let currentPlan = 'free';
 
-// ─── Sidebar mobile toggle ────────────────────────────────────────────────────
-window.toggleSidebar = () => {
-  const sidebar = document.getElementById('sidebar');
-  const overlay  = document.getElementById('overlay');
-  const hamburger = document.getElementById('hamburger');
-  const isOpen = sidebar.classList.contains('open');
-  sidebar.classList.toggle('open');
-  overlay.classList.toggle('active');
-  hamburger.classList.toggle('open');
-};
-window.closeSidebar = () => {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('active');
-  document.getElementById('hamburger').classList.remove('open');
-};
-
-// ─── Tab switching ────────────────────────────────────────────────────────────
-window.switchTab = (id, btn) => {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  btn.classList.add('active');
-};
-
-// ─── lwId from internal email ─────────────────────────────────────────────────
 function lwIdFromInternalEmail(email) {
   if (!email) return null;
   const match = email.match(/^(lw-\d+)@leadwase\.internal$/i);
   return match ? match[1].toUpperCase() : null;
 }
 
-// ─── Auth state ───────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = '/connexion.html'; return; }
 
@@ -959,7 +658,6 @@ onAuthStateChanged(auth, async user => {
       lwId = lwIdFromEmail;
       profileDoc = await getDoc(doc(db, 'profiles', lwId));
       if (!profileDoc.exists()) profileDoc = null;
-
       if (profileDoc) {
         try {
           const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
@@ -977,23 +675,22 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  const p         = profileDoc.data();
-  const planFinal = p.plan || plan;
-  currentPlan     = planFinal;
+  const p          = profileDoc.data();
+  const planFinal  = p.plan || plan;
+  currentPlan      = planFinal;
   const isPro      = ['pro','business'].includes(planFinal);
   const isBusiness = planFinal === 'business';
 
-  // ── Afficher layout ──────────────────────────────────────────────────────
   document.getElementById('app-layout').style.display = '';
 
   // Sidebar
-  const ini = ((p.firstName||'?')[0] + (p.lastName||'?')[0]).toUpperCase();
   document.getElementById('sb-av').textContent   = (p.firstName||'?')[0];
   document.getElementById('sb-name').textContent = (p.firstName||'') + ' ' + (p.lastName||'');
   document.getElementById('sb-plan').textContent = planFinal.toUpperCase();
   document.getElementById('sb-pub').href         = 'profil.html?id=' + lwId;
 
   // Header profil
+  const ini = ((p.firstName||'?')[0] + (p.lastName||'?')[0]).toUpperCase();
   document.getElementById('pf-av').textContent   = ini;
   document.getElementById('pf-name').textContent = (p.firstName||'') + ' ' + (p.lastName||'');
   document.getElementById('pf-job').textContent  = p.jobTitle || '';
@@ -1003,7 +700,7 @@ onAuthStateChanged(auth, async user => {
 
   const pb = document.getElementById('pf-plan');
   pb.textContent = planFinal.toUpperCase();
-  pb.className   = 'plan-badge plan-' + planFinal;
+  pb.className   = 'plan-badge' + (planFinal !== 'free' ? ' plan-' + planFinal : '');
 
   // Formulaire infos
   ['first','last','job','co','phone','email'].forEach((k, i) =>
@@ -1011,20 +708,16 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('e-web').value = p.website || '';
   document.getElementById('e-bio').value = p.bio     || '';
 
-  // ── Fonctionnalités selon plan ───────────────────────────────────────────
   if (isPro) {
-    // Masquer locked / upgrade
     document.getElementById('locked-sec').style.display  = 'none';
     document.getElementById('upgrade-sec').style.display = 'none';
 
-    // Analytics
     document.getElementById('analytics-teaser').style.display = 'flex';
     document.getElementById('analytics-nav-item').innerHTML =
       '<a class="sidebar-item" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>';
 
-    // Social form
-    document.getElementById('social-locked').style.display = 'none';
-    document.getElementById('social-form').style.display   = 'block';
+    // Réseaux
+    document.getElementById('links-sec').style.display = 'block';
     document.getElementById('l-li').value = p.linkedin  || '';
     document.getElementById('l-ig').value = p.instagram || '';
     document.getElementById('l-tk').value = p.tiktok    || '';
@@ -1033,38 +726,28 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('l-tw').value = p.twitter   || '';
     document.getElementById('l-wa').value = p.whatsapp  || '';
 
-    // Extras form
-    document.getElementById('extras-locked').style.display = 'none';
-    document.getElementById('extras-form').style.display   = 'block';
-    document.getElementById('e-location').value  = p.location  || '';
-    document.getElementById('e-rdv').value        = p.rdvLink   || '';
-    document.getElementById('e-rdv-label').value  = p.rdvLabel  || 'Prendre rendez-vous';
-    document.getElementById('e-google-review').value = p.googleReview || '';
+    // Extras
+    document.getElementById('extras-sec').style.display     = 'block';
+    document.getElementById('e-location').value             = p.location        || '';
+    document.getElementById('e-rdv').value                   = p.rdvLink         || '';
+    document.getElementById('e-rdv-label').value             = p.rdvLabel        || 'Prendre rendez-vous';
+    document.getElementById('e-google-review').value         = p.googleReview    || '';
+    document.getElementById('e-contact-email').value         = p.contactEmail    || '';
+    document.getElementById('e-contact-msg').value           = p.contactMessage  || '';
+    document.getElementById('e-contact-active').checked      = p.contactActive   || false;
 
-    // Google review preview
-    if (p.googleReview) {
-      document.getElementById('review-preview').style.display = 'flex';
-    }
+    if (p.googleReview) document.getElementById('review-preview').style.display = 'flex';
 
-    // Business only: IA reviews
     if (isBusiness) {
-      document.getElementById('ai-review-section').style.display = 'block';
+      document.getElementById('ai-review-box').style.display = 'block';
       document.getElementById('ai-review-toggle').checked = p.aiReviewEnabled || false;
     }
-
-  } else {
-    // Free: afficher les locked
-    document.getElementById('social-locked').style.display = 'block';
-    document.getElementById('social-form').style.display   = 'none';
-    document.getElementById('extras-locked').style.display = 'block';
-    document.getElementById('extras-form').style.display   = 'none';
   }
 
   document.getElementById('loader').style.display  = 'none';
   document.getElementById('content').style.display = 'block';
 });
 
-// ── Sauvegarde profil ─────────────────────────────────────────────────────────
 window.saveProfile = async () => {
   try {
     const { updateDoc, doc: fbDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
@@ -1083,7 +766,6 @@ window.saveProfile = async () => {
   } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
-// ── Sauvegarde liens ──────────────────────────────────────────────────────────
 window.saveLinks = async () => {
   try {
     const { updateDoc, doc: fbDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
@@ -1101,44 +783,36 @@ window.saveLinks = async () => {
   } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
-// ── Sauvegarde extras ─────────────────────────────────────────────────────────
 window.saveExtras = async () => {
   try {
     const { updateDoc, doc: fbDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-    const isBusiness = currentPlan === 'business';
     const data = {
-      location:     document.getElementById('e-location').value.trim(),
-      rdvLink:      document.getElementById('e-rdv').value.trim(),
-      rdvLabel:     document.getElementById('e-rdv-label').value.trim(),
-      googleReview: document.getElementById('e-google-review').value.trim(),
-      updatedAt:    new Date(),
+      location:       document.getElementById('e-location').value.trim(),
+      rdvLink:        document.getElementById('e-rdv').value.trim(),
+      rdvLabel:       document.getElementById('e-rdv-label').value.trim(),
+      googleReview:   document.getElementById('e-google-review').value.trim(),
+      contactEmail:   document.getElementById('e-contact-email').value.trim(),
+      contactMessage: document.getElementById('e-contact-msg').value.trim(),
+      contactActive:  document.getElementById('e-contact-active').checked,
+      updatedAt:      new Date(),
     };
-    if (isBusiness) {
+    if (currentPlan === 'business') {
       data.aiReviewEnabled = document.getElementById('ai-review-toggle').checked;
     }
     await updateDoc(fbDoc(db, 'profiles', lwId), data);
-
-    // Show review preview if link present
-    if (data.googleReview) {
-      document.getElementById('review-preview').style.display = 'flex';
-    } else {
-      document.getElementById('review-preview').style.display = 'none';
-    }
+    document.getElementById('review-preview').style.display = data.googleReview ? 'flex' : 'none';
     toast('Extras mis à jour !', 'success');
   } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
 window.doLogout = async () => {
   const { signOut: so } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js");
-  await so(auth);
-  window.location.href = '/';
+  await so(auth); window.location.href = '/';
 };
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg, type) {
   const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
+  t.className = 'toast ' + type; t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
