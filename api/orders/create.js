@@ -59,6 +59,17 @@ export default async function handler(req, res) {
       }),
     });
     const gData = await gRes.json();
+
+    // Log pour diagnostiquer la réponse de la gateway en cas de champ manquant
+    console.log('[gateway response]', JSON.stringify(gData));
+
+    // Vérifier que la gateway a bien renvoyé pid et url avant tout update()
+    // Firestore interdit les valeurs undefined dans update() — erreur si pid/url absent
+    if (!gData.pid || !gData.url) {
+      await orderRef.update({ status: 'gateway_error', gatewayResponse: JSON.stringify(gData) });
+      return res.status(502).json({ error: 'Réponse invalide de la gateway de paiement', detail: gData });
+    }
+
     await payRef.update({ pid: gData.pid, payUrl: gData.url });
     await orderRef.update({ paymentId: payRef.id, pid: gData.pid });
     res.json({ success: true, orderId: orderRef.id, payUrl: gData.url });
