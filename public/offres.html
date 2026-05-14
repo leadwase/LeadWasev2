@@ -14,7 +14,7 @@
 .plans-intro{text-align:center;padding:44px 40px 0}
 .plans-intro h2{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:8px}
 .plans-intro p{font-size:13px;color:var(--gray2);font-style:italic;max-width:500px;margin:0 auto}
-.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:900px;margin:32px auto 0;padding:0 32px 72px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1100px;margin:32px auto 0;padding:0 32px 72px}
 .plan-col{background:var(--white);border:1px solid var(--gray5);border-right:none;padding:36px 26px;position:relative}
 .plan-col:last-child{border-right:1px solid var(--gray5)}
 .plan-col.featured{background:var(--black);border:2px solid var(--green);z-index:2;transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -82,8 +82,17 @@
       <div class="plan-price">0 <small>XOF</small></div>
       <div class="plan-period">Pour toujours gratuit</div>
       <p class="plan-desc">Inclus avec votre carte LeadWase.</p>
-      <ul class="plan-features"><li><span class="ck">✓</span>Profil</li><li><span class="ck">✓</span>Personnalisation et Modification</li><li><span class="ck">✓</span>Réseaux sociaux</li><li><span class="ck">✓</span>Photo de Profil</li><li><span class="ck">✓</span>Analytics</li><li><span class="ck">✓</span>Lien de votre site</li></ul>
-      <span class="plan-btn outline" style="cursor:default">Plan actuel</span>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de Profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
+        <li><span class="ck">✓</span>Localisation</li>
+      </ul>
+      <span class="plan-btn outline" style="cursor:default">Commencer gratuitement</span>
     </div>
     <div class="plan-col featured">
       <div class="rec-badge">⭐ Recommandé</div>
@@ -91,7 +100,16 @@
       <div class="plan-price">2 999 <small>XOF</small></div>
       <div class="plan-period">par mois · résiliable à tout moment</div>
       <p class="plan-desc">Pour les professionnels qui veulent plus de visibilité.</p>
-      <ul class="plan-features"><li><span class="ck">✓</span>Profil</li><li><span class="ck">✓</span>Personnalisation et Modification</li><li><span class="ck">✓</span>Réseaux sociaux</li><li><span class="ck">✓</span>Photo de profil</li><li><span class="ck">✓</span>Analytics</li><li><span class="ck">✓</span>Lien de votre site</li></ul>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
+        <li><span class="ck">✓</span>Localisation</li>
+      </ul>
       <button class="plan-btn filled" id="btn-pro" onclick="subscribe('pro')">Passer au Pro →</button>
     </div>
     <div class="plan-col">
@@ -99,26 +117,34 @@
       <div class="plan-price">4 566 <small>XOF</small></div>
       <div class="plan-period">par mois · facturation annuelle</div>
       <p class="plan-desc">Pour les équipes et entreprises qui veulent tout maîtriser.</p>
-      <ul class="plan-features"><li><span class="ck">✓</span>Profil</li><li><span class="ck">✓</span>Personnalisation et Modification</li><li><span class="ck">✓</span>Réseaux sociaux</li><li><span class="ck">✓</span>Photo de profil</li><li><span class="ck">✓</span>Analytics</li><li><span class="ck">✓</span>Lien de votre site</li></ul>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
+        <li><span class="ck">✓</span>Localisation</li>
+      </ul>
       <button class="plan-btn outline" id="btn-biz" onclick="subscribe('business')">Choisir Business →</button>
     </div>
   </div>
   <div class="compare-wrap">
     <div class="compare-title">Comparaison détaillée</div>
     <table class="compare-table">
-      <thead><tr><th style="width:40%">Fonctionnalité</th><th>Free</th><th class="th-pro">Pro</th><th>Business</th></tr></thead>
+      <thead>
+        <tr><th style="width:40%">Fonctionnalité</th><th>Free</th><th class="th-pro">Pro</th><th>Business</th></tr>
+      </thead>
       <tbody>
-        <tr><td>Profil digital personnalisé</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Personnalisation &amp; Modification</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
+        <tr><td>Profil</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
+        <tr><td>Personnalisation et Modification</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
         <tr><td>Réseaux sociaux</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
         <tr><td>Photo de profil</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
         <tr><td>Analytics</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
         <tr><td>Lien de votre site</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>CRM leads intégré</td><td><span class="t-cx">✗</span></td><td><span class="t-cx">✗</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Export contacts CSV</td><td><span class="t-cx">✗</span></td><td><span class="t-cx">✗</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Gestion multi-profils</td><td><span class="t-cx">✗</span></td><td><span class="t-cx">✗</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Support prioritaire</td><td><span class="t-cx">✗</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Suppression logo LeadWase</td><td><span class="t-cx">✗</span></td><td><span class="t-cx">✗</span></td><td><span class="t-ck">✓</span></td></tr>
+        <tr><td>Fonctionnalité d'échange</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
+        <tr><td>Localisation</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
       </tbody>
     </table>
   </div>
