@@ -610,6 +610,24 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 </div><!-- /.app-layout -->
 
 <script>
+// Fonction pour transformer l'ID en code public (sécurisé)
+function getPublicCode(lwId) {
+  if (!lwId) return 'LW-????';
+  // Option 1: Garder le format existant mais masquer les derniers caractères
+  if (lwId.startsWith('LW-')) {
+    const base = lwId.substring(3, 6); // Prendre les 3 premiers caractères après LW-
+    return `LW-${base}***`;
+  }
+  // Option 2: Générer un hash court à partir de l'ID complet
+  let hash = 0;
+  for (let i = 0; i < lwId.length; i++) {
+    hash = ((hash << 5) - hash) + lwId.charCodeAt(i);
+    hash |= 0;
+  }
+  const positiveHash = Math.abs(hash).toString(36).substring(0, 6).toUpperCase();
+  return `LW-${positiveHash}`;
+}
+
 // ── Mobile sidebar ────────────────────────────────────────────────────────────
 window.toggleSidebar = () => {
   document.getElementById('sidebar').classList.toggle('open');
@@ -692,13 +710,14 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('sb-plan').textContent = planFinal.toUpperCase();
   document.getElementById('sb-pub').href         = 'profil.html?id=' + lwId;
 
-  // Header profil
+  // Header profil - utilisation du code public au lieu de l'ID réel
   const ini = ((p.firstName||'?')[0] + (p.lastName||'?')[0]).toUpperCase();
   document.getElementById('pf-av').textContent   = ini;
   document.getElementById('pf-name').textContent = (p.firstName||'') + ' ' + (p.lastName||'');
   document.getElementById('pf-job').textContent  = p.jobTitle || '';
   document.getElementById('pf-co').textContent   = p.company  || '';
-  document.getElementById('pf-id').textContent   = lwId;
+  // Afficher le code public au lieu de l'ID réel
+  document.getElementById('pf-id').textContent   = getPublicCode(lwId);
   document.getElementById('pub-link').href        = 'profil.html?id=' + lwId;
 
   const pb = document.getElementById('pf-plan');
