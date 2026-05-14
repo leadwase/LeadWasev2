@@ -69,6 +69,7 @@ export default async function handler(req, res) {
       // uid: pay.uid  → commenté
       await db.collection('profiles').doc(lwId).set({
         // uid: pay.uid,
+        ownerUid: userRecord.uid,
         leadwaseId: lwId,
         firstName:  oData.firstName,
         lastName:   oData.lastName,
