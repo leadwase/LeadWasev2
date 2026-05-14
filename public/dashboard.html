@@ -620,6 +620,16 @@ window.toggleReviewPreview = (val) => {
 </script>
 
 <script type="module">
+   const DEBUG = true;
+
+function log(...args) {
+  if (DEBUG) console.log("[DEBUG]", ...args);
+}
+
+function logError(...args) {
+  console.error("[ERROR]", ...args);
+}
+   
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -635,7 +645,9 @@ function lwIdFromInternalEmail(email) {
 
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = '/connexion.html'; return; }
-
+   log("profileDoc exists =", profileDoc?.exists());
+   log("profile data =", profileDoc?.data());
+   log("lwId final =", lwId);
   const uDoc = await getDoc(doc(db, 'users', user.uid));
   const ud   = uDoc.exists() ? uDoc.data() : {};
   const plan = ud.plan || 'free';
@@ -750,8 +762,18 @@ onAuthStateChanged(auth, async user => {
 
 window.saveProfile = async () => {
   try {
-    const { updateDoc, doc: fbDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-    await updateDoc(fbDoc(db, 'profiles', lwId), {
+    log("saveProfile lancé");
+    log("lwId =", lwId);
+
+    if (!lwId) {
+      throw new Error("lwId est null ou undefined");
+    }
+
+    const { updateDoc, doc: fbDoc } = await import(
+      "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
+    );
+
+    const payload = {
       firstName: document.getElementById('e-first').value.trim(),
       lastName:  document.getElementById('e-last').value.trim(),
       jobTitle:  document.getElementById('e-job').value.trim(),
@@ -761,15 +783,34 @@ window.saveProfile = async () => {
       website:   document.getElementById('e-web').value.trim(),
       bio:       document.getElementById('e-bio').value.trim(),
       updatedAt: new Date(),
-    });
+    };
+
+    log("payload envoyé =", payload);
+
+    const ref = fbDoc(db, 'profiles', lwId);
+    log("Firestore path =", `profiles/${lwId}`);
+
+    await updateDoc(ref, payload);
+
+    log("updateDoc OK");
+
     toast('Profil mis à jour !', 'success');
-  } catch(e) { toast('Erreur : ' + e.message, 'error'); }
+
+  } catch (e) {
+    logError("saveProfile FAILED:", e);
+    toast('Erreur : ' + e.message, 'error');
+  }
 };
 
 window.saveLinks = async () => {
   try {
-    const { updateDoc, doc: fbDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-    await updateDoc(fbDoc(db, 'profiles', lwId), {
+    log("saveLinks lancé", lwId);
+
+    const { updateDoc, doc: fbDoc } = await import(
+      "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
+    );
+
+    const payload = {
       linkedin:  document.getElementById('l-li').value.trim(),
       instagram: document.getElementById('l-ig').value.trim(),
       tiktok:    document.getElementById('l-tk').value.trim(),
@@ -778,9 +819,19 @@ window.saveLinks = async () => {
       twitter:   document.getElementById('l-tw').value.trim(),
       whatsapp:  document.getElementById('l-wa').value.trim(),
       updatedAt: new Date(),
-    });
+    };
+
+    log("links payload =", payload);
+
+    await updateDoc(fbDoc(db, 'profiles', lwId), payload);
+
+    log("links OK");
     toast('Liens mis à jour !', 'success');
-  } catch(e) { toast('Erreur : ' + e.message, 'error'); }
+
+  } catch (e) {
+    logError("saveLinks FAILED:", e);
+    toast('Erreur : ' + e.message, 'error');
+  }
 };
 
 window.saveExtras = async () => {
