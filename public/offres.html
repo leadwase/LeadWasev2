@@ -14,7 +14,7 @@
 .plans-intro{text-align:center;padding:44px 40px 0}
 .plans-intro h2{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:8px}
 .plans-intro p{font-size:13px;color:var(--gray2);font-style:italic;max-width:500px;margin:0 auto}
-.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1100px;margin:32px auto 0;padding:0 32px 72px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1100px;margin:32px auto 0;padding:0 32px 72px;gap:0}
 .plan-col{background:var(--white);border:1px solid var(--gray5);border-right:none;padding:36px 26px;position:relative}
 .plan-col:last-child{border-right:1px solid var(--gray5)}
 .plan-col.featured{background:var(--black);border:2px solid var(--green);z-index:2;transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -31,17 +31,15 @@
 .featured .plan-desc{color:var(--gray4)}
 .plan-features{list-style:none;margin-bottom:24px;border-top:1px solid var(--gray5);padding-top:14px}
 .featured .plan-features{border-top-color:rgba(255,255,255,.1)}
-.plan-features li{font-size:13px;color:var(--gray2);padding:7px 0;border-bottom:1px dotted var(--gray5);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.plan-features li{font-size:13px;color:var(--gray2);padding:7px 0;border-bottom:1px dotted var(--gray5);display:flex;align-items:center;gap:8px;line-height:1.4}
 .plan-features li:last-child{border-bottom:none}
 .featured .plan-features li{color:var(--gray4);border-bottom-color:rgba(255,255,255,.06)}
-.ck{color:var(--green2);font-weight:bold;flex-shrink:0}
+.ck{color:var(--green2);font-weight:bold;flex-shrink:0;font-size:14px}
 .plan-btn{width:100%;padding:13px;border-radius:2px;font-family:var(--serif);font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;border:none;display:block;text-align:center;text-decoration:none}
 .plan-btn.outline{background:transparent;border:1px solid var(--gray5);color:var(--gray2)}
 .plan-btn.outline:hover{border-color:var(--black);color:var(--black)}
 .plan-btn.filled{background:var(--green);color:var(--white)}
 .plan-btn.filled:hover{background:var(--green2)}
-.plan-btn.light{background:var(--white);color:var(--black)}
-.plan-btn.light:hover{background:var(--off)}
 .plan-btn:disabled{opacity:.6;cursor:not-allowed}
 .compare-wrap{background:var(--white);padding:64px 40px;border-top:1px solid var(--gray5)}
 .compare-title{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:24px;text-align:center}
@@ -53,8 +51,9 @@
 .compare-table td:first-child{text-align:left;font-style:italic}
 .compare-table tr:hover td{background:var(--green-pale)}
 .t-ck{color:var(--green2);font-size:16px;font-weight:bold}
-.t-cx{color:var(--gray5);font-size:16px}
-@media(max-width:900px){.plans-grid{grid-template-columns:1fr;padding:20px}.plan-col.featured{transform:none}.offers-hero,.plans-intro,.compare-wrap{padding-left:20px;padding-right:20px}}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.plans-grid{grid-template-columns:1fr;padding:20px;gap:20px}.plan-col{border-right:1px solid var(--gray5)}.plan-col.featured{transform:none}.offers-hero,.plans-intro,.compare-wrap{padding-left:20px;padding-right:20px}}
 </style>
 </head>
 <body>
@@ -92,7 +91,7 @@
         <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
         <li><span class="ck">✓</span>Localisation</li>
       </ul>
-      <span class="plan-btn outline" style="cursor:default">Commencer gratuitement</span>
+      <span class="plan-btn outline" id="btn-free" style="cursor:default">Commencer gratuitement</span>
     </div>
     <div class="plan-col featured">
       <div class="rec-badge">⭐ Recommandé</div>
@@ -104,11 +103,11 @@
         <li><span class="ck">✓</span>Profil</li>
         <li><span class="ck">✓</span>Personnalisation et Modification</li>
         <li><span class="ck">✓</span>Réseaux sociaux</li>
-        <li><span class="ck">✓</span>Photo de profil</li>
-        <li><span class="ck">✓</span>Analytics</li>
-        <li><span class="ck">✓</span>Lien de votre site</li>
-        <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
-        <li><span class="ck">✓</span>Localisation</li>
+        <li><span class="ck">✗</span>Photo de profil</li>
+        <li><span class="ck">✗</span>Analytics</li>
+        <li><span class="ck">✗</span>Lien de votre site</li>
+        <li><span class="ck">✗</span>Fonctionnalité d'échange</li>
+        <li><span class="ck">✗</span>Localisation</li>
       </ul>
       <button class="plan-btn filled" id="btn-pro" onclick="subscribe('pro')">Passer au Pro →</button>
     </div>
@@ -124,8 +123,8 @@
         <li><span class="ck">✓</span>Photo de profil</li>
         <li><span class="ck">✓</span>Analytics</li>
         <li><span class="ck">✓</span>Lien de votre site</li>
-        <li><span class="ck">✓</span>Fonctionnalité d'échange</li>
-        <li><span class="ck">✓</span>Localisation</li>
+        <li><span class="ck">✗</span>Fonctionnalité d'échange</li>
+        <li><span class="ck">✗</span>Localisation</li>
       </ul>
       <button class="plan-btn outline" id="btn-biz" onclick="subscribe('business')">Choisir Business →</button>
     </div>
@@ -137,14 +136,14 @@
         <tr><th style="width:40%">Fonctionnalité</th><th>Free</th><th class="th-pro">Pro</th><th>Business</th></tr>
       </thead>
       <tbody>
-        <tr><td>Profil</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Personnalisation et Modification</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Réseaux sociaux</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Photo de profil</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Analytics</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Lien de votre site</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Fonctionnalité d'échange</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
-        <tr><td>Localisation</td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td><td><span class="t-ck">✓</span></td></tr>
+        <tr><td>Profil</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Personnalisation et Modification</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Réseaux sociaux</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Photo de profil</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Analytics</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Lien de votre site</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Fonctionnalité d'échange</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Localisation</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
       </tbody>
     </table>
   </div>
@@ -162,29 +161,69 @@
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, getIdToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
 onAuthStateChanged(auth, async user => {
   if (user) {
-    document.getElementById('nav-auth').textContent='Mon profil';
-    document.getElementById('nav-auth').href='dashboard.html';
-    const ud=(await getDoc(doc(db,'users',user.uid))).data();
-    if (ud?.plan&&ud.plan!=='free') { const b=document.getElementById('btn-'+(ud.plan==='pro'?'pro':'biz')); if(b){b.textContent='Plan actuel';b.disabled=true;} }
+    document.getElementById('nav-auth').textContent = 'Mon profil';
+    document.getElementById('nav-auth').href = 'dashboard.html';
+    
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userPlan = userDoc.exists() ? userDoc.data()?.plan : 'free';
+    
+    // Désactiver le bouton du plan actuel
+    const btnPro = document.getElementById('btn-pro');
+    const btnBiz = document.getElementById('btn-biz');
+    const btnFree = document.getElementById('btn-free');
+    
+    if (userPlan === 'pro' && btnPro) {
+      btnPro.disabled = true;
+      btnPro.textContent = 'Plan actuel';
+    } else if (userPlan === 'business' && btnBiz) {
+      btnBiz.disabled = true;
+      btnBiz.textContent = 'Plan actuel';
+    } else if (userPlan === 'free' && btnFree) {
+      btnFree.disabled = true;
+      btnFree.textContent = 'Plan actuel';
+    }
   }
 });
+
 window.subscribe = async plan => {
   const user = auth.currentUser;
-  if (!user) { sessionStorage.setItem('pendingPlan',plan); window.location.href='/connexion.html?redirect=offres'; return; }
-  const btn = document.getElementById('btn-'+(plan==='pro'?'pro':'biz'));
-  btn.disabled=true; btn.innerHTML='<span class="loader"></span>';
+  if (!user) { 
+    sessionStorage.setItem('pendingPlan', plan); 
+    window.location.href = '/connexion.html?redirect=offres'; 
+    return; 
+  }
+  const btn = document.getElementById(plan === 'pro' ? 'btn-pro' : 'btn-biz');
+  btn.disabled = true; 
+  btn.innerHTML = '<span class="loader"></span>';
   try {
     const token = await getIdToken(user);
-    const r = await fetch('/api/subscriptions/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan})});
+    const r = await fetch('/api/subscriptions/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    });
     const d = await r.json();
-    if (d.payUrl) window.location.href=d.payUrl;
-    else { alert('Erreur : '+(d.error||'Impossible')); btn.disabled=false; btn.textContent=plan==='pro'?'Passer au Pro →':'Choisir Business →'; }
-  } catch(e){ alert('Erreur réseau'); btn.disabled=false; btn.textContent=plan==='pro'?'Passer au Pro →':'Choisir Business →'; }
+    if (d.payUrl) window.location.href = d.payUrl;
+    else { 
+      alert('Erreur : ' + (d.error || 'Impossible')); 
+      btn.disabled = false; 
+      btn.innerHTML = plan === 'pro' ? 'Passer au Pro →' : 'Choisir Business →'; 
+    }
+  } catch(e) { 
+    alert('Erreur réseau'); 
+    btn.disabled = false; 
+    btn.innerHTML = plan === 'pro' ? 'Passer au Pro →' : 'Choisir Business →'; 
+  }
 };
-const pp=sessionStorage.getItem('pendingPlan');
-if(pp&&auth.currentUser){sessionStorage.removeItem('pendingPlan');window.subscribe(pp);}
+
+const pp = sessionStorage.getItem('pendingPlan');
+if (pp && auth.currentUser) {
+  sessionStorage.removeItem('pendingPlan');
+  window.subscribe(pp);
+}
 </script>
 </body>
 </html>
