@@ -139,3 +139,28 @@ export async function notifyAdminPaymentFailed({ orderId, firstName, lastName, e
     `,
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. Notif admin — demande B2B reçue
+// ─────────────────────────────────────────────────────────────────────────────
+export async function notifyAdminB2BRequest({ orderId, company, name, email, phone, quantity, description }) {
+  return sendMail({
+    to:      ADMIN_EMAIL,
+    subject: `📋 Nouvelle demande B2B — ${company}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:560px;margin:auto">
+        <h2 style="color:#2563eb">Nouvelle demande B2B</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <tr><td style="padding:8px;color:#555">Référence</td><td style="padding:8px;font-weight:bold;font-family:monospace">${orderId.slice(-6).toUpperCase()}</td></tr>
+          <tr style="background:#f9f9f9"><td style="padding:8px;color:#555">Entreprise</td><td style="padding:8px;font-weight:bold">${company}</td></tr>
+          <tr><td style="padding:8px;color:#555">Responsable</td><td style="padding:8px">${name}</td></tr>
+          <tr style="background:#f9f9f9"><td style="padding:8px;color:#555">Email</td><td style="padding:8px"><a href="mailto:${email}">${email}</a></td></tr>
+          <tr><td style="padding:8px;color:#555">Téléphone</td><td style="padding:8px">${phone}</td></tr>
+          <tr style="background:#f9f9f9"><td style="padding:8px;color:#555">Quantité</td><td style="padding:8px">${quantity}</td></tr>
+          <tr><td style="padding:8px;color:#555">Besoin</td><td style="padding:8px;font-style:italic">${description}</td></tr>
+        </table>
+        <p style="margin-top:20px;font-size:13px;color:#888">Répondez directement à <a href="mailto:${email}">${email}</a> avec votre devis.</p>
+      </div>
+    `,
+  });
+}
