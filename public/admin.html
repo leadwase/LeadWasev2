@@ -650,9 +650,9 @@ window.loadB2B = async () => {
   const tbody = document.getElementById('b2b-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
   try {
-    const d = await api('/api/admin/orders');
+    const d = await api('/api/admin/b2b');  // route dédiée B2B
     if (!d.success) throw new Error(d.error);
-    const b2bOrders = d.orders.filter(o => o.cardType === 'b2b');
+    const b2bOrders = d.orders;
     const count = b2bOrders.filter(o => o.status === 'b2b_pending').length;
     document.getElementById('sb-b2b-count').textContent = count;
     if (!b2bOrders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
