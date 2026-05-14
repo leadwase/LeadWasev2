@@ -177,56 +177,83 @@
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, setDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, getDocs, updateDoc, collection, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cherche le profil dans `profiles` par email de l'utilisateur Firebase Auth.
+// Utilisé en fallback quand users/{uid}.leadwaseId est absent (commandes sans
+// compte lié, webhook qui ne crée pas le doc users).
+// ─────────────────────────────────────────────────────────────────────────────
+async function findProfileByEmail(email) {
+  if (!email) return null;
+  const q = query(
+    collection(db, 'profiles'),
+    where('email', '==', email),
+    limit(1)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  return snap.docs[0];
+}
 
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = '/connexion.html'; return; }
 
+  // ── 1. Lire le document users/{uid} ─────────────────────────────────────
   const uDoc = await getDoc(doc(db, 'users', user.uid));
-
-  // ── Bloquer si pas de document users ────────────────────────────
-  if (!uDoc.exists()) {
-    document.getElementById('blocker').style.display = 'flex';
-    return;
-  }
-
-  const ud   = uDoc.data();
+  const ud   = uDoc.exists() ? uDoc.data() : {};
   const plan = ud.plan || 'free';
 
-  // ── Lien admin si role=admin ─────────────────────────────────────
+  // ── 2. Lien admin ────────────────────────────────────────────────────────
   if (ud.role === 'admin') {
     document.querySelector('.sidebar-nav').insertAdjacentHTML('afterbegin',
       '<a class="sidebar-item" href="admin.html"><span class="s-icon">⚙️</span>Administration</a>');
   }
 
-  lwId = ud.leadwaseId;
+  // ── 3. Trouver le leadwaseId ─────────────────────────────────────────────
+  //    Priorité : users/{uid}.leadwaseId → sinon cherche par email dans profiles
+  let profileDoc = null;
 
-  // ── Bloquer si pas de leadwaseId (carte non achetée ou non livrée) ─
-  if (!lwId) {
+  if (ud.leadwaseId) {
+    // Cas normal : le doc users contient déjà le leadwaseId
+    lwId = ud.leadwaseId;
+    profileDoc = await getDoc(doc(db, 'profiles', lwId));
+    if (!profileDoc.exists()) profileDoc = null; // sécurité
+  }
+
+  if (!profileDoc) {
+    // Fallback : recherche par email (commandes passées sans compte lié)
+    profileDoc = await findProfileByEmail(user.email);
+    if (profileDoc) {
+      lwId = profileDoc.data().leadwaseId;
+
+      // Rattacher silencieusement le profil au compte Firebase pour les prochaines fois
+      try {
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+        await setDoc(doc(db, 'users', user.uid), { leadwaseId: lwId, plan: profileDoc.data().plan || 'free', updatedAt: new Date() }, { merge: true });
+      } catch(_) { /* non bloquant */ }
+    }
+  }
+
+  // ── 4. Aucun profil trouvé → bloquer ────────────────────────────────────
+  if (!profileDoc) {
     document.getElementById('blocker').style.display = 'flex';
     return;
   }
 
-  const pDoc = await getDoc(doc(db, 'profiles', lwId));
+  const p         = profileDoc.data();
+  const planFinal = p.plan || plan; // le plan stocké dans le profil fait foi
 
-  // ── Bloquer si profil introuvable ───────────────────────────────
-  if (!pDoc.exists()) {
-    document.getElementById('blocker').style.display = 'flex';
-    return;
-  }
-
-  const p = pDoc.data();
-
-  // ── Afficher l'app ───────────────────────────────────────────────
+  // ── 5. Afficher l'app ────────────────────────────────────────────────────
   document.getElementById('app-layout').style.display = '';
 
   // Sidebar
   const ini = ((p.firstName||'?')[0] + (p.lastName||'?')[0]).toUpperCase();
   document.getElementById('sb-av').textContent    = (p.firstName||'?')[0];
   document.getElementById('sb-name').textContent  = (p.firstName||'') + ' ' + (p.lastName||'');
-  document.getElementById('sb-plan').textContent  = plan.toUpperCase();
+  document.getElementById('sb-plan').textContent  = planFinal.toUpperCase();
   document.getElementById('sb-pub').href          = 'profil.html?id=' + lwId;
 
   // Header profil
@@ -237,69 +264,67 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('pf-id').textContent   = lwId;
   document.getElementById('pub-link').href        = 'profil.html?id=' + lwId;
   const pb = document.getElementById('pf-plan');
-  pb.textContent = plan.toUpperCase();
-  pb.className   = 'plan-badge plan-' + plan;
+  pb.textContent = planFinal.toUpperCase();
+  pb.className   = 'plan-badge plan-' + planFinal;
 
   // Formulaire
-  ['first','last','job','co','phone','email'].forEach((k,i) =>
+  ['first','last','job','co','phone','email'].forEach((k, i) =>
     document.getElementById('e-'+k).value = [p.firstName,p.lastName,p.jobTitle,p.company,p.phone,p.email][i]||'');
   document.getElementById('e-web').value = p.website || '';
   document.getElementById('e-bio').value = p.bio     || '';
 
-  // ── Fonctionnalités selon plan ───────────────────────────────────
-  const isPro = ['pro','business'].includes(plan);
+  // ── 6. Fonctionnalités selon plan ────────────────────────────────────────
+  const isPro = ['pro','business'].includes(planFinal);
 
   if (isPro) {
-    // Masquer locked & upgrade, afficher liens + analytics
-    document.getElementById('locked-sec').style.display    = 'none';
-    document.getElementById('upgrade-sec').style.display   = 'none';
-    document.getElementById('links-sec').style.display     = 'block';
+    document.getElementById('locked-sec').style.display       = 'none';
+    document.getElementById('upgrade-sec').style.display      = 'none';
+    document.getElementById('links-sec').style.display        = 'block';
     document.getElementById('analytics-teaser').style.display = 'flex';
 
-    // Lien Analytics dans la sidebar
     document.getElementById('analytics-nav-item').innerHTML =
       '<a class="sidebar-item" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>';
 
-    // Remplir liens
     document.getElementById('l-li').value = p.linkedin  || '';
     document.getElementById('l-ig').value = p.instagram || '';
     document.getElementById('l-tw').value = p.twitter   || '';
     document.getElementById('l-fb').value = p.facebook  || '';
   }
 
-  // ── Enregistrer une visite sur le profil dashboard (analytics) ───
-  // On ne logue pas ici — les visites sont loguées sur profil.html (page publique)
-
   document.getElementById('loader').style.display  = 'none';
   document.getElementById('content').style.display = 'block';
 });
 
+// ── Sauvegarde profil ────────────────────────────────────────────────────────
 window.saveProfile = async () => {
   try {
-    await updateDoc(doc(db, 'profiles', lwId), {
-      firstName: document.getElementById('e-first').value,
-      lastName:  document.getElementById('e-last').value,
-      jobTitle:  document.getElementById('e-job').value,
-      company:   document.getElementById('e-co').value,
-      phone:     document.getElementById('e-phone').value,
-      email:     document.getElementById('e-email').value,
-      website:   document.getElementById('e-web').value,
-      bio:       document.getElementById('e-bio').value,
-      updatedAt: new Date(),
-    });
+    await (await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"))
+      .updateDoc(doc(db, 'profiles', lwId), {
+        firstName: document.getElementById('e-first').value,
+        lastName:  document.getElementById('e-last').value,
+        jobTitle:  document.getElementById('e-job').value,
+        company:   document.getElementById('e-co').value,
+        phone:     document.getElementById('e-phone').value,
+        email:     document.getElementById('e-email').value,
+        website:   document.getElementById('e-web').value,
+        bio:       document.getElementById('e-bio').value,
+        updatedAt: new Date(),
+      });
     toast('Profil mis à jour !', 'success');
   } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
+// ── Sauvegarde liens ─────────────────────────────────────────────────────────
 window.saveLinks = async () => {
   try {
-    await updateDoc(doc(db, 'profiles', lwId), {
-      linkedin:  document.getElementById('l-li').value,
-      instagram: document.getElementById('l-ig').value,
-      twitter:   document.getElementById('l-tw').value,
-      facebook:  document.getElementById('l-fb').value,
-      updatedAt: new Date(),
-    });
+    await (await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"))
+      .updateDoc(doc(db, 'profiles', lwId), {
+        linkedin:  document.getElementById('l-li').value,
+        instagram: document.getElementById('l-ig').value,
+        twitter:   document.getElementById('l-tw').value,
+        facebook:  document.getElementById('l-fb').value,
+        updatedAt: new Date(),
+      });
     toast('Liens mis à jour !', 'success');
   } catch(e) { toast('Erreur : ' + e.message, 'error'); }
 };
