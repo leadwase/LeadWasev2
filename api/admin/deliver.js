@@ -3,7 +3,7 @@ import { getFirestore }                  from 'firebase-admin/firestore';
 import { getAuth }                       from 'firebase-admin/auth';
 import {
   notifyClientCredentials,
-} from './brevo.js';
+} from '../brevo.js';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
