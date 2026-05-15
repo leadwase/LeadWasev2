@@ -619,7 +619,7 @@ async function loadAnalytics(days) {
 
   try {
     const visitsRef = collection(db, 'analytics', lwId, 'visits');
-    const visitsQ = query(visitsRef, where('visitedAt', '>=', sinceTs), orderBy('visitedAt', 'desc'), limit(500));
+    const visitsQ = query(visitsRef, where('visitedAt', '>=', sinceTs), limit(500));
     const visitsSnap = await getDocs(visitsQ);
     const visits = visitsSnap.docs.map(d => d.data());
 
