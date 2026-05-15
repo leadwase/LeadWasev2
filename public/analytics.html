@@ -55,6 +55,19 @@
 #access-denied p{font-size:14px;color:var(--gray3);max-width:400px;line-height:1.7}
 #access-denied a{padding:12px 28px;background:var(--green);color:var(--white);text-decoration:none;font-weight:bold;font-size:13px;letter-spacing:1px;text-transform:uppercase;border-radius:2px}
 
+.loader {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--gray5);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @media(max-width:900px){
   .analytics-wrap{padding:14px}
   .an-stats{grid-template-columns:1fr 1fr}
@@ -99,7 +112,7 @@
   <main class="app-content">
     <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
       <div style="text-align:center">
-        <div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div>
+        <div class="loader"></div>
         <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
       </div>
     </div>
@@ -108,9 +121,9 @@
       <div class="an-header">
         <div class="an-h1">📊 Analytics</div>
         <div class="an-period">
-          <button class="period-btn active" onclick="setPeriod(7,this)">7 jours</button>
-          <button class="period-btn" onclick="setPeriod(30,this)">30 jours</button>
-          <button class="period-btn" onclick="setPeriod(90,this)">90 jours</button>
+          <button class="period-btn active" data-period="7">7 jours</button>
+          <button class="period-btn" data-period="30">30 jours</button>
+          <button class="period-btn" data-period="90">90 jours</button>
         </div>
       </div>
 
@@ -167,48 +180,76 @@
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp }
-  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
 let currentPeriod = 7;
 
+// Fonction pour trouver le profil par firebaseUid
+async function findProfileByFirebaseUid(uid) {
+  const profilesRef = collection(db, 'profiles');
+  const q = query(profilesRef, where('firebaseUid', '==', uid), limit(1));
+  const snapshot = await getDocs(q);
+  if (!snapshot.empty) {
+    const doc = snapshot.docs[0];
+    return { id: doc.id, data: doc.data() };
+  }
+  return null;
+}
+
 onAuthStateChanged(auth, async user => {
-  if (!user) { window.location.href = '/connexion.html'; return; }
-
-  const uDoc = await getDoc(doc(db, 'users', user.uid));
-  if (!uDoc.exists()) { window.location.href = '/connexion.html'; return; }
-
-  const ud   = uDoc.data();
-  const plan = ud.plan || 'free';
-
-  // ── Bloquer si pas Pro/Business ──────────────────────────────────
-  if (!['pro','business'].includes(plan)) {
-    document.getElementById('access-denied').style.display = 'flex';
+  if (!user) {
+    window.location.href = '/connexion.html';
     return;
   }
 
-  lwId = ud.leadwaseId;
-  if (!lwId) { window.location.href = '/dashboard.html'; return; }
+  const loader = document.getElementById('loader');
+  const content = document.getElementById('content');
+  const accessDenied = document.getElementById('access-denied');
 
-  const pDoc = await getDoc(doc(db, 'profiles', lwId));
-  if (!pDoc.exists()) { window.location.href = '/dashboard.html'; return; }
-  const p = pDoc.data();
-
-  // Sidebar
-  document.getElementById('sb-av').textContent   = (p.firstName||'?')[0];
-  document.getElementById('sb-name').textContent = (p.firstName||'') + ' ' + (p.lastName||'');
-  document.getElementById('sb-plan').textContent = plan.toUpperCase();
-  document.getElementById('sb-pub').href         = 'profil.html?id=' + lwId;
-
-  document.getElementById('app-layout').style.display = '';
-  document.getElementById('loader').style.display     = 'none';
-  document.getElementById('content').style.display    = 'block';
-
-  loadAnalytics(7);
+  try {
+    // 🔥 RECHERCHE DU PROFIL PAR firebaseUid
+    const profileResult = await findProfileByFirebaseUid(user.uid);
+    
+    if (!profileResult) {
+      console.error('Aucun profil trouvé pour cet utilisateur');
+      window.location.href = '/dashboard.html';
+      return;
+    }
+    
+    const profile = profileResult.data;
+    lwId = profileResult.id;
+    const userPlan = profile.plan || 'free';
+    
+    console.log('Profil trouvé:', lwId, 'Plan:', userPlan);
+    
+    // 🔥 VÉRIFICATION DU PLAN POUR L'ACCÈS ANALYTICS
+    if (!['pro', 'business'].includes(userPlan)) {
+      accessDenied.style.display = 'flex';
+      return;
+    }
+    
+    // Mise à jour de la sidebar
+    document.getElementById('sb-av').textContent = (profile.firstName || '?')[0];
+    document.getElementById('sb-name').textContent = `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Utilisateur';
+    document.getElementById('sb-plan').textContent = userPlan.toUpperCase();
+    document.getElementById('sb-pub').href = `profil.html?id=${lwId}`;
+    
+    // Affichage de l'interface
+    document.getElementById('app-layout').style.display = '';
+    loader.style.display = 'none';
+    content.style.display = 'block';
+    
+    // Chargement des analytics
+    await loadAnalytics(currentPeriod);
+    
+  } catch (error) {
+    console.error('Erreur:', error);
+    window.location.href = '/dashboard.html';
+  }
 });
 
-// ── Changer période ──────────────────────────────────────────────
+// ── Changer période ──
 window.setPeriod = (days, btn) => {
   document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -216,7 +257,15 @@ window.setPeriod = (days, btn) => {
   loadAnalytics(days);
 };
 
-// ── Charger analytics depuis Firestore ───────────────────────────
+// ── Initialiser les boutons ──
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const days = parseInt(btn.dataset.period);
+    setPeriod(days, btn);
+  });
+});
+
+// ── Charger analytics ──
 async function loadAnalytics(days) {
   if (!lwId) return;
 
@@ -225,35 +274,33 @@ async function loadAnalytics(days) {
   const sinceTs = Timestamp.fromDate(since);
 
   try {
-    // Requête sur la collection analytics/{lwId}/visits
-    const visitsRef  = collection(db, 'analytics', lwId, 'visits');
-    const visitsQ    = query(visitsRef, where('visitedAt', '>=', sinceTs), orderBy('visitedAt', 'desc'), limit(200));
+    const visitsRef = collection(db, 'analytics', lwId, 'visits');
+    const visitsQ = query(visitsRef, where('visitedAt', '>=', sinceTs), orderBy('visitedAt', 'desc'), limit(500));
     const visitsSnap = await getDocs(visitsQ);
-    const visits     = visitsSnap.docs.map(d => d.data());
+    const visits = visitsSnap.docs.map(d => d.data());
 
     // Totaux
-    const total   = visits.length;
-    const unique  = new Set(visits.map(v => v.ip || v.visitorId || Math.random())).size;
+    const total = visits.length;
+    const unique = new Set(visits.map(v => v.visitorId || v.ip || 'unknown')).size;
     const contacts = visits.filter(v => v.type === 'contact_click').length;
-    const shares   = visits.filter(v => v.type === 'share').length;
+    const shares = visits.filter(v => v.type === 'share').length;
 
-    document.getElementById('stat-total').textContent    = total;
-    document.getElementById('stat-unique').textContent   = unique;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-unique').textContent = unique;
     document.getElementById('stat-contacts').textContent = contacts;
-    document.getElementById('stat-shares').textContent   = shares;
+    document.getElementById('stat-shares').textContent = shares;
 
-    document.getElementById('stat-total-sub').textContent    = total > 0   ? `sur ${days} jours` : 'aucune visite';
-    document.getElementById('stat-unique-sub').textContent   = unique > 0  ? 'visiteurs distincts' : '';
+    document.getElementById('stat-total-sub').textContent = total > 0 ? `sur ${days} jours` : 'aucune visite';
+    document.getElementById('stat-unique-sub').textContent = unique > 0 ? 'visiteurs distincts' : '';
     document.getElementById('stat-contacts-sub').textContent = contacts > 0 ? 'clics sur contact' : '';
-    document.getElementById('stat-shares-sub').textContent   = shares > 0  ? 'partages' : '';
+    document.getElementById('stat-shares-sub').textContent = shares > 0 ? 'partages' : '';
 
     buildChart(visits, days);
     buildSources(visits);
     buildRecentVisits(visits.slice(0, 10));
 
   } catch(e) {
-    console.error('analytics error', e);
-    // Afficher état vide proprement
+    console.error('Erreur analytics:', e);
     ['stat-total','stat-unique','stat-contacts','stat-shares'].forEach(id =>
       document.getElementById(id).textContent = '0');
     buildChart([], days);
@@ -262,81 +309,107 @@ async function loadAnalytics(days) {
   }
 }
 
-// ── Graphe en barres ─────────────────────────────────────────────
+// ── Graphique ──
 function buildChart(visits, days) {
-  const area   = document.getElementById('chart-area');
-  const labels = document.getElementById('chart-labels');
-  area.innerHTML = ''; labels.innerHTML = '';
+  const area = document.getElementById('chart-area');
+  area.innerHTML = '';
 
-  // Grouper par jour
   const map = {};
   const now = new Date();
   for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(now); d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0,10);
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
     map[key] = 0;
   }
+  
   visits.forEach(v => {
     const d = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
-    const key = d.toISOString().slice(0,10);
+    const key = d.toISOString().slice(0, 10);
     if (map[key] !== undefined) map[key]++;
   });
 
-  const vals  = Object.values(map);
-  const keys  = Object.keys(map);
-  const maxV  = Math.max(...vals, 1);
-  const shown = days <= 14 ? keys : keys.filter((_,i) => i % Math.ceil(days/14) === 0);
+  const vals = Object.values(map);
+  const keys = Object.keys(map);
+  const maxV = Math.max(...vals, 1);
+  const shown = days <= 14 ? keys : keys.filter((_, i) => i % Math.ceil(days / 14) === 0);
 
   keys.forEach((key, i) => {
-    const pct  = (map[key] / maxV) * 100;
+    const pct = (map[key] / maxV) * 100;
     const date = new Date(key);
-    const lbl  = date.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+    const lbl = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
     const wrap = document.createElement('div');
     wrap.className = 'bar-wrap';
     wrap.innerHTML = `
-      <div class="bar" style="height:${Math.max(pct,1)}%">
-        <span class="bar-tooltip">${map[key]} visite${map[key]>1?'s':''} — ${lbl}</span>
+      <div class="bar" style="height: ${Math.max(pct, 2)}%">
+        <span class="bar-tooltip">${map[key]} visite${map[key] > 1 ? 's' : ''} — ${lbl}</span>
       </div>
       <span class="bar-label">${shown.includes(key) ? lbl : ''}</span>`;
     area.appendChild(wrap);
   });
 }
 
-// ── Sources ──────────────────────────────────────────────────────
+// ── Sources ──
 function buildSources(visits) {
   const map = {};
   visits.forEach(v => {
     const src = v.source || 'Direct';
-    map[src] = (map[src]||0) + 1;
+    map[src] = (map[src] || 0) + 1;
   });
-  const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,5);
-  const max    = sorted[0]?.[1] || 1;
-  const el     = document.getElementById('sources-list');
-  if (!sorted.length) { el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune donnée</div>'; return; }
-  el.innerHTML = sorted.map(([name,count]) => `
+  const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const max = sorted[0]?.[1] || 1;
+  const el = document.getElementById('sources-list');
+  
+  if (!sorted.length) {
+    el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune donnée</div>';
+    return;
+  }
+  
+  el.innerHTML = sorted.map(([name, count]) => `
     <div class="source-row">
       <span class="source-name">${name}</span>
-      <div class="source-bar-wrap"><div class="source-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></div></div>
+      <div class="source-bar-wrap"><div class="source-bar-fill" style="width: ${(count / max * 100).toFixed(0)}%"></div></div>
       <span class="source-count">${count}</span>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
-// ── Visites récentes ─────────────────────────────────────────────
+// ── Visites récentes ──
 function buildRecentVisits(visits) {
   const el = document.getElementById('visits-list');
-  if (!visits.length) { el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune visite</div>'; return; }
+  if (!visits.length) {
+    el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune visite récente</div>';
+    return;
+  }
+  
   el.innerHTML = visits.map(v => {
-    const d   = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
-    const lbl = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-    return `<div class="visit-row">
-      <span>${v.country||'Inconnu'} — ${v.device||'Web'}</span>
-      <span class="visit-src">${v.source||'Direct'}</span>
-      <span class="visit-date">${lbl}</span>
-    </div>`;
+    const d = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
+    const lbl = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const country = v.country || 'Inconnu';
+    const device = v.device || 'Web';
+    const source = v.source || 'Direct';
+    return `
+      <div class="visit-row">
+        <span>${country} — ${device}</span>
+        <span class="visit-src">${source}</span>
+        <span class="visit-date">${lbl}</span>
+      </div>
+    `;
   }).join('');
 }
 
-window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
+window.doLogout = async () => {
+  await signOut(auth);
+  window.location.href = '/';
+};
+
+// Démarrer avec la période par défaut
+function setPeriod(days, btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPeriod = days;
+  loadAnalytics(days);
+}
 </script>
 </body>
 </html>
