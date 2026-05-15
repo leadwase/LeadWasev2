@@ -720,13 +720,13 @@ function displayAvatar(p) {
   const avText = document.getElementById('pf-av-text');
   const avImg = document.getElementById('pf-av-img');
   const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
-  const photoUrl = p.photoURL || p.profileImage || null;
+  const photoBase64 = p.photoURL || null;
   const isPro = ['pro', 'business'].includes(p.plan);
   
-  if (isPro && photoUrl && photoUrl.trim()) {
+  if (isPro && photoBase64 && photoBase64.startsWith('data:image')) {
     avText.style.display = 'none';
     avImg.style.display = 'block';
-    avImg.src = photoUrl;
+    avImg.src = photoBase64;
   } else {
     avText.style.display = 'flex';
     avImg.style.display = 'none';
@@ -734,17 +734,42 @@ function displayAvatar(p) {
   }
 }
 
+// Remplacer la fonction uploadProfileImage par celle-ci :
+
 async function uploadProfileImage(file) {
   if (!lwId) return null;
   
-  const storageRef = ref(storage, `profile_photos/${lwId}`);
-  await uploadBytes(storageRef, file);
-  const downloadURL = await getDownloadURL(storageRef);
-  
-  const profileRef = doc(db, 'profiles', lwId);
-  await updateDoc(profileRef, { photoURL: downloadURL });
-  
-  return downloadURL;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onloadend = async () => {
+      const base64String = reader.result; // Format: data:image/jpeg;base64,xxxxx
+      
+      // Limiter la taille (max 500KB pour Firestore)
+      if (base64String.length > 600000) {
+        reject('L\'image est trop lourde (max 500KB)');
+        return;
+      }
+      
+      try {
+        const profileRef = doc(db, 'profiles', lwId);
+        await updateDoc(profileRef, { 
+          photoURL: base64String,
+          updatedAt: new Date()
+        });
+        
+        // Mettre à jour l'affichage
+        displayAvatar({ ...currentProfileData, photoURL: base64String });
+        
+        resolve(base64String);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 onAuthStateChanged(auth, async user => {
