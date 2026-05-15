@@ -81,7 +81,6 @@ export default async function handler(req, res) {
       const loginEmail = `lw-${cleanLwId}@leadwase.internal`;
       const displayName = `${oData.firstName || ''} ${oData.lastName || ''}`.trim();
 
-      // 🔥 Créer l'utilisateur dans Firebase Auth
       let firebaseUid = null;
       try {
         const userRecord = await auth.createUser({
@@ -98,7 +97,6 @@ export default async function handler(req, res) {
 
       await ord.ref.update({ status: 'paid', leadwaseId: lwId, paidAt: new Date() });
 
-      // 🔥 Créer le profil avec firebaseUid
       const profileData = {
         leadwaseId: lwId,
         firstName:  oData.firstName,
@@ -117,8 +115,6 @@ export default async function handler(req, res) {
       }
 
       await db.collection('profiles').doc(lwId).set(profileData);
-
-      // 🔥 Stocker les credentials
       await db.collection('credentials').doc(lwId).set({
         leadwaseId:   lwId,
         loginEmail:   loginEmail,
@@ -126,7 +122,6 @@ export default async function handler(req, res) {
         createdAt:    new Date(),
       });
 
-      // Notifications
       await Promise.allSettled([
         notifyAdminNewOrder({
           orderId:   pay.orderId,
@@ -170,7 +165,7 @@ export default async function handler(req, res) {
       ]);
     }
 
-    // ── ABONNEMENT (PRO ou BUSINESS) ──────────────────────────────────────────
+    // ── ABONNEMENT (PRO ou BUSINESS) - CORRIGÉ ─────────────────────────────────
     if (ok && pay.subscriptionId) {
       const sub   = await db.collection('subscriptions').doc(pay.subscriptionId).get();
       const sData = sub.data();
@@ -185,10 +180,13 @@ export default async function handler(req, res) {
         paidAt:     new Date(),
       });
 
-      const firebaseUid = pay.firebaseUid || sData?.firebaseUid;
+      // Récupérer l'UID depuis le payment ou la subscription
+      const firebaseUid = pay.firebaseUid || pay.uid || sData?.firebaseUid || sData?.uid;
+      
+      console.log(`🔍 Recherche du profil avec firebaseUid: ${firebaseUid}`);
       
       if (firebaseUid) {
-        // 🔥 Rechercher le profil par firebaseUid
+        // Rechercher le profil par firebaseUid
         const profileQuery = await db.collection('profiles')
           .where('firebaseUid', '==', firebaseUid)
           .limit(1)
@@ -196,26 +194,29 @@ export default async function handler(req, res) {
         
         if (!profileQuery.empty) {
           const profileDoc = profileQuery.docs[0];
-          const oldPlan = profileDoc.data().plan;
+          const oldPlan = profileDoc.data().plan || 'free';
           
-          // 🔥 Mettre à jour le plan dans le profil
+          // Mettre à jour le plan
           await profileDoc.ref.update({ 
             plan: sData.plan,
             updatedAt: new Date(),
           });
-          console.log(`✅ Profil ${profileDoc.id} mis à jour: ${oldPlan} → ${sData.plan}`);
+          console.log(`✅ Plan mis à jour: ${oldPlan} → ${sData.plan} pour le profil ${profileDoc.id}`);
         } else {
-          console.log(`❌ Aucun profil trouvé pour firebaseUid: ${firebaseUid}`);
+          console.log(`❌ Aucun profil trouvé avec firebaseUid: ${firebaseUid}`);
           
-          // Option: créer un profil si inexistant (cas exceptionnel)
-          const newLwId = genId();
-          await db.collection('profiles').doc(newLwId).set({
-            leadwaseId: newLwId,
-            firebaseUid: firebaseUid,
-            plan: sData.plan,
-            createdAt: new Date(),
-          });
-          console.log(`✅ Nouveau profil créé pour abonnement: ${newLwId}`);
+          // Essayer de trouver par leadwaseId si disponible
+          if (sData.leadwaseId) {
+            const profileById = await db.collection('profiles').doc(sData.leadwaseId).get();
+            if (profileById.exists) {
+              await profileById.ref.update({ 
+                plan: sData.plan,
+                firebaseUid: firebaseUid,
+                updatedAt: new Date(),
+              });
+              console.log(`✅ Profil trouvé par leadwaseId ${sData.leadwaseId} mis à jour: plan = ${sData.plan}`);
+            }
+          }
         }
       } else {
         console.log(`⚠️ Abonnement ${pay.subscriptionId} sans firebaseUid associé`);
