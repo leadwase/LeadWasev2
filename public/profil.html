@@ -108,7 +108,11 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   border:4px solid #f5f5f3;
   display:flex;align-items:center;justify-content:center;
   font-size:30px;font-weight:bold;color:#fff;
-  box-shadow:0 6px 24px rgba(26,122,60,.2),0 2px 8px rgba(0,0,0,.12)
+  box-shadow:0 6px 24px rgba(26,122,60,.2),0 2px 8px rgba(0,0,0,.12);
+  object-fit:cover;
+}
+.pf-av img{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;
 }
 .pf-plan-tag{
   position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
@@ -300,7 +304,10 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 
   <div class="pf-identity a1">
     <div class="pf-av-wrap">
-      <div class="pf-av" id="pf-av">?</div>
+      <div class="pf-av" id="pf-av">
+        <span id="pf-av-text">?</span>
+        <img id="pf-av-img" style="display:none;width:100%;height:100%;border-radius:50%;object-fit:cover" alt="Photo de profil">
+      </div>
       <div class="pf-plan-tag" id="pf-plan">FREE</div>
     </div>
     <div class="pf-info">
@@ -397,11 +404,78 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 </div>
 
 <script type="module">
-import { db } from './js/firebase-config.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { db, auth } from './js/firebase-config.js';
+import { doc, getDoc, setDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const id = new URLSearchParams(window.location.search).get('id');
 if (!id) showErr(); else load(id.toUpperCase());
+
+// Fonction pour enregistrer les analytics
+async function recordAnalytics(type, leadwaseId, element = null) {
+  if (!leadwaseId) return;
+  
+  try {
+    // Générer un ID de visiteur unique basé sur l'IP approximative (session)
+    let visitorId = localStorage.getItem('visitor_id');
+    if (!visitorId) {
+      visitorId = 'vis_' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('visitor_id', visitorId);
+    }
+    
+    // Récupérer les infos de l'appareil et source
+    const device = /Mobile|Tablet|iPhone|iPad|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+    const source = document.referrer ? new URL(document.referrer).hostname : 'Direct';
+    const country = 'Inconnu'; // À améliorer avec une API IP
+    
+    const analyticsRef = doc(db, 'analytics', leadwaseId, 'visits', new Date().toISOString());
+    await setDoc(analyticsRef, {
+      visitedAt: serverTimestamp(),
+      type: type,
+      device: device,
+      source: source,
+      country: country,
+      visitorId: visitorId
+    });
+    
+    console.log(`Analytics enregistré: ${type}`);
+  } catch(e) {
+    console.error('Erreur analytics:', e);
+  }
+}
+
+// Fonction pour enregistrer un clic sur un lien
+async function recordClick(element, leadwaseId, clickType) {
+  if (!leadwaseId) return;
+  await recordAnalytics(`click_${clickType}`, leadwaseId);
+  
+  // Laisser le lien s'ouvrir normalement
+  return true;
+}
+
+// Fonction pour afficher l'avatar (image ou initiales)
+function displayAvatar(p) {
+  const avDiv = document.getElementById('pf-av');
+  const avText = document.getElementById('pf-av-text');
+  const avImg = document.getElementById('pf-av-img');
+  const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
+  
+  // Vérifier si une photo de profil existe (pour Pro/Business)
+  const isPro = ['pro', 'business'].includes(p.plan);
+  const photoUrl = p.photoURL || p.profileImage || null;
+  
+  if (isPro && photoUrl && photoUrl.trim()) {
+    // Afficher l'image
+    avText.style.display = 'none';
+    avImg.style.display = 'block';
+    avImg.src = photoUrl;
+    avImg.alt = `${p.firstName || ''} ${p.lastName || ''}`;
+  } else {
+    // Afficher les initiales
+    avText.style.display = 'flex';
+    avImg.style.display = 'none';
+    avText.textContent = ini;
+  }
+}
 
 async function load(leadwaseId) {
   try {
@@ -409,14 +483,14 @@ async function load(leadwaseId) {
     if (!snap.exists()) { showErr(); return; }
 
     const p = snap.data();
-    const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
     const isPro = ['pro', 'business'].includes(p.plan);
     const isBusiness = p.plan === 'business';
 
     document.title = `${p.firstName || ''} ${p.lastName || ''} — LeadWase`;
 
-    // Infos de base
-    document.getElementById('pf-av').textContent = ini;
+    // Afficher l'avatar (image ou initiales)
+    displayAvatar(p);
+    
     document.getElementById('pf-plan').textContent = (p.plan || 'free').toUpperCase();
     document.getElementById('pf-name').textContent = `${p.firstName || ''} ${p.lastName || ''}`.trim() || '–';
     document.getElementById('pf-job').textContent = p.jobTitle || '';
@@ -426,8 +500,16 @@ async function load(leadwaseId) {
     document.getElementById('pf-email').textContent = p.email || '–';
 
     // Téléphone et email cliquables
-    if (p.phone) document.getElementById('tile-phone').href = `tel:${p.phone}`;
-    if (p.email) document.getElementById('tile-email').href = `mailto:${p.email}`;
+    if (p.phone) {
+      const phoneTile = document.getElementById('tile-phone');
+      phoneTile.href = `tel:${p.phone}`;
+      phoneTile.addEventListener('click', () => recordClick(phoneTile, leadwaseId, 'phone'));
+    }
+    if (p.email) {
+      const emailTile = document.getElementById('tile-email');
+      emailTile.href = `mailto:${p.email}`;
+      emailTile.addEventListener('click', () => recordClick(emailTile, leadwaseId, 'email'));
+    }
 
     // Bio
     if (p.bio && p.bio.trim()) {
@@ -449,6 +531,7 @@ async function load(leadwaseId) {
       webTile.style.display = 'flex';
       webTile.href = p.website.startsWith('http') ? p.website : `https://${p.website}`;
       document.getElementById('pf-web').textContent = p.website.replace(/^https?:\/\//, '');
+      webTile.addEventListener('click', () => recordClick(webTile, leadwaseId, 'website'));
     }
 
     // Réseaux sociaux (Pro et Business)
@@ -470,9 +553,14 @@ async function load(leadwaseId) {
         if (p[s.key] && p[s.key].trim()) {
           hasSocial = true;
           const link = p[s.key].startsWith('http') ? p[s.key] : `https://${p[s.key]}`;
-          socialBox.insertAdjacentHTML('beforeend', 
-            `<a class="social-btn" href="${link}" target="_blank" rel="noopener noreferrer">${s.icon} ${s.name}</a>`
-          );
+          const btn = document.createElement('a');
+          btn.className = 'social-btn';
+          btn.href = link;
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          btn.innerHTML = `${s.icon} ${s.name}`;
+          btn.addEventListener('click', () => recordClick(btn, leadwaseId, `social_${s.key}`));
+          socialBox.appendChild(btn);
         }
       });
       
@@ -483,9 +571,14 @@ async function load(leadwaseId) {
         const waLink = p.whatsapp.startsWith('http') ? p.whatsapp : `https://wa.me/${p.whatsapp.replace(/[^0-9]/g, '')}`;
         const extraBox = document.getElementById('pf-extra-links');
         extraBox.innerHTML = '';
-        extraBox.insertAdjacentHTML('beforeend',
-          `<a class="social-btn" href="${waLink}" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>`
-        );
+        const waBtn = document.createElement('a');
+        waBtn.className = 'social-btn';
+        waBtn.href = waLink;
+        waBtn.target = '_blank';
+        waBtn.rel = 'noopener noreferrer';
+        waBtn.innerHTML = '💬 WhatsApp';
+        waBtn.addEventListener('click', () => recordClick(waBtn, leadwaseId, 'whatsapp'));
+        extraBox.appendChild(waBtn);
         document.getElementById('pf-extra-links-wrap').style.display = 'block';
       }
     }
@@ -497,6 +590,7 @@ async function load(leadwaseId) {
         const rdvBtn = document.getElementById('appointment-link');
         rdvBtn.href = p.rdvLink.startsWith('http') ? p.rdvLink : `https://${p.rdvLink}`;
         rdvBtn.textContent = p.rdvLabel || '📅 Prendre rendez-vous';
+        rdvBtn.addEventListener('click', () => recordClick(rdvBtn, leadwaseId, 'appointment'));
         document.getElementById('pf-appointment-wrap').style.display = 'block';
       }
       
@@ -504,6 +598,7 @@ async function load(leadwaseId) {
       if (p.googleReview && p.googleReview.trim()) {
         const reviewLink = document.getElementById('google-review-link');
         reviewLink.href = p.googleReview.startsWith('http') ? p.googleReview : `https://${p.googleReview}`;
+        reviewLink.addEventListener('click', () => recordClick(reviewLink, leadwaseId, 'google_review'));
         document.getElementById('pf-google-review-wrap').style.display = 'block';
       }
       
@@ -513,12 +608,15 @@ async function load(leadwaseId) {
         const contactLink = document.getElementById('contact-form-link');
         contactMsg.textContent = p.contactMessage || 'Contactez-moi via le formulaire';
         contactLink.href = p.contactLink.startsWith('http') ? p.contactLink : `https://${p.contactLink}`;
+        contactLink.addEventListener('click', () => recordClick(contactLink, leadwaseId, 'contact_form'));
         document.getElementById('pf-contact-form-wrap').style.display = 'block';
       }
     }
 
-    // Gestion du fichier vCard
+    // Gestion du fichier vCard (téléchargement)
     document.getElementById('vcf-btn').onclick = () => {
+      recordAnalytics('vcard_download', leadwaseId);
+      
       const vcard = [
         'BEGIN:VCARD',
         'VERSION:3.0',
@@ -541,6 +639,9 @@ async function load(leadwaseId) {
       a.click();
       URL.revokeObjectURL(url);
     };
+
+    // ENREGISTRER LA VUE DU PROFIL
+    await recordAnalytics('profile_view', leadwaseId);
 
     document.getElementById('pf-loading').style.display = 'none';
     document.getElementById('pf-content').style.display = 'block';
