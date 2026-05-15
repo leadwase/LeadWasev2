@@ -5,106 +5,307 @@
 <title>Profil — LeadWase</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-.profile-page{background:var(--off);min-height:100vh}
-.brand-bar{background:var(--black);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--green)}
-.pb-logo{font-size:14px;font-weight:bold;color:var(--white);letter-spacing:2px;text-transform:uppercase}
-.pb-logo em{color:var(--green3);font-style:normal}
-.pb-verified{font-size:11px;color:var(--green3);display:flex;align-items:center;gap:6px}
-.pb-verified::before{content:'●'}
-.cover{background:var(--black);height:120px;position:relative;overflow:hidden}
-.cover-ticker{position:absolute;bottom:14px;left:0;white-space:nowrap;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.05);animation:ticker 22s linear infinite}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f7f7f5;font-family:var(--serif,'Georgia',serif);min-height:100vh}
+
+/* ── Animations ───────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.cover-line{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green3))}
-.pf-main{max-width:620px;margin:0 auto;padding:0 20px 60px}
-.pf-av-wrap{width:88px;margin-top:-44px;margin-bottom:14px;position:relative}
-.pf-av{width:88px;height:88px;border-radius:50%;background:var(--green);border:4px solid var(--white);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;color:var(--white);box-shadow:0 4px 20px rgba(0,0,0,.2)}
-.pf-plan-tag{position:absolute;bottom:2px;right:-4px;background:var(--black);color:var(--green3);font-size:8px;font-weight:bold;letter-spacing:1.5px;padding:3px 7px;text-transform:uppercase}
-.pf-name{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:3px}
-.pf-job{font-size:14px;color:var(--gray2);font-style:italic;margin-bottom:2px}
-.pf-co{font-size:12px;color:var(--green);font-weight:bold;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
-.pf-bio{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic;margin-bottom:18px}
-.save-btn{display:block;width:100%;padding:13px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:14px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;margin-bottom:14px;text-align:center;transition:background .2s}
-.save-btn:hover{background:var(--green)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+.anim-1{animation:fadeUp .5s ease both}
+.anim-2{animation:fadeUp .5s .1s ease both}
+.anim-3{animation:fadeUp .5s .2s ease both}
+.anim-4{animation:fadeUp .5s .3s ease both}
+.anim-5{animation:fadeUp .5s .4s ease both}
+.anim-6{animation:fadeUp .5s .5s ease both}
+
+/* ── Banner ───────────────────────────────────── */
+.brand-banner{
+  background:#111;
+  padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+  position:sticky;top:0;z-index:100;
+  border-bottom:2px solid #1a7a3c;
+}
+.banner-logo{
+  font-size:16px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;
+  text-decoration:none;color:#fff;display:flex;align-items:center;gap:0
+}
+.banner-logo span{color:#22c55e}
+.banner-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;margin-left:6px;animation:pulse 2s ease-in-out infinite}
+.banner-verified{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:rgba(255,255,255,.55);letter-spacing:.5px
+}
+.banner-verified-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s .5s ease-in-out infinite}
+.banner-verified strong{color:#22c55e;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── Cover strip ─────────────────────────────── */
+.cover{
+  background:#111;height:160px;position:relative;overflow:hidden;
+}
+.cover-pattern{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(34,197,94,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,197,94,.06) 1px,transparent 1px);
+  background-size:36px 36px;
+}
+.cover-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 100% at 50% 120%,rgba(26,122,60,.25),transparent)
+}
+.cover-ticker{
+  position:absolute;bottom:16px;left:0;
+  white-space:nowrap;font-size:9px;letter-spacing:5px;text-transform:uppercase;
+  color:rgba(255,255,255,.06);animation:ticker 30s linear infinite;user-select:none
+}
+.cover-line{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,#1a7a3c 25%,#22c55e 50%,#1a7a3c 75%,transparent)
+}
+
+/* ── Main wrapper ────────────────────────────── */
+.pf-wrap{max-width:660px;margin:0 auto;padding:0 24px 80px}
+
+/* ── Identity block ──────────────────────────── */
+.pf-identity{
+  display:flex;align-items:flex-end;gap:20px;
+  margin-top:-44px;margin-bottom:24px;
+}
+.pf-av-wrap{position:relative;flex-shrink:0}
+.pf-av{
+  width:88px;height:88px;border-radius:50%;
+  background:linear-gradient(135deg,#0f5c2a 0%,#1a7a3c 50%,#22c55e 100%);
+  border:4px solid #f7f7f5;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:bold;color:#fff;
+  box-shadow:0 4px 24px rgba(26,122,60,.25),0 2px 8px rgba(0,0,0,.1)
+}
+.pf-plan-tag{
+  position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  background:#111;color:#22c55e;
+  font-size:7px;font-weight:bold;letter-spacing:2px;padding:3px 9px;
+  text-transform:uppercase;white-space:nowrap;border-radius:20px;
+  border:2px solid #f7f7f5;box-shadow:0 2px 8px rgba(0,0,0,.15)
+}
+.pf-info{padding-bottom:4px}
+.pf-name{font-size:24px;font-weight:bold;color:#111;letter-spacing:-.4px;margin-bottom:3px}
+.pf-job{font-size:13px;color:#666;font-style:italic;margin-bottom:3px}
+.pf-co{font-size:11px;color:#1a7a3c;font-weight:bold;letter-spacing:1px;text-transform:uppercase}
+
+/* ── Bio ─────────────────────────────────────── */
+.pf-bio{
+  font-size:13px;color:#555;line-height:1.85;font-style:italic;
+  padding:16px 20px;margin-bottom:20px;
+  background:#fff;border:1px solid #e8e8e6;border-left:3px solid #1a7a3c;
+  border-radius:0 6px 6px 0
+}
+
+/* ── Divider ─────────────────────────────────── */
+.pf-divider{height:1px;background:linear-gradient(90deg,transparent,#ddd,transparent);margin:18px 0}
+
+/* ── vCard button ────────────────────────────── */
+.vcf-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:14px;
+  background:#111;color:#fff;
+  border:none;border-radius:4px;
+  font-family:inherit;font-size:11px;font-weight:bold;letter-spacing:2.5px;text-transform:uppercase;
+  cursor:pointer;margin-bottom:16px;
+  position:relative;overflow:hidden;transition:background .2s,transform .15s
+}
+.vcf-btn::after{
+  content:'';position:absolute;top:0;left:0;width:60px;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+  animation:shimmer 2.5s 1s ease-in-out infinite
+}
+.vcf-btn:hover{background:#1a7a3c;transform:translateY(-1px)}
+.vcf-btn:active{transform:translateY(0)}
+
+/* ── Contact grid ────────────────────────────── */
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.c-tile{background:var(--white);border:1px solid var(--gray5);padding:14px;display:flex;align-items:center;gap:10px;transition:border-color .2s;text-decoration:none}
-.c-tile:hover{border-color:var(--green)}
-.c-tile-icon{width:34px;height:34px;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.c-tile-label{font-size:9px;color:var(--gray3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
-.c-tile-val{font-size:12px;font-weight:bold;color:var(--black)}
-.social-links{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.social-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--white);border:1px solid var(--gray5);font-size:13px;color:var(--black);transition:all .2s;border-radius:2px;text-decoration:none}
-.social-btn:hover{border-color:var(--green);color:var(--green)}
-.pf-footer{text-align:center;padding-top:24px;border-top:1px solid var(--gray5);margin-top:24px}
-.pf-footer p{font-size:11px;color:var(--gray3);font-style:italic;margin-bottom:6px}
-.pf-footer a{color:var(--green);font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase}
-@media(max-width:600px){.contact-grid{grid-template-columns:1fr}}
+.c-tile{
+  background:#fff;border:1px solid #e8e8e6;
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  transition:border-color .2s,box-shadow .2s,transform .15s;
+  text-decoration:none;border-radius:6px;
+  border-bottom:2px solid transparent
+}
+.c-tile:hover{
+  border-color:#c8e6d0;border-bottom-color:#1a7a3c;
+  box-shadow:0 4px 16px rgba(26,122,60,.1);
+  transform:translateY(-2px)
+}
+.c-tile-icon{
+  width:38px;height:38px;flex-shrink:0;
+  background:linear-gradient(135deg,#f0faf4,#e0f5e9);
+  border:1px solid #c8e6d0;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px
+}
+.c-tile-label{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
+.c-tile-val{font-size:12px;font-weight:bold;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Section label ───────────────────────────── */
+.sec-label{font-size:9px;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;margin-top:4px}
+
+/* ── Social links ────────────────────────────── */
+.social-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.social-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px;background:#fff;
+  border:1px solid #e8e8e6;
+  font-size:12px;color:#333;
+  transition:all .2s;border-radius:4px;text-decoration:none;
+  font-family:inherit
+}
+.social-btn:hover{border-color:#1a7a3c;color:#1a7a3c;box-shadow:0 2px 8px rgba(26,122,60,.12)}
+
+/* ── Footer ──────────────────────────────────── */
+.pf-footer{
+  text-align:center;padding-top:24px;
+  border-top:1px solid #ececea;margin-top:28px
+}
+.pf-footer p{font-size:10px;color:#bbb;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.pf-footer a{
+  color:#111;font-size:11px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;
+  text-decoration:none;transition:color .2s
+}
+.pf-footer a:hover{color:#1a7a3c}
+.pf-footer a span{color:#1a7a3c}
+
+/* ── Loading / Error ─────────────────────────── */
+#pf-loading{text-align:center;padding:80px 20px;animation:fadeIn .4s ease}
+#pf-error{text-align:center;padding:80px 20px;animation:fadeIn .4s ease}
+.loader-ring{width:36px;height:36px;border:2px solid rgba(26,122,60,.15);border-top-color:#1a7a3c;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+
+/* ── Responsive ───────────────────────────────── */
+@media(max-width:700px){
+  .brand-banner{padding:0 16px;height:50px}
+  .banner-logo{font-size:14px}
+  .banner-verified{display:none}
+  .cover{height:130px}
+  .pf-wrap{padding:0 16px 60px}
+  .pf-identity{gap:14px;margin-top:-38px}
+  .pf-av{width:76px;height:76px;font-size:24px}
+  .pf-name{font-size:20px}
+  .contact-grid{grid-template-columns:1fr}
+  .social-links{gap:6px}
+  .social-btn{padding:8px 12px;font-size:11px}
+}
+@media(max-width:420px){
+  .pf-name{font-size:18px}
+  .pf-av{width:68px;height:68px;font-size:22px}
+  .cover{height:110px}
+}
 </style>
 </head>
 <body>
-<div class="profile-page">
-  <div class="brand-bar">
-    <a class="pb-logo" href="/">Lead<em>Wase</em></a>
-    <div class="pb-verified">Profil vérifié LeadWase</div>
-  </div>
+
+  <!-- ── Banner ──────────────────────────────── -->
+  <header class="brand-banner">
+    <a class="banner-logo" href="/">
+      LEAD<span>WASE</span>
+      <div class="banner-dot"></div>
+    </a>
+    <div class="banner-verified">
+      <div class="banner-verified-dot"></div>
+      <strong>Profil vérifié</strong>
+    </div>
+  </header>
+
+  <!-- ── Cover ────────────────────────────────── -->
   <div class="cover">
-    <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
+    <div class="cover-pattern"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
     <div class="cover-line"></div>
   </div>
 
-  <!-- Chargement -->
-  <div class="pf-main" id="pf-loading" style="text-align:center;padding-top:60px">
-    <div class="loader" style="width:32px;height:32px;border-width:3px;border-color:rgba(26,122,60,.2);border-top-color:var(--green)"></div>
-    <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+  <!-- ── Loading ──────────────────────────────── -->
+  <div class="pf-wrap" id="pf-loading">
+    <div style="margin-top:60px">
+      <div class="loader-ring"></div>
+      <p style="color:#aaa;font-style:italic;font-size:13px">Chargement du profil...</p>
+    </div>
   </div>
 
-  <!-- Contenu profil -->
-  <div class="pf-main" id="pf-content" style="display:none">
-    <div class="pf-av-wrap">
-      <div class="pf-av" id="pf-av">?</div>
-      <div class="pf-plan-tag" id="pf-plan">FREE</div>
+  <!-- ── Content ──────────────────────────────── -->
+  <div class="pf-wrap" id="pf-content" style="display:none">
+
+    <!-- Identity -->
+    <div class="pf-identity anim-1">
+      <div class="pf-av-wrap">
+        <div class="pf-av" id="pf-av">?</div>
+        <div class="pf-plan-tag" id="pf-plan">FREE</div>
+      </div>
+      <div class="pf-info">
+        <div class="pf-name" id="pf-name">–</div>
+        <div class="pf-job"  id="pf-job">–</div>
+        <div class="pf-co"   id="pf-co"></div>
+      </div>
     </div>
-    <div class="pf-name" id="pf-name">–</div>
-    <div class="pf-job"  id="pf-job">–</div>
-    <div class="pf-co"   id="pf-co"></div>
-    <div class="pf-bio"  id="pf-bio"></div>
 
-    <button class="save-btn" id="vcf-btn">📲 Enregistrer le contact</button>
+    <!-- Bio -->
+    <div class="pf-bio anim-2" id="pf-bio" style="display:none"></div>
 
-    <div class="contact-grid">
+    <div class="pf-divider"></div>
+
+    <!-- vCard -->
+    <div class="anim-3">
+      <button class="vcf-btn" id="vcf-btn">
+        <span>📲</span> Enregistrer le contact
+      </button>
+    </div>
+
+    <!-- Contact tiles -->
+    <div class="contact-grid anim-4">
       <a class="c-tile" id="tile-phone" href="#">
         <div class="c-tile-icon">📞</div>
-        <div><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div>
+        <div style="min-width:0"><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div>
       </a>
       <a class="c-tile" id="tile-email" href="#">
         <div class="c-tile-icon">✉️</div>
-        <div><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div>
+        <div style="min-width:0"><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div>
       </a>
       <a class="c-tile" id="tile-co">
         <div class="c-tile-icon">🏢</div>
-        <div><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div>
+        <div style="min-width:0"><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div>
       </a>
       <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none">
         <div class="c-tile-icon">🌐</div>
-        <div><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div>
+        <div style="min-width:0"><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div>
       </a>
     </div>
 
-    <div class="social-links" id="pf-socials" style="display:none"></div>
+    <!-- Social links -->
+    <div id="pf-socials-wrap" style="display:none" class="anim-5">
+      <div class="sec-label">Réseaux sociaux</div>
+      <div class="social-links" id="pf-socials"></div>
+    </div>
 
-    <div class="pf-footer">
+    <!-- Footer -->
+    <div class="pf-footer anim-6">
       <p>Profil créé avec</p>
-      <a href="/">Lead<span style="color:var(--green)">Wase</span> — Créez le vôtre</a>
+      <a href="/">Lead<span>Wase</span> — Créez le vôtre</a>
     </div>
   </div>
 
-  <!-- Erreur -->
-  <div class="pf-main" id="pf-error" style="display:none;text-align:center;padding-top:60px">
-    <div style="font-size:48px;margin-bottom:14px">😕</div>
-    <h2 style="font-size:22px;font-weight:bold;margin-bottom:8px">Profil introuvable</h2>
-    <p style="color:var(--gray3);font-style:italic;margin-bottom:20px">Ce profil n'existe pas ou a été supprimé.</p>
-    <a class="btn-green" href="/">Retour à l'accueil</a>
+  <!-- ── Error ────────────────────────────────── -->
+  <div class="pf-wrap" id="pf-error" style="display:none">
+    <div style="margin-top:60px">
+      <div style="font-size:48px;margin-bottom:16px">😕</div>
+      <h2 style="font-size:22px;font-weight:bold;color:#111;margin-bottom:10px">Profil introuvable</h2>
+      <p style="color:#888;font-style:italic;margin-bottom:24px">Ce profil n'existe pas ou a été supprimé.</p>
+      <a href="/" style="display:inline-block;padding:12px 28px;background:#111;color:#fff;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-radius:4px;text-decoration:none">Retour à l'accueil</a>
+    </div>
   </div>
-</div>
 
 <script type="module">
 import { db } from './js/firebase-config.js';
@@ -129,9 +330,14 @@ async function load(id) {
     document.getElementById('pf-job').textContent   = p.jobTitle || '';
     document.getElementById('pf-co').textContent    = p.company  || '';
     document.getElementById('pf-co2').textContent   = p.company  || '–';
-    document.getElementById('pf-bio').textContent   = p.bio      || '';
     document.getElementById('pf-phone').textContent = p.phone    || '–';
     document.getElementById('pf-email').textContent = p.email    || '–';
+
+    if (p.bio) {
+      const bioEl = document.getElementById('pf-bio');
+      bioEl.textContent   = p.bio;
+      bioEl.style.display = 'block';
+    }
 
     document.getElementById('tile-phone').href = p.phone ? 'tel:' + p.phone : '#';
     document.getElementById('tile-email').href = p.email ? 'mailto:' + p.email : '#';
@@ -140,17 +346,15 @@ async function load(id) {
       const tw = document.getElementById('tile-web');
       tw.style.display = 'flex';
       tw.href = p.website;
-      // Regex correctement échappée — pas de double antislash
       document.getElementById('pf-web').textContent = p.website.replace(/https?:\/\//, '');
     }
 
-    // Réseaux sociaux (Pro / Business uniquement)
     if (p.plan !== 'free') {
       const socials = [
-        { k: 'linkedin',  i: '💼', l: 'LinkedIn'   },
-        { k: 'instagram', i: '📷', l: 'Instagram'  },
-        { k: 'twitter',   i: '🐦', l: 'Twitter/X'  },
-        { k: 'facebook',  i: '📘', l: 'Facebook'   },
+        { k: 'linkedin',  i: '💼', l: 'LinkedIn'  },
+        { k: 'instagram', i: '📷', l: 'Instagram' },
+        { k: 'twitter',   i: '🐦', l: 'Twitter/X' },
+        { k: 'facebook',  i: '📘', l: 'Facebook'  },
       ];
       const box = document.getElementById('pf-socials');
       let has = false;
@@ -161,10 +365,9 @@ async function load(id) {
             `<a class="social-btn" href="${p[s.k]}" target="_blank">${s.i} ${s.l}</a>`);
         }
       });
-      if (has) box.style.display = 'flex';
+      if (has) document.getElementById('pf-socials-wrap').style.display = 'block';
     }
 
-    // Bouton vCard
     document.getElementById('vcf-btn').onclick = () => {
       const vcard = [
         'BEGIN:VCARD',
@@ -178,7 +381,6 @@ async function load(id) {
         'NOTE:LeadWase — leadwase.com/profil/' + id,
         'END:VCARD',
       ].join('\n');
-
       const a = document.createElement('a');
       a.href     = URL.createObjectURL(new Blob([vcard], { type: 'text/vcard' }));
       a.download = (p.firstName || 'contact') + '_' + (p.lastName || '') + '.vcf';
