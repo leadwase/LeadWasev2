@@ -25,7 +25,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 
 /* ════════════════════════════════════════
    BANNER
-   ════════════════════════════════════════ */
+═══════════════════════════════════════════ */
 .banner{
   background:#0d0d0d;
   height:64px;
@@ -130,7 +130,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   border-left:3px solid #1a7a3c;border-radius:0 6px 6px 0
 }
 
-/* ── Location ────────────────────────────── */
+/* ── Location (BUSINESS uniquement) ────────────────────────────── */
 .pf-location{
   font-size:13px;color:#555;line-height:1.6;
   padding:14px 20px;margin-bottom:20px;
@@ -193,7 +193,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 }
 .social-btn:hover{border-color:#1a7a3c;color:#1a7a3c;box-shadow:0 2px 8px rgba(26,122,60,.1)}
 
-/* ── Appointment button ──────────────────── */
+/* ── Appointment button (BUSINESS uniquement) ──────────────────── */
 .appointment-btn{
   display:flex;align-items:center;justify-content:center;gap:10px;
   width:100%;padding:14px;
@@ -205,7 +205,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 }
 .appointment-btn:hover{background:#0f5c2a}
 
-/* ── Google Reviews ──────────────────────── */
+/* ── Google Reviews (BUSINESS uniquement) ──────────────────────── */
 .google-reviews{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px;margin-top:16px;
@@ -216,7 +216,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 .google-reviews-stars{color:#f4b942;font-size:14px;letter-spacing:2px}
 .google-reviews-text{font-size:12px;color:#555}
 
-/* ── Contact form preview ────────────────── */
+/* ── Contact form (BUSINESS uniquement) ────────────────────────── */
 .contact-form-preview{
   margin-top:16px;padding:16px;
   background:#fff;border:1px solid #e5e5e3;border-radius:6px
@@ -228,6 +228,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;
   border-radius:4px;text-decoration:none
 }
+.contact-form-btn:hover{background:#1a7a3c}
 
 /* ── Footer ──────────────────────────────── */
 .pf-footer{text-align:center;padding-top:24px;border-top:1px solid #eaeae8;margin-top:24px}
@@ -310,6 +311,8 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   </div>
 
   <div class="pf-bio a2" id="pf-bio" style="display:none"></div>
+  
+  <!-- Localisation (BUSINESS uniquement) -->
   <div class="pf-location a2" id="pf-location" style="display:none">
     <span class="pf-location-icon">📍</span>
     <span id="pf-location-text"></span>
@@ -344,20 +347,24 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
     </a>
   </div>
 
+  <!-- Réseaux sociaux (Pro et Business) -->
   <div id="pf-socials-wrap" style="display:none" class="a5">
     <div class="sec-label">Réseaux sociaux</div>
     <div class="social-links" id="pf-socials"></div>
   </div>
 
+  <!-- Liens supplémentaires (WhatsApp - Pro et Business) -->
   <div id="pf-extra-links-wrap" style="display:none" class="a5">
     <div class="sec-label">Liens supplémentaires</div>
     <div class="social-links" id="pf-extra-links"></div>
   </div>
 
+  <!-- Rendez-vous (BUSINESS uniquement) -->
   <div id="pf-appointment-wrap" style="display:none" class="a5">
     <a class="appointment-btn" id="appointment-link" href="#" target="_blank">📅 Prendre rendez-vous</a>
   </div>
 
+  <!-- Avis Google (BUSINESS uniquement) -->
   <div id="pf-google-review-wrap" style="display:none" class="a5">
     <a class="google-reviews" id="google-review-link" href="#" target="_blank">
       <span class="google-reviews-stars">★★★★★</span>
@@ -365,11 +372,12 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
     </a>
   </div>
 
+  <!-- Formulaire de contact (BUSINESS uniquement) -->
   <div id="pf-contact-form-wrap" style="display:none" class="a5">
     <div class="contact-form-preview">
       <h4>📨 Formulaire de contact</h4>
       <div class="contact-form-message" id="contact-form-message"></div>
-      <a class="contact-form-btn" id="contact-form-link" href="#">Envoyer un message</a>
+      <a class="contact-form-btn" id="contact-form-link" href="#" target="_blank">Accéder au formulaire</a>
     </div>
   </div>
 
@@ -403,6 +411,7 @@ async function load(leadwaseId) {
     const p = snap.data();
     const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
     const isPro = ['pro', 'business'].includes(p.plan);
+    const isBusiness = p.plan === 'business';
 
     document.title = `${p.firstName || ''} ${p.lastName || ''} — LeadWase`;
 
@@ -427,8 +436,8 @@ async function load(leadwaseId) {
       bioEl.style.display = 'block';
     }
 
-    // Localisation
-    if (p.location && p.location.trim()) {
+    // Localisation (BUSINESS uniquement)
+    if (isBusiness && p.location && p.location.trim()) {
       const locEl = document.getElementById('pf-location');
       document.getElementById('pf-location-text').textContent = p.location;
       locEl.style.display = 'flex';
@@ -442,7 +451,7 @@ async function load(leadwaseId) {
       document.getElementById('pf-web').textContent = p.website.replace(/^https?:\/\//, '');
     }
 
-    // Réseaux sociaux (uniquement pour Pro/Business)
+    // Réseaux sociaux (Pro et Business)
     if (isPro) {
       const socials = [
         { key: 'linkedin', icon: '💼', name: 'LinkedIn' },
@@ -469,16 +478,20 @@ async function load(leadwaseId) {
       
       if (hasSocial) document.getElementById('pf-socials-wrap').style.display = 'block';
       
-      // WhatsApp (si présent)
+      // WhatsApp (Pro et Business)
       if (p.whatsapp && p.whatsapp.trim()) {
         const waLink = p.whatsapp.startsWith('http') ? p.whatsapp : `https://wa.me/${p.whatsapp.replace(/[^0-9]/g, '')}`;
         const extraBox = document.getElementById('pf-extra-links');
+        extraBox.innerHTML = '';
         extraBox.insertAdjacentHTML('beforeend',
           `<a class="social-btn" href="${waLink}" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>`
         );
         document.getElementById('pf-extra-links-wrap').style.display = 'block';
       }
-      
+    }
+
+    // Fonctionnalités BUSINESS uniquement
+    if (isBusiness) {
       // Rendez-vous
       if (p.rdvLink && p.rdvLink.trim()) {
         const rdvBtn = document.getElementById('appointment-link');
@@ -494,12 +507,12 @@ async function load(leadwaseId) {
         document.getElementById('pf-google-review-wrap').style.display = 'block';
       }
       
-      // Formulaire de contact
-      if (p.contactActive && p.contactEmail) {
+      // Formulaire de contact (avec lien)
+      if (p.contactActive && p.contactLink && p.contactLink.trim()) {
         const contactMsg = document.getElementById('contact-form-message');
         const contactLink = document.getElementById('contact-form-link');
-        contactMsg.textContent = p.contactMessage || 'Contactez-moi directement par email';
-        contactLink.href = `mailto:${p.contactEmail}?subject=Contact depuis votre profil LeadWase&body=${encodeURIComponent(p.contactMessage || 'Bonjour,')}`;
+        contactMsg.textContent = p.contactMessage || 'Contactez-moi via le formulaire';
+        contactLink.href = p.contactLink.startsWith('http') ? p.contactLink : `https://${p.contactLink}`;
         document.getElementById('pf-contact-form-wrap').style.display = 'block';
       }
     }
@@ -515,7 +528,7 @@ async function load(leadwaseId) {
         `TEL;TYPE=CELL:${p.phone || ''}`,
         `EMAIL:${p.email || ''}`,
         `URL:${p.website || ''}`,
-        `ADR:${p.location || ''}`,
+        `ADR:${isBusiness && p.location ? p.location : ''}`,
         `NOTE:Profil LeadWase - leadwase.com/profil/${leadwaseId}`,
         'END:VCARD'
       ].join('\n');
