@@ -95,6 +95,159 @@ tbody td{padding:13px 16px;color:var(--gray2);white-space:nowrap}
 .btn-done{background:var(--gray6);color:var(--gray4);cursor:default}
 .empty-row td{text-align:center;padding:40px;color:var(--gray4);font-style:italic}
 .bottom-grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
+
+/* Styles pour la section des credentials avec pagination et filtres */
+.credentials-section {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  margin-bottom: 20px;
+}
+.credentials-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--gray5);
+  background: #fafafa;
+}
+.credentials-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray1);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.credentials-header h3 span {
+  background: var(--green);
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.filter-group label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray4);
+}
+.filter-input {
+  border: 1px solid var(--gray5);
+  padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--gray1);
+  outline: none;
+  border-radius: 2px;
+  background: var(--white);
+  min-width: 180px;
+}
+.filter-input:focus {
+  border-color: var(--green);
+}
+.filter-btn {
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.filter-btn:hover {
+  background: var(--green);
+}
+.filter-reset {
+  background: var(--gray5);
+  color: var(--gray2);
+}
+.filter-reset:hover {
+  background: var(--gray4);
+  color: white;
+}
+.credentials-table-wrapper {
+  overflow-x: auto;
+}
+.credentials-table {
+  width: 100%;
+}
+.credentials-table th {
+  background: var(--gray6);
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray4);
+}
+.credentials-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray6);
+}
+.credential-cell {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+.copy-cred-btn {
+  background: var(--green);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 2px;
+  margin-left: 8px;
+}
+.copy-cred-btn:hover {
+  background: var(--green2);
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid var(--gray5);
+  background: #fafafa;
+}
+.pagination button {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.pagination button:hover:not(:disabled) {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pagination span {
+  font-size: 13px;
+  color: var(--gray3);
+}
+.red-border {
+  border: 2px solid var(--red);
+  border-radius: 4px;
+}
+
 .gen-info{background:var(--green-pale);border:1px solid #bbf7d0;padding:14px 18px;margin:20px 24px 0;font-size:12px;color:var(--green2);line-height:1.6;border-radius:2px}
 .gen-form{padding:20px 24px 24px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
@@ -143,6 +296,7 @@ select.f-input{cursor:pointer}
   .card-head{padding:14px 16px}.gen-form{padding:14px 16px 16px}
   .gen-info{margin:14px 16px 0}.cred-result{margin:0 16px 16px}
   .sub-list{padding:4px 16px 16px}.form-grid{grid-template-columns:1fr}.stat-val{font-size:28px}
+  .filter-group .filter-input{min-width:140px}
 }
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr}}
 </style>
@@ -171,8 +325,8 @@ select.f-input{cursor:pointer}
       <a class="sb-item active" onclick="nav('dashboard')" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
       <a class="sb-item" onclick="nav('commandes')" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
       <a class="sb-item" onclick="nav('utilisateurs')" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" onclick="nav('credentials')" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
       <a class="sb-item" onclick="nav('b2b')" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
-      <a class="sb-item" onclick="nav('generer')" id="nav-generer"><span class="ico">🔑</span> Générer accès</a>
       <div class="sb-section">Finances</div>
       <a class="sb-item" onclick="nav('paiements')" id="nav-paiements"><span class="ico">💳</span> Paiements</a>
       <a class="sb-item" onclick="nav('abonnements')" id="nav-abonnements"><span class="ico">🔄</span> Abonnements</a>
@@ -218,21 +372,9 @@ select.f-input{cursor:pointer}
           </div>
           <div class="bottom-grid">
             <div class="card">
-              <div class="card-head"><span class="card-title">🔑 Générer des accès</span></div>
-              <div class="gen-info">Renseignez l'identifiant Firestore de la commande pour récupérer les accès générés automatiquement.</div>
-              <div class="gen-form">
-                <div class="form-grid">
-                  <div class="f-group"><label class="f-label">N° de commande</label><input class="f-input" id="g-orderid" placeholder="ID Firestore"></div>
-                  <div class="f-group"><label class="f-label">Type</label><select class="f-input" id="g-type"><option value="classic">Classique</option><option value="b2b">B2B</option></select></div>
-                </div>
-                <button class="gen-btn" id="gen-btn" onclick="fetchAccess()">Générer les accès</button>
-              </div>
-              <div class="cred-result" id="cred-result">
-                <div class="cred-result-title">✅ Accès — à copier et envoyer au client</div>
-                <div class="cred-item"><span class="cred-key">Identifiant</span><div class="cred-val-wrap"><span class="cred-val" id="r-id">—</span><button class="copy-btn" onclick="copyVal('r-id',this)">Copier</button></div></div>
-                <div class="cred-item"><span class="cred-key">Mot de passe</span><div class="cred-val-wrap"><span class="cred-val" id="r-pwd">—</span><button class="copy-btn" onclick="copyVal('r-pwd',this)">Copier</button></div></div>
-                <div class="cred-item"><span class="cred-key">Email</span><div class="cred-val-wrap"><span class="cred-val" id="r-email" style="font-size:12px">—</span><button class="copy-btn" onclick="copyVal('r-email',this)">Copier</button></div></div>
-              </div>
+              <div class="card-head"><span class="card-title">ℹ️ Information</span></div>
+              <div class="gen-info">Les credentials sont générés automatiquement par le webhook après paiement validé.</div>
+              <div class="gen-info" style="margin-top:8px">👉 Rendez-vous dans l'onglet <strong>🔑 Credentials</strong> pour voir tous les identifiants et mots de passe générés automatiquement.</div>
             </div>
             <div class="card">
               <div class="card-head"><span class="card-title">☑️ Abonnements actifs</span><span class="card-link" onclick="nav('abonnements')">Gérer →</span></div>
@@ -271,6 +413,54 @@ select.f-input{cursor:pointer}
           </div>
         </div>
 
+        <!-- CREDENTIALS - PAGE AVEC PAGINATION ET FILTRES (ENCADRÉ EN ROUGE) -->
+        <div class="page" id="page-credentials">
+          <div class="credentials-section" id="credentials-section" style="border: 2px solid var(--red); border-radius: 4px;">
+            <div class="credentials-header">
+              <h3>🔐 Identifiants générés automatiquement <span>webhook</span></h3>
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label>🔍 ID LeadWase</label>
+                  <input type="text" id="filter-leadwaseid" class="filter-input" placeholder="LW-12345">
+                </div>
+                <div class="filter-group">
+                  <label>📧 Email</label>
+                  <input type="text" id="filter-email" class="filter-input" placeholder="client@exemple.com">
+                </div>
+                <div class="filter-group">
+                  <label>👤 Nom</label>
+                  <input type="text" id="filter-name" class="filter-input" placeholder="Nom du client">
+                </div>
+                <button class="filter-btn" onclick="applyFilters()">🔍 Filtrer</button>
+                <button class="filter-btn filter-reset" onclick="resetFilters()">⟳ Réinitialiser</button>
+              </div>
+            </div>
+            <div class="credentials-table-wrapper">
+              <table class="credentials-table">
+                <thead>
+                  <tr>
+                    <th>ID LeadWase</th>
+                    <th>Client</th>
+                    <th>Email</th>
+                    <th>Identifiant (Login)</th>
+                    <th>Mot de passe</th>
+                    <th>Date création</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="credentials-tbody">
+                  <tr><td colspan="7" class="empty-row">Chargement des credentials...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="cred-pagination">
+              <button id="prev-page-btn" onclick="prevPage()" disabled>◀ Précédent</button>
+              <span id="page-info">Page 1 / 1</span>
+              <button id="next-page-btn" onclick="nextPage()" disabled>Suivant ▶</button>
+            </div>
+          </div>
+        </div>
+
         <!-- B2B -->
         <div class="page" id="page-b2b">
           <div class="card">
@@ -280,28 +470,6 @@ select.f-input{cursor:pointer}
                 <thead><tr><th>Référence</th><th>Entreprise</th><th>Responsable</th><th>Email</th><th>Téléphone</th><th>Quantité</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
                 <tbody id="b2b-body"><tr class="empty-row"><td colspan="9">Chargement...</td></tr></tbody>
               </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- GÉNÉRER ACCÈS -->
-        <div class="page" id="page-generer">
-          <div class="card">
-            <div class="card-head"><span class="card-title">🔑 Générer / Récupérer des accès client</span></div>
-            <div class="gen-info">Entrez l'identifiant Firestore de la commande pour récupérer les accès générés automatiquement par le webhook après paiement.</div>
-            <div class="gen-form">
-              <div class="form-grid">
-                <div class="f-group"><label class="f-label">N° de commande (ID Firestore)</label><input class="f-input" id="g2-orderid" placeholder="ex: abc123def456"></div>
-                <div class="f-group"><label class="f-label">Type de carte</label><select class="f-input" id="g2-type"><option value="classic">Classique</option><option value="b2b">B2B</option></select></div>
-              </div>
-              <button class="gen-btn" id="gen-btn2" onclick="fetchAccess2()">Récupérer les accès</button>
-            </div>
-            <div class="cred-result" id="cred-result2">
-              <div class="cred-result-title">✅ Accès disponibles — à copier et envoyer au client</div>
-              <div class="cred-item"><span class="cred-key">Identifiant</span><div class="cred-val-wrap"><span class="cred-val" id="r2-id">—</span><button class="copy-btn" onclick="copyVal('r2-id',this)">Copier</button></div></div>
-              <div class="cred-item"><span class="cred-key">Mot de passe</span><div class="cred-val-wrap"><span class="cred-val" id="r2-pwd">—</span><button class="copy-btn" onclick="copyVal('r2-pwd',this)">Copier</button></div></div>
-              <div class="cred-item"><span class="cred-key">Email client</span><div class="cred-val-wrap"><span class="cred-val" id="r2-email" style="font-size:12px">—</span><button class="copy-btn" onclick="copyVal('r2-email',this)">Copier</button></div></div>
-              <div class="cred-item"><span class="cred-key">Client</span><div class="cred-val-wrap"><span class="cred-val" id="r2-name" style="font-size:12px">—</span></div></div>
             </div>
           </div>
         </div>
@@ -368,7 +536,7 @@ let TOKEN  = null;
 document.getElementById('topbar-date').textContent =
   new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-// ── API helper — déclaré en premier pour être disponible partout ──
+// API helper
 async function api(url, opts = {}) {
   TOKEN = await getIdToken(auth.currentUser);
   const r = await fetch(url, {
@@ -378,7 +546,7 @@ async function api(url, opts = {}) {
   return r.json();
 }
 
-// ── Helpers ──────────────────────────────────────────────────────
+// Helpers
 function fmtDate(v) {
   if (!v) return '—';
   const d = v._seconds ? new Date(v._seconds*1000) : new Date(v);
@@ -386,20 +554,16 @@ function fmtDate(v) {
 }
 function fmtNum(n) { return (n||0).toLocaleString('fr-FR'); }
 function badge(s) {
-  const map = {
-    pending:'b-pending',paid:'b-paid',delivered:'b-delivered',failed:'b-failed',
+  const map = { pending:'b-pending',paid:'b-paid',delivered:'b-delivered',failed:'b-failed',
     success:'b-success',payment_failed:'b-failed',gateway_error:'b-failed',
-    active:'b-paid',free:'b-pending',b2b_pending:'b-encours',b2b_done:'b-delivered',
-  };
-  const labels = {
-    pending:'EN ATTENTE',paid:'PAYÉ',delivered:'LIVRÉ',failed:'ÉCHOUÉ',
+    active:'b-paid',free:'b-pending',b2b_pending:'b-encours',b2b_done:'b-delivered' };
+  const labels = { pending:'EN ATTENTE',paid:'PAYÉ',delivered:'LIVRÉ',failed:'ÉCHOUÉ',
     success:'SUCCÈS',payment_failed:'ÉCHOUÉ',gateway_error:'ERREUR',
-    active:'ACTIF',free:'FREE',b2b_pending:'EN COURS',b2b_done:'TRAITÉ',
-  };
+    active:'ACTIF',free:'FREE',b2b_pending:'EN COURS',b2b_done:'TRAITÉ' };
   return `<span class="badge ${map[s]||'b-pending'}">${labels[s]||s||'—'}</span>`;
 }
 
-// ── Auth ─────────────────────────────────────────────────────────
+// Auth
 onAuthStateChanged(auth, async user => {
   if (user) {
     TOKEN = await getIdToken(user);
@@ -407,6 +571,7 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('app').style.display = 'block';
     document.getElementById('sb-user-email').textContent = user.email;
     initDashboard();
+    loadCredentials(); // Charger les credentials au démarrage
   } else {
     TOKEN = null;
     document.getElementById('login-screen').style.display = 'flex';
@@ -431,12 +596,10 @@ window.doLogin = async () => {
 document.getElementById('l-pwd').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
 window.doLogout = () => signOut(auth);
 
-// ── Navigation ───────────────────────────────────────────────────
-const titles = {
-  dashboard:'Tableau de bord',commandes:'Commandes',utilisateurs:'Utilisateurs',
-  b2b:'Demandes B2B',generer:'Générer accès',paiements:'Paiements',
-  abonnements:'Abonnements',parametres:'Paramètres',notifications:'Notifications',
-};
+// Navigation
+const titles = { dashboard:'Tableau de bord',commandes:'Commandes',utilisateurs:'Utilisateurs',
+  credentials:'Credentials (webhook)',b2b:'Demandes B2B',paiements:'Paiements',
+  abonnements:'Abonnements',parametres:'Paramètres',notifications:'Notifications' };
 window.nav = (page) => {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
@@ -446,6 +609,7 @@ window.nav = (page) => {
   closeSidebar();
   if (page==='commandes')    loadAllOrders();
   if (page==='utilisateurs') loadProfiles();
+  if (page==='credentials')  loadCredentials();
   if (page==='paiements')    loadPayments();
   if (page==='abonnements')  loadSubs();
   if (page==='b2b')          loadB2B();
@@ -459,12 +623,123 @@ window.closeSidebar = () => {
   document.getElementById('sb-overlay').classList.remove('open');
 };
 
-// ── Init dashboard ───────────────────────────────────────────────
-async function initDashboard() {
-  await Promise.allSettled([loadStats(), loadDashOrders(), initB2BCount()]);
+// Variables pour pagination credentials
+let allCredentials = [];
+let currentPage = 1;
+const itemsPerPage = 10;
+
+// Charger les credentials depuis l'API (webhook a déjà créé les données)
+async function loadCredentials() {
+  try {
+    const response = await api('/api/admin/credentials');
+    if (response.success && response.credentials) {
+      allCredentials = response.credentials;
+      document.getElementById('sb-cred-count').textContent = allCredentials.length;
+      applyFilters(); // Applique les filtres et pagination
+    } else {
+      allCredentials = [];
+      document.getElementById('credentials-tbody').innerHTML = '<tr class="empty-row"><td colspan="7">Aucun credential trouvé. Les webhooks créeront automatiquement les identifiants après paiement.</td></tr>';
+      document.getElementById('sb-cred-count').textContent = '0';
+    }
+  } catch(e) {
+    console.error('Erreur chargement credentials:', e);
+    document.getElementById('credentials-tbody').innerHTML = '<tr class="empty-row"><td colspan="7">Erreur de chargement</td></tr>';
+  }
 }
 
-// ── Stats ────────────────────────────────────────────────────────
+// Appliquer les filtres
+let filteredCredentials = [];
+function applyFilters() {
+  const filterLeadwaseId = document.getElementById('filter-leadwaseid').value.trim().toLowerCase();
+  const filterEmail = document.getElementById('filter-email').value.trim().toLowerCase();
+  const filterName = document.getElementById('filter-name').value.trim().toLowerCase();
+  
+  filteredCredentials = allCredentials.filter(cred => {
+    const matchId = !filterLeadwaseId || (cred.leadwaseId || '').toLowerCase().includes(filterLeadwaseId);
+    const matchEmail = !filterEmail || (cred.email || '').toLowerCase().includes(filterEmail);
+    const matchName = !filterName || (cred.clientName || '').toLowerCase().includes(filterName);
+    return matchId && matchEmail && matchName;
+  });
+  
+  currentPage = 1;
+  renderCredentialsPage();
+}
+
+function resetFilters() {
+  document.getElementById('filter-leadwaseid').value = '';
+  document.getElementById('filter-email').value = '';
+  document.getElementById('filter-name').value = '';
+  filteredCredentials = [...allCredentials];
+  currentPage = 1;
+  renderCredentialsPage();
+}
+
+function renderCredentialsPage() {
+  const tbody = document.getElementById('credentials-tbody');
+  const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const pageCredentials = filteredCredentials.slice(start, start + itemsPerPage);
+  
+  if (pageCredentials.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucun credential correspondant aux filtres.</td></tr>';
+  } else {
+    tbody.innerHTML = pageCredentials.map(cred => `
+      <tr>
+        <td style="font-family:'Space Mono',monospace;font-weight:700;color:var(--green)">${cred.leadwaseId || '—'}</td>
+        <td style="font-weight:600">${cred.clientName || '—'}</td>
+        <td style="color:var(--gray4)">${cred.email || '—'}</td>
+        <td class="credential-cell">${cred.login || cred.leadwaseId || '—'} 
+          <button class="copy-cred-btn" onclick="copyText('${(cred.login || cred.leadwaseId || '').replace(/'/g, "\\'")}')">Copier</button>
+        </td>
+        <td class="credential-cell">${cred.password || '—'}
+          ${cred.password ? `<button class="copy-cred-btn" onclick="copyText('${cred.password.replace(/'/g, "\\'")}')">Copier</button>` : ''}
+        </td>
+        <td>${fmtDate(cred.createdAt)}</td>
+        <td>
+          <button class="copy-cred-btn" onclick="copyFullCredentials('${cred.leadwaseId || ''}', '${(cred.login || cred.leadwaseId || '').replace(/'/g, "\\'")}', '${(cred.password || '').replace(/'/g, "\\'")}')">📋 Tout copier</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  // Mise à jour pagination
+  document.getElementById('page-info').textContent = `Page ${currentPage} / ${totalPages || 1}`;
+  document.getElementById('prev-page-btn').disabled = currentPage === 1;
+  document.getElementById('next-page-btn').disabled = currentPage === totalPages || totalPages === 0;
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderCredentialsPage();
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderCredentialsPage();
+  }
+}
+
+// Fonctions de copie
+window.copyText = (text) => {
+  navigator.clipboard.writeText(text);
+  // Feedback simple
+};
+
+window.copyFullCredentials = (leadwaseId, login, password) => {
+  const message = `🔐 Vos identifiants LeadWase :\nIdentifiant : ${login}\nMot de passe : ${password}`;
+  navigator.clipboard.writeText(message);
+  alert('✅ Identifiants copiés !');
+};
+
+async function initDashboard() {
+  await Promise.allSettled([loadStats(), loadDashOrders(), initB2BCount(), loadCredentials()]);
+}
+
+// Stats, Orders, etc (reste du code identique à l'original)
 async function loadStats() {
   try {
     const d = await api('/api/admin/stats');
@@ -474,7 +749,6 @@ async function loadStats() {
     document.getElementById('d-revenue').textContent = fmtNum(s.totalRevenue);
     document.getElementById('d-subs').textContent    = s.activeSubscriptions || 0;
     document.getElementById('d-pending').textContent = s.pendingOrders || 0;
-    document.getElementById('d-pending-sub').textContent = s.pendingOrders > 0 ? 'À traiter aujourd\'hui' : '';
     document.getElementById('sb-pending-count').textContent = s.pendingOrders || 0;
     document.getElementById('sub-free').textContent     = s.freeProfiles || '—';
     document.getElementById('sub-pro').textContent      = s.proPlan      || '—';
@@ -482,7 +756,6 @@ async function loadStats() {
   } catch(e) { console.error('stats', e); }
 }
 
-// ── Compteur B2B sidebar au démarrage ────────────────────────────
 async function initB2BCount() {
   try {
     const d = await api('/api/admin/b2b');
@@ -493,7 +766,6 @@ async function initB2BCount() {
   } catch(e) { console.error('b2b count', e); }
 }
 
-// ── Dashboard — 5 dernières commandes ────────────────────────────
 async function loadDashOrders() {
   const tbody = document.getElementById('dash-orders-body');
   try {
@@ -507,7 +779,6 @@ async function loadDashOrders() {
   }
 }
 
-// ── Toutes les commandes ─────────────────────────────────────────
 window.loadAllOrders = async () => {
   const tbody = document.getElementById('all-orders-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Chargement...</td></tr>';
@@ -541,7 +812,6 @@ function orderRow(o, showId) {
   </tr>`;
 }
 
-// ── Profils ──────────────────────────────────────────────────────
 window.loadProfiles = async () => {
   const tbody = document.getElementById('profiles-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Chargement...</td></tr>';
@@ -563,7 +833,6 @@ window.loadProfiles = async () => {
   }
 };
 
-// ── B2B ──────────────────────────────────────────────────────────
 window.loadB2B = async () => {
   const tbody = document.getElementById('b2b-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
@@ -590,64 +859,18 @@ window.loadB2B = async () => {
   }
 };
 
-// ── Paiements ────────────────────────────────────────────────────
 window.loadPayments = async () => {
   document.getElementById('payments-body').innerHTML =
     '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → payments pour le détail complet.</td></tr>';
 };
 
-// ── Abonnements ──────────────────────────────────────────────────
 window.loadSubs = async () => {
   document.getElementById('subs-body').innerHTML =
     '<tr class="empty-row"><td colspan="5" style="color:var(--gray4)">Consultez Firebase Console → subscriptions pour le détail.</td></tr>';
 };
 
-// ── Générer accès (dashboard) ────────────────────────────────────
-window.fetchAccess = async () => {
-  const orderId = document.getElementById('g-orderid').value.trim();
-  if (!orderId) return;
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = true; btn.textContent = 'Récupération...';
-  try {
-    const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
-    if (!d.success) throw new Error(d.error || 'Erreur');
-    document.getElementById('r-id').textContent    = d.leadwaseId || '—';
-    document.getElementById('r-pwd').textContent   = d.alreadyCreated ? '(déjà généré)' : (d.password || '—');
-    document.getElementById('r-email').textContent = d.email || '—';
-    document.getElementById('cred-result').classList.add('show');
-  } catch(e) { alert('Erreur : ' + e.message); }
-  btn.disabled = false; btn.textContent = 'Générer les accès';
-};
+window.prefillOrder = (orderId) => { nav('generer'); if(document.getElementById('g2-orderid')) document.getElementById('g2-orderid').value = orderId; };
 
-// ── Générer accès (page dédiée) ──────────────────────────────────
-window.fetchAccess2 = async () => {
-  const orderId = document.getElementById('g2-orderid').value.trim();
-  if (!orderId) return;
-  const btn = document.getElementById('gen-btn2');
-  btn.disabled = true; btn.textContent = 'Récupération...';
-  try {
-    const d = await api('/api/admin/deliver', { method:'POST', body: JSON.stringify({ orderId }) });
-    if (!d.success) throw new Error(d.error || 'Erreur');
-    document.getElementById('r2-id').textContent    = d.leadwaseId || '—';
-    document.getElementById('r2-pwd').textContent   = d.alreadyCreated ? '(déjà généré — voir email client)' : (d.password || '—');
-    document.getElementById('r2-email').textContent = d.email || '—';
-    document.getElementById('r2-name').textContent  = d.clientName || '—';
-    document.getElementById('cred-result2').classList.add('show');
-  } catch(e) { alert('Erreur : ' + e.message); }
-  btn.disabled = false; btn.textContent = 'Récupérer les accès';
-};
-
-window.prefillOrder = (orderId) => { nav('generer'); document.getElementById('g2-orderid').value = orderId; };
-
-// ── Copier ───────────────────────────────────────────────────────
-window.copyVal = (elId, btn) => {
-  navigator.clipboard.writeText(document.getElementById(elId).textContent).then(() => {
-    btn.textContent = '✓ Copié'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
-  });
-};
-
-// ── Modal détail ─────────────────────────────────────────────────
 window.showDetail = async (orderId) => {
   try {
     const d = await api('/api/admin/orders');
