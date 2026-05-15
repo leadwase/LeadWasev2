@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp }       from 'firebase-admin/firestore';
+import { getAuth }                        from 'firebase-admin/auth';
 import {
   notifyAdminNewOrder,
   notifyClientPaymentSuccess,
@@ -15,10 +16,11 @@ if (!getApps().length) {
   })});
 }
 const db = getFirestore();
+const auth = getAuth();
 
 function genId() { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
-function genPwd(n = 10) {
-  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+function genPwd(n = 24) {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   return Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join('');
 }
 
@@ -55,7 +57,7 @@ export default async function handler(req, res) {
     if (!payDoc) return res.json({ received: true });
 
     const pay = payDoc.data();
-    if (pay.status === 'success') return res.json({ received: true }); // anti-doublon
+    if (pay.status === 'success') return res.json({ received: true });
 
     const status = ok ? 'success' : 'failed';
     await payDoc.ref.update({
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
       updatedAt:        new Date(),
     });
 
-    // ── Création de carte classique ───────────────────────────────────────────
+    // ── CARTE CLASSIQUE (achat carte physique) ────────────────────────────────
     if (ok && pay.orderId) {
       const ord   = await db.collection('orders').doc(pay.orderId).get();
       const oData = ord.data();
@@ -73,12 +75,30 @@ export default async function handler(req, res) {
       let lwId = genId();
       const ex = await db.collection('profiles').where('leadwaseId','==',lwId).get();
       if (!ex.empty) lwId = genId();
+      
       const pwd = genPwd();
+      const loginEmail = `lw-${lwId.toLowerCase()}@leadwase.internal`;
+      const displayName = `${oData.firstName || ''} ${oData.lastName || ''}`.trim();
+
+      // 🔥 Créer l'utilisateur dans Firebase Auth
+      let firebaseUid = null;
+      try {
+        const userRecord = await auth.createUser({
+          email: loginEmail,
+          password: pwd,
+          displayName: displayName,
+          emailVerified: true,
+        });
+        firebaseUid = userRecord.uid;
+        console.log(`✅ Utilisateur Firebase créé: ${firebaseUid} pour ${loginEmail}`);
+      } catch (authError) {
+        console.error('❌ Erreur création utilisateur Firebase:', authError);
+      }
 
       await ord.ref.update({ status: 'paid', leadwaseId: lwId, paidAt: new Date() });
 
-      // Pas de uid — commande passée sans connexion obligatoire
-      await db.collection('profiles').doc(lwId).set({
+      // 🔥 Créer le profil avec firebaseUid
+      const profileData = {
         leadwaseId: lwId,
         firstName:  oData.firstName,
         lastName:   oData.lastName,
@@ -86,17 +106,26 @@ export default async function handler(req, res) {
         company:    oData.company,
         phone:      oData.phone,
         email:      oData.email,
+        loginEmail: loginEmail,
         plan:       'free',
         createdAt:  new Date(),
-      });
+      };
+      
+      if (firebaseUid) {
+        profileData.firebaseUid = firebaseUid;
+      }
 
+      await db.collection('profiles').doc(lwId).set(profileData);
+
+      // 🔥 Stocker les credentials
       await db.collection('credentials').doc(lwId).set({
         leadwaseId:   lwId,
+        loginEmail:   loginEmail,
         passwordHash: pwd,
         createdAt:    new Date(),
       });
 
-      // Notifications email
+      // Notifications
       await Promise.allSettled([
         notifyAdminNewOrder({
           orderId:   pay.orderId,
@@ -111,11 +140,14 @@ export default async function handler(req, res) {
           firstName: oData.firstName,
           email:     oData.email,
           amount:    pay.amount,
+          loginEmail: loginEmail,
+          password: pwd,
+          leadwaseId: lwId,
         }),
       ]);
     }
 
-    // ── Paiement échoué (carte classique) ─────────────────────────────────────
+    // ── PAIEMENT ÉCHOUÉ (carte classique) ─────────────────────────────────────
     if (ko && pay.orderId) {
       const ord   = await db.collection('orders').doc(pay.orderId).get();
       const oData = ord.data();
@@ -137,32 +169,61 @@ export default async function handler(req, res) {
       ]);
     }
 
-    // ── Renouvellement d'abonnement ───────────────────────────────────────────
+    // ── ABONNEMENT (PRO ou BUSINESS) ──────────────────────────────────────────
     if (ok && pay.subscriptionId) {
       const sub   = await db.collection('subscriptions').doc(pay.subscriptionId).get();
       const sData = sub.data();
-      const exp   = new Date(); exp.setMonth(exp.getMonth() + 1);
+      const exp   = new Date(); 
+      exp.setMonth(exp.getMonth() + 1);
+      const expTimestamp = Timestamp.fromDate(exp);
 
       await sub.ref.update({
         status:     'active',
         startDate:  new Date(),
-        expiryDate: Timestamp.fromDate(exp),
+        expiryDate: expTimestamp,
+        paidAt:     new Date(),
       });
 
-      // uid présent ici — abonnement nécessite d'être connecté
-      if (pay.uid) {
-        await db.collection('users').doc(pay.uid).update({
-          plan:       sData.plan,
-          planExpiry: Timestamp.fromDate(exp),
-          updatedAt:  new Date(),
-        });
-        const uDoc = await db.collection('users').doc(pay.uid).get();
-        if (uDoc.data()?.leadwaseId) {
-          await db.collection('profiles').doc(uDoc.data().leadwaseId).update({ plan: sData.plan });
+      const firebaseUid = pay.firebaseUid || sData?.firebaseUid;
+      
+      if (firebaseUid) {
+        // 🔥 Rechercher le profil par firebaseUid
+        const profileQuery = await db.collection('profiles')
+          .where('firebaseUid', '==', firebaseUid)
+          .limit(1)
+          .get();
+        
+        if (!profileQuery.empty) {
+          const profileDoc = profileQuery.docs[0];
+          const oldPlan = profileDoc.data().plan;
+          
+          // 🔥 Mettre à jour le plan dans le profil
+          await profileDoc.ref.update({ 
+            plan: sData.plan,
+            updatedAt: new Date(),
+          });
+          console.log(`✅ Profil ${profileDoc.id} mis à jour: ${oldPlan} → ${sData.plan}`);
+        } else {
+          console.log(`❌ Aucun profil trouvé pour firebaseUid: ${firebaseUid}`);
+          
+          // Option: créer un profil si inexistant (cas exceptionnel)
+          const newLwId = genId();
+          await db.collection('profiles').doc(newLwId).set({
+            leadwaseId: newLwId,
+            firebaseUid: firebaseUid,
+            plan: sData.plan,
+            createdAt: new Date(),
+          });
+          console.log(`✅ Nouveau profil créé pour abonnement: ${newLwId}`);
         }
+      } else {
+        console.log(`⚠️ Abonnement ${pay.subscriptionId} sans firebaseUid associé`);
       }
     }
 
     res.json({ received: true, status });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { 
+    console.error('❌ Webhook error:', e);
+    res.status(500).json({ error: e.message }); 
+  }
 }
