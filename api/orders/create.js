@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     }
 
     // ── Commande Classique ─────────────────────────────────────────
-    const amount   = 100;
+    const amount   = 50;
     const orderRef = await db.collection('orders').add({
       // uid: user.uid,  // plus de uid — commande sans connexion obligatoire
       cardType, firstName, lastName, jobTitle, company, phone, email, address,
