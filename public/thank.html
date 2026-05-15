@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeadWase — Commande confirmée</title>
+<title>LeadWase — Confirmation</title>
 <style>
 :root {
   --black:  #0A0A0A;
@@ -35,7 +35,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── CONFETTI ── */
 .confetti-wrap {
   position: fixed;
   inset: 0;
@@ -57,7 +56,6 @@ body {
   100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
 }
 
-/* ── HEADER ── */
 .header {
   width: 100%;
   background: var(--black);
@@ -88,7 +86,6 @@ body {
 }
 .header-step span { color: var(--green3); }
 
-/* ── MAIN CARD ── */
 .main-wrap {
   width: 100%;
   max-width: 680px;
@@ -97,7 +94,6 @@ body {
   z-index: 2;
 }
 
-/* Success icon */
 .success-icon-wrap {
   display: flex;
   justify-content: center;
@@ -142,7 +138,6 @@ body {
   to { stroke-dashoffset: 0; }
 }
 
-/* Title block */
 .title-block {
   text-align: center;
   margin-bottom: 40px;
@@ -193,7 +188,6 @@ body {
   margin: 0 auto;
 }
 
-/* ── COMMANDE BOX ── */
 .order-box {
   background: var(--white);
   border: 1px solid var(--gray5);
@@ -239,7 +233,6 @@ body {
 .odv { font-weight: bold; color: var(--black); }
 .odv.green { color: var(--green); }
 
-/* ── CREDENTIALS BOX ── */
 .credentials-box {
   background: var(--black);
   padding: 36px 28px;
@@ -328,7 +321,64 @@ body {
 }
 .cred-warning strong { font-weight: bold; font-style: normal; }
 
-/* ── NEXT STEPS ── */
+.subscription-box {
+  background: linear-gradient(135deg, #1a7a3c 0%, #0d5c2e 100%);
+  padding: 36px 28px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp .5s ease both;
+  animation-delay: .55s;
+  text-align: center;
+}
+.subscription-box::before {
+  content: '⭐';
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 40px;
+  opacity: 0.15;
+}
+.sub-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.sub-plan {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 6px 18px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+.sub-message {
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.sub-features {
+  text-align: left;
+  display: inline-block;
+  margin: 0 auto;
+}
+.sub-features li {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  padding: 6px 0;
+  list-style: none;
+}
+.sub-features li::before {
+  content: '✓';
+  margin-right: 10px;
+  font-weight: bold;
+}
+
 .next-steps {
   background: var(--white);
   border: 1px solid var(--gray5);
@@ -399,7 +449,6 @@ body {
 .ns-step-desc { font-size: 12px; color: var(--gray2); line-height: 1.7; font-style: italic; }
 .ns-step-time { display: inline-block; margin-top: 4px; font-size: 10px; color: var(--green); font-weight: bold; letter-spacing: 0.5px; background: var(--green-light); padding: 2px 8px; }
 
-/* ── DELIVERY INFO ── */
 .delivery-box {
   background: var(--green-light);
   border: 1px solid rgba(26,122,60,0.2);
@@ -417,7 +466,6 @@ body {
 .del-title { font-family: var(--serif); font-size: 14px; font-weight: bold; color: var(--black); margin-bottom: 4px; }
 .del-sub { font-size: 12px; color: var(--gray2); line-height: 1.7; font-style: italic; }
 
-/* ── ACTIONS ── */
 .actions-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -462,7 +510,6 @@ body {
 }
 .action-btn-secondary:hover { border-color: var(--black); }
 
-/* ── FOOTER ── */
 .page-footer {
   width: 100%;
   background: var(--black);
@@ -475,7 +522,21 @@ body {
 .footer-copy { font-size: 11px; color: var(--gray2); letter-spacing: 0.5px; }
 .footer-copy em { color: var(--green3); font-style: normal; }
 
-/* Print styles */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray5);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden { display: none; }
+
 @media print {
   .confetti-wrap, .actions-row, .page-footer { display: none; }
   body { background: white; }
@@ -492,177 +553,53 @@ body {
 </head>
 <body>
 
-<!-- Confetti -->
 <div class="confetti-wrap" id="confetti"></div>
 
-<!-- Header -->
 <header class="header">
   <div class="logo">Lead<em>Wase</em></div>
-  <div class="header-step">Étape <span>3 / 3</span> — Confirmation</div>
+  <div class="header-step">Confirmation</div>
 </header>
 
-<!-- Main -->
-<div class="main-wrap">
-
-  <!-- Icône succès -->
-  <div class="success-icon-wrap">
-    <div class="success-circle">
-      <svg viewBox="0 0 40 40">
-        <path class="check-path" d="M8 20 L16 28 L32 12"/>
-      </svg>
-    </div>
+<div class="main-wrap" id="main-container">
+  <div style="text-align:center; padding:60px 20px">
+    <div class="loader"></div>
+    <p style="color:var(--gray3)">Chargement de votre confirmation...</p>
   </div>
-
-  <!-- Titre -->
-  <div class="title-block">
-    <div class="confirm-eyebrow">Commande enregistrée</div>
-    <h1 class="confirm-title">Merci pour<br>votre <em>commande !</em></h1>
-    <p class="confirm-sub">Votre carte LeadWase est en préparation. Vous recevrez vos identifiants de connexion avec votre livraison.</p>
-  </div>
-
-  <!-- Récapitulatif commande -->
-  <div class="order-box">
-    <div class="order-box-header">
-      <span class="obh-left">Récapitulatif de commande</span>
-      <span class="obh-num">#CMD-0052</span>
-    </div>
-    <div class="order-box-body">
-      <div class="order-detail-row">
-        <span class="odl">Produit</span>
-        <span class="odv">Carte Classique LeadWase</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Nom</span>
-        <span class="odv">Kofi Mensah</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Email</span>
-        <span class="odv">kofi@amani.com</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Adresse de livraison</span>
-        <span class="odv">Cocody, Abidjan, Côte d'Ivoire</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Mode de paiement</span>
-        <span class="odv">Mobile Money</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Montant payé</span>
-        <span class="odv green">2 500 FCFA ✓</span>
-      </div>
-      <div class="order-detail-row">
-        <span class="odl">Date de commande</span>
-        <span class="odv">12 mai 2026, 14h37</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Credentials -->
-  <div class="credentials-box">
-    <div class="cred-title">Vos identifiants de connexion</div>
-    <p class="cred-sub">Ces identifiants vous seront également remis avec votre carte physique. Conservez-les précieusement.</p>
-
-    <div class="cred-grid">
-      <div class="cred-item">
-        <div class="cred-label">Identifiant unique</div>
-        <div class="cred-value" id="cred-id">LW-48292</div>
-      </div>
-      <div class="cred-item">
-        <div class="cred-label">Mot de passe</div>
-        <div class="cred-value pwd" id="cred-pwd">Lw@9k3#7nX</div>
-      </div>
-    </div>
-
-    <div class="cred-warning">
-      <span class="cred-warning-icon">⚠️</span>
-      <p><strong>Important :</strong> Notez ou prenez en photo ces informations maintenant. Elles vous permettront de vous connecter à votre profil digital sur <strong>leadwase.com</strong> dès réception de votre carte.</p>
-    </div>
-  </div>
-
-  <!-- Prochaines étapes -->
-  <div class="next-steps">
-    <div class="ns-title">📋 Prochaines étapes</div>
-    <div class="ns-steps">
-
-      <div class="ns-step">
-        <div class="ns-dot-wrap">
-          <div class="ns-dot done">✓</div>
-          <div class="ns-line"></div>
-        </div>
-        <div class="ns-content">
-          <div class="ns-step-title">Commande enregistrée</div>
-          <div class="ns-step-desc">Votre commande a bien été reçue et le paiement confirmé.</div>
-          <span class="ns-step-time">Fait — 12 mai 2026, 14h37</span>
-        </div>
-      </div>
-
-      <div class="ns-step">
-        <div class="ns-dot-wrap">
-          <div class="ns-dot waiting">2</div>
-          <div class="ns-line"></div>
-        </div>
-        <div class="ns-content">
-          <div class="ns-step-title">Préparation de votre carte</div>
-          <div class="ns-step-desc">Notre équipe prépare votre carte LeadWase personnalisée avec votre QR code et vos informations.</div>
-          <span class="ns-step-time">En cours — sous 24h</span>
-        </div>
-      </div>
-
-      <div class="ns-step">
-        <div class="ns-dot-wrap">
-          <div class="ns-dot pending">3</div>
-          <div class="ns-line"></div>
-        </div>
-        <div class="ns-content">
-          <div class="ns-step-title">Expédition & Livraison</div>
-          <div class="ns-step-desc">Votre carte sera expédiée avec votre document d'identifiants de connexion.</div>
-          <span class="ns-step-time">Prévu — sous 48h</span>
-        </div>
-      </div>
-
-      <div class="ns-step">
-        <div class="ns-dot-wrap">
-          <div class="ns-dot pending">4</div>
-        </div>
-        <div class="ns-content">
-          <div class="ns-step-title">Activation de votre profil</div>
-          <div class="ns-step-desc">À réception, connectez-vous sur leadwase.com avec vos identifiants et personnalisez votre profil digital.</div>
-          <span class="ns-step-time">À votre réception</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Info livraison -->
-  <div class="delivery-box">
-    <span class="del-icon">📦</span>
-    <div class="del-text">
-      <div class="del-title">Livraison estimée : 13 – 14 mai 2026</div>
-      <div class="del-sub">Votre carte sera livrée à Cocody, Abidjan sous 48h ouvrables. Vous serez contacté par SMS ou appel avant la livraison.</div>
-    </div>
-  </div>
-
-  <!-- Actions -->
-  <div class="actions-row">
-    <button class="action-btn-primary" onclick="window.print()">🖨 Imprimer la confirmation</button>
-    <a href="connexion.html" class="action-btn-secondary">🔑 Aller à la page de connexion</a>
-  </div>
-
 </div>
 
-<!-- Footer -->
 <footer class="page-footer">
   <div class="footer-copy">© 2026 <em>LeadWase</em> · Votre identité digitale professionnelle · Tous droits réservés</div>
 </footer>
 
-<script>
-// ── Confetti ──
-const colors = ['#1A7A3C','#2DC56A','#0A0A0A','#FFFFFF','#22A050','#E8F5EE'];
-const shapes = ['square','circle','rect'];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8X6ZqQFw3qRjQxYjY7JqLm6ZqQFw3qRjQ",
+  authDomain: "leadwase.firebaseapp.com",
+  projectId: "leadwase",
+  storageBucket: "leadwase.firebasestorage.app",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abc123def456"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function formatDate(timestamp) {
+  if (!timestamp) return '—';
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function formatNumber(n) {
+  return (n || 0).toLocaleString('fr-FR');
+}
 
 function makeConfetti() {
+  const colors = ['#1A7A3C','#2DC56A','#0A0A0A','#FFFFFF','#22A050','#E8F5EE'];
+  const shapes = ['square','circle','rect'];
   const wrap = document.getElementById('confetti');
   const count = 80;
 
@@ -686,14 +623,260 @@ function makeConfetti() {
       animation-delay: ${delay}s;
     `;
     wrap.appendChild(el);
-
-    // Remove after animation
     setTimeout(() => el.remove(), (delay + duration) * 1000 + 200);
   }
 }
 
-// Launch confetti after check animation
-setTimeout(makeConfetti, 700);
+async function loadConfirmation() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let orderId = urlParams.get('orderId');
+  let subscriptionId = urlParams.get('subscriptionId');
+  let type = urlParams.get('type');
+
+  const container = document.getElementById('main-container');
+
+  // Récupérer depuis sessionStorage si pas dans l'URL
+  if (!orderId && !subscriptionId) {
+    orderId = sessionStorage.getItem('last_order_id');
+    subscriptionId = sessionStorage.getItem('last_subscription_id');
+  }
+
+  // CAS 1: Abonnement
+  if (subscriptionId || type === 'subscription') {
+    let subId = subscriptionId;
+    
+    if (subId) {
+      try {
+        const subDoc = await getDoc(doc(db, 'subscriptions', subId));
+        if (subDoc.exists()) {
+          const sub = subDoc.data();
+          const planName = sub.plan === 'pro' ? 'PRO' : 'BUSINESS';
+          const planPrice = sub.plan === 'pro' ? '2 999 FCFA' : '4 566 FCFA';
+          
+          const features = sub.plan === 'pro' 
+            ? ['Réseaux sociaux', 'WhatsApp direct', 'Analytics de visites']
+            : ['Réseaux sociaux', 'WhatsApp direct', 'Analytics de visites', 'Localisation', 'Prise de rendez-vous', 'Avis Google', 'Formulaire de contact'];
+          
+          container.innerHTML = `
+            <div class="success-icon-wrap">
+              <div class="success-circle">
+                <svg viewBox="0 0 40 40">
+                  <path class="check-path" d="M8 20 L16 28 L32 12"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="title-block">
+              <div class="confirm-eyebrow">Abonnement activé</div>
+              <h1 class="confirm-title">Bienvenue sur<br>votre formule <em>${planName}</em> !</h1>
+              <p class="confirm-sub">Votre abonnement est maintenant actif. Profitez de toutes les fonctionnalités exclusives.</p>
+            </div>
+
+            <div class="subscription-box">
+              <div class="sub-title">🎉 Félicitations !</div>
+              <div class="sub-plan">${planName} — ${planPrice}/mois</div>
+              <div class="sub-message">Vous avez débloqué toutes les fonctionnalités premium :</div>
+              <ul class="sub-features">
+                ${features.map(f => `<li>${f}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="delivery-box">
+              <span class="del-icon">✨</span>
+              <div class="del-text">
+                <div class="del-title">Déblocage immédiat</div>
+                <div class="del-sub">Toutes les fonctionnalités ${planName} sont disponibles immédiatement sur votre espace personnel.</div>
+              </div>
+            </div>
+
+            <div class="actions-row">
+              <a href="dashboard.html" class="action-btn-primary">📱 Accéder à mon espace</a>
+              <a href="offres.html" class="action-btn-secondary">⭐ Voir les offres</a>
+            </div>
+          `;
+          
+          setTimeout(makeConfetti, 700);
+          sessionStorage.removeItem('last_subscription_id');
+          return;
+        }
+      } catch(e) { 
+        console.error('Erreur chargement abonnement:', e);
+      }
+    }
+  }
+
+  // CAS 2: Commande de carte
+  if (orderId) {
+    try {
+      const orderDoc = await getDoc(doc(db, 'orders', orderId));
+      if (orderDoc.exists()) {
+        const order = orderDoc.data();
+        const amountFormatted = order.amount ? formatNumber(order.amount) + ' FCFA' : 'Sur devis';
+        const orderRef = 'CMD-' + orderId.slice(-6).toUpperCase();
+        
+        let loginEmail = null;
+        let password = null;
+        let leadwaseId = null;
+        
+        if (order.leadwaseId) {
+          leadwaseId = order.leadwaseId;
+          const credDoc = await getDoc(doc(db, 'credentials', order.leadwaseId));
+          if (credDoc.exists()) {
+            const cred = credDoc.data();
+            loginEmail = cred.loginEmail || order.leadwaseId;
+            password = cred.passwordHash || '—';
+          }
+        }
+        
+        container.innerHTML = `
+          <div class="success-icon-wrap">
+            <div class="success-circle">
+              <svg viewBox="0 0 40 40">
+                <path class="check-path" d="M8 20 L16 28 L32 12"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="title-block">
+            <div class="confirm-eyebrow">Commande enregistrée</div>
+            <h1 class="confirm-title">Merci pour<br>votre <em>commande !</em></h1>
+            <p class="confirm-sub">Votre carte LeadWase est en préparation. Vous recevrez vos identifiants de connexion avec votre livraison.</p>
+          </div>
+
+          <div class="order-box">
+            <div class="order-box-header">
+              <span class="obh-left">Récapitulatif de commande</span>
+              <span class="obh-num">#${orderRef}</span>
+            </div>
+            <div class="order-box-body">
+              <div class="order-detail-row">
+                <span class="odl">Produit</span>
+                <span class="odv">Carte Classique LeadWase</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Nom</span>
+                <span class="odv">${order.firstName || ''} ${order.lastName || ''}</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Email</span>
+                <span class="odv">${order.email || '—'}</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Adresse de livraison</span>
+                <span class="odv">${order.address || 'À renseigner'}</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Mode de paiement</span>
+                <span class="odv">Mobile Money / Wave</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Montant payé</span>
+                <span class="odv green">${amountFormatted} ✓</span>
+              </div>
+              <div class="order-detail-row">
+                <span class="odl">Date de commande</span>
+                <span class="odv">${formatDate(order.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+
+          ${loginEmail ? `
+          <div class="credentials-box">
+            <div class="cred-title">Vos identifiants de connexion</div>
+            <p class="cred-sub">Ces identifiants vous seront également remis avec votre carte physique. Conservez-les précieusement.</p>
+            <div class="cred-grid">
+              <div class="cred-item">
+                <div class="cred-label">Identifiant unique</div>
+                <div class="cred-value" id="cred-id">${loginEmail}</div>
+              </div>
+              <div class="cred-item">
+                <div class="cred-label">Mot de passe</div>
+                <div class="cred-value pwd" id="cred-pwd">${password}</div>
+              </div>
+            </div>
+            <div class="cred-warning">
+              <span class="cred-warning-icon">⚠️</span>
+              <p><strong>Important :</strong> Notez ou prenez en photo ces informations maintenant. Elles vous permettront de vous connecter à votre profil digital sur <strong>leadwase.com</strong> dès réception de votre carte.</p>
+            </div>
+          </div>
+          ` : ''}
+
+          <div class="next-steps">
+            <div class="ns-title">📋 Prochaines étapes</div>
+            <div class="ns-steps">
+              <div class="ns-step">
+                <div class="ns-dot-wrap"><div class="ns-dot done">✓</div><div class="ns-line"></div></div>
+                <div class="ns-content">
+                  <div class="ns-step-title">Commande enregistrée</div>
+                  <div class="ns-step-desc">Votre commande a bien été reçue et le paiement confirmé.</div>
+                  <span class="ns-step-time">Fait — ${formatDate(order.createdAt)}</span>
+                </div>
+              </div>
+              <div class="ns-step">
+                <div class="ns-dot-wrap"><div class="ns-dot waiting">2</div><div class="ns-line"></div></div>
+                <div class="ns-content">
+                  <div class="ns-step-title">Préparation de votre carte</div>
+                  <div class="ns-step-desc">Notre équipe prépare votre carte LeadWase personnalisée avec votre QR code et vos informations.</div>
+                  <span class="ns-step-time">En cours — sous 24h</span>
+                </div>
+              </div>
+              <div class="ns-step">
+                <div class="ns-dot-wrap"><div class="ns-dot pending">3</div><div class="ns-line"></div></div>
+                <div class="ns-content">
+                  <div class="ns-step-title">Expédition & Livraison</div>
+                  <div class="ns-step-desc">Votre carte sera expédiée avec votre document d'identifiants de connexion.</div>
+                  <span class="ns-step-time">Prévu — sous 48h</span>
+                </div>
+              </div>
+              <div class="ns-step">
+                <div class="ns-dot-wrap"><div class="ns-dot pending">4</div></div>
+                <div class="ns-content">
+                  <div class="ns-step-title">Activation de votre profil</div>
+                  <div class="ns-step-desc">À réception, connectez-vous sur leadwase.com avec vos identifiants et personnalisez votre profil digital.</div>
+                  <span class="ns-step-time">À votre réception</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="delivery-box">
+            <span class="del-icon">📦</span>
+            <div class="del-text">
+              <div class="del-title">Livraison estimée : 48h après validation</div>
+              <div class="del-sub">Votre carte sera livrée à l'adresse indiquée. Vous serez contacté par SMS ou appel avant la livraison.</div>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="action-btn-primary" onclick="window.print()">🖨 Imprimer la confirmation</button>
+            <a href="connexion.html" class="action-btn-secondary">🔑 Aller à la page de connexion</a>
+          </div>
+        `;
+        
+        setTimeout(makeConfetti, 700);
+        sessionStorage.removeItem('last_order_id');
+        return;
+      }
+    } catch(e) { 
+      console.error('Erreur chargement commande:', e);
+    }
+  }
+
+  // CAS 3: Aucune information trouvée
+  container.innerHTML = `
+    <div class="title-block">
+      <div class="confirm-eyebrow">Information</div>
+      <h1 class="confirm-title">Confirmation <em>traitée</em></h1>
+      <p class="confirm-sub">Votre paiement a bien été reçu. Vous recevrez un email de confirmation détaillé.</p>
+    </div>
+    <div class="actions-row">
+      <a href="/" class="action-btn-primary">Accueil</a>
+      <a href="connexion.html" class="action-btn-secondary">Connexion</a>
+    </div>
+  `;
+}
+
+loadConfirmation();
 </script>
 </body>
 </html>
