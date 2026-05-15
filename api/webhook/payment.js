@@ -77,7 +77,8 @@ export default async function handler(req, res) {
       if (!ex.empty) lwId = genId();
       
       const pwd = genPwd();
-      const loginEmail = `lw-${lwId.toLowerCase()}@leadwase.internal`;
+      const cleanLwId = lwId.toLowerCase().replace('lw-', '');
+      const loginEmail = `lw-${cleanLwId}@leadwase.internal`;
       const displayName = `${oData.firstName || ''} ${oData.lastName || ''}`.trim();
 
       // 🔥 Créer l'utilisateur dans Firebase Auth
