@@ -16,7 +16,7 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-function genId()  { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
+function genId() { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
 function genPwd(n = 10) {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
   return Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join('');
@@ -34,14 +34,21 @@ export default async function handler(req, res) {
     // ── Retrouver le document payment ─────────────────────────────────────────
     let payDoc = null;
     const txId = transaction?.metadata?.transactionId;
-    if (txId) { const d = await db.collection('payments').doc(txId).get(); if (d.exists) payDoc = d; }
+    if (txId) {
+      const d = await db.collection('payments').doc(txId).get();
+      if (d.exists) payDoc = d;
+    }
     if (!payDoc) {
       const ref = transaction?.reference || transaction?.id;
-      if (ref) { const s = await db.collection('payments').where('pid','==',ref).limit(1).get(); if (!s.empty) payDoc = s.docs[0]; }
+      if (ref) {
+        const s = await db.collection('payments').where('pid','==',ref).limit(1).get();
+        if (!s.empty) payDoc = s.docs[0];
+      }
     }
     if (!payDoc && transaction?.amount) {
       const s = await db.collection('payments')
-        .where('status','==','pending').where('amount','==',transaction.amount)
+        .where('status','==','pending')
+        .where('amount','==',transaction.amount)
         .orderBy('createdAt','desc').limit(1).get();
       if (!s.empty) payDoc = s.docs[0];
     }
@@ -51,7 +58,12 @@ export default async function handler(req, res) {
     if (pay.status === 'success') return res.json({ received: true }); // anti-doublon
 
     const status = ok ? 'success' : 'failed';
-    await payDoc.ref.update({ status, gatewayRef: transaction?.reference, webhookVerified: true, updatedAt: new Date() });
+    await payDoc.ref.update({
+      status,
+      gatewayRef:       transaction?.reference,
+      webhookVerified:  true,
+      updatedAt:        new Date(),
+    });
 
     // ── Création de carte classique ───────────────────────────────────────────
     if (ok && pay.orderId) {
@@ -65,11 +77,8 @@ export default async function handler(req, res) {
 
       await ord.ref.update({ status: 'paid', leadwaseId: lwId, paidAt: new Date() });
 
-      // uid retiré — commande passée sans connexion obligatoire
-      // uid: pay.uid  → commenté
+      // Pas de uid — commande passée sans connexion obligatoire
       await db.collection('profiles').doc(lwId).set({
-        // uid: pay.uid,
-        ownerUid: userRecord.uid,
         leadwaseId: lwId,
         firstName:  oData.firstName,
         lastName:   oData.lastName,
@@ -82,14 +91,10 @@ export default async function handler(req, res) {
       });
 
       await db.collection('credentials').doc(lwId).set({
-        // uid: pay.uid,
         leadwaseId:   lwId,
         passwordHash: pwd,
         createdAt:    new Date(),
       });
-
-      // Mise à jour users désactivée — pas de compte Firebase lié à la commande
-      // await db.collection('users').doc(pay.uid).set({ leadwaseId: lwId, plan: 'free', updatedAt: new Date() }, { merge: true });
 
       // Notifications email
       await Promise.allSettled([
@@ -138,9 +143,13 @@ export default async function handler(req, res) {
       const sData = sub.data();
       const exp   = new Date(); exp.setMonth(exp.getMonth() + 1);
 
-      await sub.ref.update({ status: 'active', startDate: new Date(), expiryDate: Timestamp.fromDate(exp) });
+      await sub.ref.update({
+        status:     'active',
+        startDate:  new Date(),
+        expiryDate: Timestamp.fromDate(exp),
+      });
 
-      // pay.uid présent ici — abonnement nécessite d'être connecté
+      // uid présent ici — abonnement nécessite d'être connecté
       if (pay.uid) {
         await db.collection('users').doc(pay.uid).update({
           plan:       sData.plan,
