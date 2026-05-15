@@ -1,59 +1,402 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics — LeadWase</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-.analytics-wrap{padding:28px;max-width:960px}
-.an-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.an-h1{font-size:22px;font-weight:bold;color:var(--black)}
-.an-period{display:flex;gap:8px}
-.period-btn{padding:6px 14px;font-size:11px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--gray5);background:var(--white);color:var(--gray3);cursor:pointer;border-radius:2px;transition:all .15s}
-.period-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+/* ══════════════════════════════════════════════
+   STYLE IDENTIQUE À DASHBOARD
+══════════════════════════════════════════════ */
+:root {
+  --green:  #1a7a3c;
+  --green2: #15652f;
+  --green3: #4caf75;
+  --black:  #0d0d0d;
+  --white:  #ffffff;
+  --gray2:  #48484a;
+  --gray3:  #8e8e93;
+  --gray4:  #aeaeb2;
+  --gray5:  #e5e5ea;
+  --gray6:  #f5f5f7;
+  --serif:  Georgia, 'Times New Roman', serif;
+  --sidebar-w: 190px;
+}
 
-/* Stats cards */
-.an-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.an-card{background:var(--white);border:1px solid var(--gray5);padding:20px 22px}
-.an-card-val{font-size:32px;font-weight:bold;color:var(--black);font-family:'Courier New',monospace;margin-bottom:4px}
-.an-card-label{font-size:10px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray4)}
-.an-card-sub{font-size:11px;color:var(--green);margin-top:4px}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--serif); background: var(--gray6); color: var(--black); min-height: 100vh; }
 
-/* Chart section */
-.chart-box{background:var(--white);border:1px solid var(--gray5);padding:24px;margin-bottom:18px}
-.chart-title{font-size:14px;font-weight:bold;color:var(--black);margin-bottom:18px}
-.chart-area{height:180px;display:flex;align-items:flex-end;gap:6px;padding-bottom:24px;position:relative;border-bottom:1px solid var(--gray5)}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
-.bar{width:100%;background:var(--green);border-radius:2px 2px 0 0;transition:height .4s;min-height:2px;cursor:pointer;position:relative}
-.bar:hover{background:var(--green2)}
-.bar-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);font-size:10px;padding:4px 8px;border-radius:2px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
-.bar:hover .bar-tooltip{opacity:1}
-.bar-label{font-size:9px;color:var(--gray4);margin-top:6px;text-align:center}
-.chart-labels{display:flex;gap:6px}
-.chart-labels span{flex:1;font-size:9px;color:var(--gray4);text-align:center}
+.app-layout { display: flex; min-height: 100vh; }
 
-/* Sources & recent */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
-.section-box{background:var(--white);border:1px solid var(--gray5);padding:22px}
-.section-title{font-size:13px;font-weight:bold;color:var(--black);margin-bottom:16px}
-.source-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dotted var(--gray5);font-size:12px}
-.source-row:last-child{border-bottom:none}
-.source-name{color:var(--gray2);font-weight:500}
-.source-bar-wrap{flex:1;margin:0 12px;height:6px;background:var(--gray5);border-radius:3px;overflow:hidden}
-.source-bar-fill{height:100%;background:var(--green);border-radius:3px}
-.source-count{color:var(--black);font-weight:bold;font-size:13px}
+/* ══════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+  transition: transform .28s ease;
+}
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  text-decoration: none;
+  display: block;
+}
+.brand { font-size: 18px; font-weight: bold; color: var(--white); letter-spacing: -.2px; }
+.brand em { color: var(--green3); font-style: normal; }
+.sub { font-size: 9px; color: var(--gray3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
-/* Visites récentes */
-.visit-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px dotted var(--gray5);font-size:12px}
-.visit-row:last-child{border-bottom:none}
-.visit-date{color:var(--gray4);font-size:11px}
-.visit-src{color:var(--green);font-size:11px;font-weight:bold}
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.sidebar-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--green);
+  color: var(--white);
+  font-size: 13px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-user-name { font-size: 12px; font-weight: bold; color: var(--white); line-height: 1.2; }
+.sidebar-user-plan { font-size: 9px; color: var(--green3); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
 
-/* Accès bloqué */
-#access-denied{position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:32px;text-align:center}
-#access-denied h2{font-size:22px;font-weight:bold;color:var(--black)}
-#access-denied p{font-size:14px;color:var(--gray3);max-width:400px;line-height:1.7}
-#access-denied a{padding:12px 28px;background:var(--green);color:var(--white);text-decoration:none;font-weight:bold;font-size:13px;letter-spacing:1px;text-transform:uppercase;border-radius:2px}
+.sidebar-nav { flex: 1; padding: 12px 0; }
+.sidebar-section-label {
+  font-size: 8px; font-weight: bold; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gray3);
+  padding: 10px 16px 4px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  font-size: 12px; color: rgba(255,255,255,.65);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+}
+.sidebar-item:hover { color: var(--white); background: rgba(255,255,255,.04); }
+.sidebar-item.active { color: var(--white); background: rgba(26,122,60,.18); border-left-color: var(--green3); }
+.s-icon { font-size: 14px; width: 18px; flex-shrink: 0; }
+
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,.06); }
+.sidebar-logout {
+  width: 100%; padding: 8px;
+  background: transparent; border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.5); font-family: var(--serif); font-size: 11px;
+  cursor: pointer; border-radius: 2px; transition: all .2s;
+}
+.sidebar-logout:hover { border-color: rgba(255,255,255,.3); color: var(--white); }
+
+/* ══════════════════════════════════════════════
+   MOBILE TOPBAR
+══════════════════════════════════════════════ */
+.topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  background: var(--black); z-index: 200;
+  align-items: center; justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.topbar-brand { font-size: 17px; font-weight: bold; color: var(--white); }
+.topbar-brand em { color: var(--green3); font-style: normal; }
+.hamburger {
+  background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px; padding: 4px;
+}
+.hamburger span {
+  display: block; width: 20px; height: 2px;
+  background: var(--white); border-radius: 1px; transition: all .3s;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); z-index: 99;
+}
+.sidebar-overlay.active { display: block; }
+
+/* ══════════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════════ */
+.app-content { 
+  margin-left: var(--sidebar-w); 
+  flex: 1; 
+  min-height: 100vh;
+  padding: 28px;
+}
+
+/* ══════════════════════════════════════════════
+   ANALYTICS STYLE - IDENTIQUE DASHBOARD
+══════════════════════════════════════════════ */
+.analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.analytics-h1 {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--black);
+}
+.period-selector {
+  display: flex;
+  gap: 8px;
+}
+.period-btn {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid var(--gray5);
+  background: var(--white);
+  color: var(--gray3);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all .15s;
+}
+.period-btn.active {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+/* Stats cards - comme dashboard */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.stat-card.green::after { background: var(--green); }
+.stat-card.orange::after { background: #d97706; }
+.stat-card.blue::after { background: #2563eb; }
+.stat-card.purple::after { background: #7c3aed; }
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray4);
+  margin-bottom: 10px;
+}
+.stat-val {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gray1);
+  font-family: 'Space Mono', monospace;
+  line-height: 1;
+}
+.stat-sub {
+  font-size: 11px;
+  color: var(--gray4);
+  margin-top: 6px;
+}
+.stat-sub.up { color: var(--green); }
+
+/* Cards */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  margin-bottom: 20px;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--gray5);
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray1);
+}
+.card-title i { font-style: normal; margin-right: 6px; }
+
+/* Chart */
+.chart-container {
+  padding: 24px;
+}
+.chart-area {
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 0 8px 24px 8px;
+  border-bottom: 1px solid var(--gray5);
+}
+.bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar {
+  width: 100%;
+  background: var(--green);
+  border-radius: 2px 2px 0 0;
+  transition: height .4s;
+  min-height: 2px;
+  cursor: pointer;
+  position: relative;
+}
+.bar:hover { background: var(--green2); }
+.bar-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--black);
+  color: var(--white);
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.bar:hover .bar-tooltip { opacity: 1; }
+.bar-label {
+  font-size: 9px;
+  color: var(--gray4);
+  text-align: center;
+}
+
+/* Two columns */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.section-box {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+}
+.section-box .card-head { border-bottom: 1px solid var(--gray5); }
+.section-body { padding: 20px 24px; }
+
+/* Source rows */
+.source-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--gray5);
+  font-size: 13px;
+}
+.source-row:last-child { border-bottom: none; }
+.source-name { color: var(--gray2); font-weight: 500; }
+.source-bar-wrap {
+  flex: 1;
+  margin: 0 12px;
+  height: 6px;
+  background: var(--gray5);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.source-bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 3px;
+}
+.source-count {
+  color: var(--black);
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* Visit rows */
+.visit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--gray5);
+  font-size: 13px;
+}
+.visit-row:last-child { border-bottom: none; }
+.visit-date {
+  color: var(--gray4);
+  font-size: 11px;
+}
+.visit-src {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* Access denied */
+#access-denied {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.97);
+  z-index: 999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+}
+#access-denied h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--black);
+}
+#access-denied p {
+  font-size: 14px;
+  color: var(--gray3);
+  max-width: 400px;
+  line-height: 1.7;
+}
+#access-denied a {
+  padding: 12px 28px;
+  background: var(--green);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
 
 .loader {
   width: 32px;
@@ -68,20 +411,33 @@
   to { transform: rotate(360deg); }
 }
 
-@media(max-width:900px){
-  .analytics-wrap{padding:14px}
-  .an-stats{grid-template-columns:1fr 1fr}
-  .two-col{grid-template-columns:1fr}
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--gray4);
+  font-style: italic;
+  font-size: 13px;
 }
-@media(max-width:480px){
-  .an-stats{grid-template-columns:1fr}
-  .an-period{flex-wrap:wrap}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .topbar { display: flex; }
+  .sidebar { transform: translateX(-100%); top: 52px; }
+  .sidebar.open { transform: translateX(0); }
+  .app-content { margin-left: 0; padding-top: 52px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .app-content { padding: 14px; }
+  .card-head { padding: 12px 16px; }
+  .section-body { padding: 14px 16px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Accès refusé -->
 <div id="access-denied">
   <div style="font-size:48px">📊</div>
   <h2>Analytics réservé aux abonnés Pro & Business</h2>
@@ -90,7 +446,7 @@
 </div>
 
 <div class="app-layout" id="app-layout" style="display:none">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
     <div class="sidebar-user">
       <div class="sidebar-avatar" id="sb-av">?</div>
@@ -109,67 +465,67 @@
     <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
   </aside>
 
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <main class="app-content">
     <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
       <div style="text-align:center">
         <div class="loader"></div>
-        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement des statistiques...</p>
       </div>
     </div>
 
-    <div class="analytics-wrap" id="content" style="display:none">
-      <div class="an-header">
-        <div class="an-h1">📊 Analytics</div>
-        <div class="an-period">
-          <button class="period-btn active" data-period="7">7 jours</button>
-          <button class="period-btn" data-period="30">30 jours</button>
+    <div id="content" style="display:none">
+      <div class="analytics-header">
+        <div class="analytics-h1">📊 Analytics</div>
+        <div class="period-selector">
+          <button class="period-btn" data-period="7">7 jours</button>
+          <button class="period-btn active" data-period="30">30 jours</button>
           <button class="period-btn" data-period="90">90 jours</button>
         </div>
       </div>
 
-      <!-- Stats cards -->
-      <div class="an-stats">
-        <div class="an-card">
-          <div class="an-card-val" id="stat-total">—</div>
-          <div class="an-card-label">Visites totales</div>
-          <div class="an-card-sub" id="stat-total-sub"></div>
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Visites totales</div>
+          <div class="stat-val" id="stat-total">—</div>
+          <div class="stat-sub up" id="stat-total-sub"></div>
         </div>
-        <div class="an-card">
-          <div class="an-card-val" id="stat-unique">—</div>
-          <div class="an-card-label">Visiteurs uniques</div>
-          <div class="an-card-sub" id="stat-unique-sub"></div>
+        <div class="stat-card blue">
+          <div class="stat-label">Visiteurs uniques</div>
+          <div class="stat-val" id="stat-unique">—</div>
+          <div class="stat-sub" id="stat-unique-sub"></div>
         </div>
-        <div class="an-card">
-          <div class="an-card-val" id="stat-contacts">—</div>
-          <div class="an-card-label">Clics contact</div>
-          <div class="an-card-sub" id="stat-contacts-sub"></div>
+        <div class="stat-card orange">
+          <div class="stat-label">Clics contact</div>
+          <div class="stat-val" id="stat-contacts">—</div>
+          <div class="stat-sub" id="stat-contacts-sub"></div>
         </div>
-        <div class="an-card">
-          <div class="an-card-val" id="stat-shares">—</div>
-          <div class="an-card-label">Partages profil</div>
-          <div class="an-card-sub" id="stat-shares-sub"></div>
+        <div class="stat-card purple">
+          <div class="stat-label">Partages</div>
+          <div class="stat-val" id="stat-shares">—</div>
+          <div class="stat-sub" id="stat-shares-sub"></div>
         </div>
       </div>
 
-      <!-- Chart -->
-      <div class="chart-box">
-        <div class="chart-title">Visites par jour</div>
-        <div class="chart-area" id="chart-area"></div>
-        <div class="chart-labels" id="chart-labels"></div>
+      <div class="card">
+        <div class="card-head"><span class="card-title"><i>📈</i> Visites par jour</span></div>
+        <div class="chart-container">
+          <div class="chart-area" id="chart-area"></div>
+        </div>
       </div>
 
-      <!-- Sources & visites récentes -->
-      <div class="two-col">
+      <div class="two-col-grid">
         <div class="section-box">
-          <div class="section-title">Sources de trafic</div>
-          <div id="sources-list">
-            <div style="color:var(--gray4);font-style:italic;font-size:12px">Chargement...</div>
+          <div class="card-head"><span class="card-title"><i>🔍</i> Sources de trafic</span></div>
+          <div class="section-body" id="sources-list">
+            <div class="empty-state">Chargement...</div>
           </div>
         </div>
         <div class="section-box">
-          <div class="section-title">Visites récentes</div>
-          <div id="visits-list">
-            <div style="color:var(--gray4);font-style:italic;font-size:12px">Chargement...</div>
+          <div class="card-head"><span class="card-title"><i>🕐</i> Visites récentes</span></div>
+          <div class="section-body" id="visits-list">
+            <div class="empty-state">Chargement...</div>
           </div>
         </div>
       </div>
@@ -183,9 +539,8 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
-let currentPeriod = 7;
+let currentPeriod = 30;
 
-// Fonction pour trouver le profil par firebaseUid
 async function findProfileByFirebaseUid(uid) {
   const profilesRef = collection(db, 'profiles');
   const q = query(profilesRef, where('firebaseUid', '==', uid), limit(1));
@@ -196,6 +551,11 @@ async function findProfileByFirebaseUid(uid) {
   }
   return null;
 }
+
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('active');
+};
 
 onAuthStateChanged(auth, async user => {
   if (!user) {
@@ -208,11 +568,9 @@ onAuthStateChanged(auth, async user => {
   const accessDenied = document.getElementById('access-denied');
 
   try {
-    // 🔥 RECHERCHE DU PROFIL PAR firebaseUid
     const profileResult = await findProfileByFirebaseUid(user.uid);
     
     if (!profileResult) {
-      console.error('Aucun profil trouvé pour cet utilisateur');
       window.location.href = '/dashboard.html';
       return;
     }
@@ -221,26 +579,20 @@ onAuthStateChanged(auth, async user => {
     lwId = profileResult.id;
     const userPlan = profile.plan || 'free';
     
-    console.log('Profil trouvé:', lwId, 'Plan:', userPlan);
-    
-    // 🔥 VÉRIFICATION DU PLAN POUR L'ACCÈS ANALYTICS
     if (!['pro', 'business'].includes(userPlan)) {
       accessDenied.style.display = 'flex';
       return;
     }
     
-    // Mise à jour de la sidebar
     document.getElementById('sb-av').textContent = (profile.firstName || '?')[0];
     document.getElementById('sb-name').textContent = `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Utilisateur';
     document.getElementById('sb-plan').textContent = userPlan.toUpperCase();
     document.getElementById('sb-pub').href = `profil.html?id=${lwId}`;
     
-    // Affichage de l'interface
     document.getElementById('app-layout').style.display = '';
     loader.style.display = 'none';
     content.style.display = 'block';
     
-    // Chargement des analytics
     await loadAnalytics(currentPeriod);
     
   } catch (error) {
@@ -249,23 +601,15 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// ── Changer période ──
-window.setPeriod = (days, btn) => {
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentPeriod = days;
-  loadAnalytics(days);
-};
-
-// ── Initialiser les boutons ──
 document.querySelectorAll('.period-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    const days = parseInt(btn.dataset.period);
-    setPeriod(days, btn);
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPeriod = parseInt(btn.dataset.period);
+    loadAnalytics(currentPeriod);
   });
 });
 
-// ── Charger analytics ──
 async function loadAnalytics(days) {
   if (!lwId) return;
 
@@ -279,7 +623,6 @@ async function loadAnalytics(days) {
     const visitsSnap = await getDocs(visitsQ);
     const visits = visitsSnap.docs.map(d => d.data());
 
-    // Totaux
     const total = visits.length;
     const unique = new Set(visits.map(v => v.visitorId || v.ip || 'unknown')).size;
     const contacts = visits.filter(v => v.type === 'contact_click').length;
@@ -309,7 +652,6 @@ async function loadAnalytics(days) {
   }
 }
 
-// ── Graphique ──
 function buildChart(visits, days) {
   const area = document.getElementById('chart-area');
   area.innerHTML = '';
@@ -334,7 +676,7 @@ function buildChart(visits, days) {
   const maxV = Math.max(...vals, 1);
   const shown = days <= 14 ? keys : keys.filter((_, i) => i % Math.ceil(days / 14) === 0);
 
-  keys.forEach((key, i) => {
+  keys.forEach((key) => {
     const pct = (map[key] / maxV) * 100;
     const date = new Date(key);
     const lbl = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
@@ -349,7 +691,6 @@ function buildChart(visits, days) {
   });
 }
 
-// ── Sources ──
 function buildSources(visits) {
   const map = {};
   visits.forEach(v => {
@@ -361,7 +702,7 @@ function buildSources(visits) {
   const el = document.getElementById('sources-list');
   
   if (!sorted.length) {
-    el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune donnée</div>';
+    el.innerHTML = '<div class="empty-state">Aucune donnée disponible</div>';
     return;
   }
   
@@ -374,11 +715,10 @@ function buildSources(visits) {
   `).join('');
 }
 
-// ── Visites récentes ──
 function buildRecentVisits(visits) {
   const el = document.getElementById('visits-list');
   if (!visits.length) {
-    el.innerHTML = '<div style="color:var(--gray4);font-style:italic;font-size:12px">Aucune visite récente</div>';
+    el.innerHTML = '<div class="empty-state">Aucune visite récente</div>';
     return;
   }
   
@@ -402,14 +742,6 @@ window.doLogout = async () => {
   await signOut(auth);
   window.location.href = '/';
 };
-
-// Démarrer avec la période par défaut
-function setPeriod(days, btn) {
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentPeriod = days;
-  loadAnalytics(days);
-}
 </script>
 </body>
 </html>
