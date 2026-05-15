@@ -1,12 +1,11 @@
-// Fichier : api/admin/credentials.js (ou .ts)
-
+// api/admin/credentials.js
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 const db = getFirestore();
 
 export default async function handler(req, res) {
-  // 1. Vérification de l'authentification admin
+  // 1. Vérifier l'authentification
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ success: false, error: 'Non authentifié' });
@@ -14,46 +13,45 @@ export default async function handler(req, res) {
   
   const token = authHeader.split('Bearer ')[1];
   try {
-    const decodedToken = await getAuth().verifyIdToken(token);
-    // Optionnel : vérifier que l'email est bien admin
-    // if (decodedToken.email !== 'votre-email-admin@example.com') throw new Error();
+    await getAuth().verifyIdToken(token);
   } catch (e) {
     return res.status(403).json({ success: false, error: 'Token invalide' });
   }
 
   try {
-    // 2. Récupérer tous les profils (utilisateurs avec leadwaseId)
-    const profilesSnapshot = await db.collection('profiles').get();
+    // 2. Lire TOUS les documents de la collection "credentials"
+    const credentialsSnapshot = await db.collection('credentials').get();
     
     const credentials = [];
     
-    for (const profileDoc of profilesSnapshot.docs) {
-      const profile = profileDoc.data();
+    for (const doc of credentialsSnapshot.docs) {
+      const credData = doc.data();
+      const leadwaseId = credData.leadwaseId || doc.id;
       
-      // Récupérer le mot de passe depuis la collection 'credentials'
-      const credDoc = await db.collection('credentials').doc(profile.leadwaseId).get();
-      const credData = credDoc.exists ? credDoc.data() : {};
+      // 3. Récupérer les infos du profil correspondant (optionnel)
+      let profile = null;
+      try {
+        const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+        if (profileDoc.exists) profile = profileDoc.data();
+      } catch(e) { console.warn('Profil manquant pour', leadwaseId); }
       
       credentials.push({
-        leadwaseId: profile.leadwaseId,
-        login: profile.leadwaseId, // L'identifiant = leadwaseId
-        password: credData.passwordHash || '(mot de passe non disponible)',
-        email: profile.email || '',
-        clientName: `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || '—',
-        createdAt: profile.createdAt,
+        leadwaseId: leadwaseId,
+        login: leadwaseId,  // L'identifiant = leadwaseId
+        password: credData.passwordHash || credData.password || '—',
+        email: profile?.email || '—',
+        clientName: profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() : '—',
+        createdAt: credData.createdAt || null,
       });
     }
     
-    return res.status(200).json({
-      success: true,
-      credentials: credentials
-    });
+    return res.status(200).json({ success: true, credentials });
     
   } catch (error) {
     console.error('Erreur API credentials:', error);
     return res.status(500).json({ 
       success: false, 
-      error: 'Erreur interne du serveur' 
+      error: error.message 
     });
   }
 }
