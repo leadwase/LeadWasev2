@@ -21,27 +21,23 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 .a3{animation:fadeUp .5s .25s ease both}
 .a4{animation:fadeUp .5s .35s ease both}
 .a5{animation:fadeUp .5s .45s ease both}
+.a6{animation:fadeUp .5s .55s ease both}
 
 /* ════════════════════════════════════════
-   BANNER — bien designée
+   BANNER
    ════════════════════════════════════════ */
 .banner{
   background:#0d0d0d;
   height:64px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 36px;
-  /* PAS sticky — on évite qu'elle cache le contenu */
   position:relative;
   border-bottom:1px solid rgba(255,255,255,.06);
 }
-
-/* Ligne verte fine en bas de la bannière */
 .banner::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent 0%,#1a7a3c 20%,#22c55e 50%,#1a7a3c 80%,transparent 100%)
 }
-
-/* Logo */
 .banner-logo{
   display:flex;align-items:center;gap:12px;text-decoration:none
 }
@@ -49,15 +45,11 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   font-size:20px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;color:#fff
 }
 .banner-logo-text em{color:#22c55e;font-style:normal}
-/* Séparateur vertical */
 .banner-sep{width:1px;height:28px;background:rgba(255,255,255,.12)}
-/* Tagline */
 .banner-tagline{
   font-size:10px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;
   font-style:italic
 }
-
-/* Badge vérifié à droite */
 .banner-badge{
   display:flex;align-items:center;gap:8px;
   background:rgba(34,197,94,.08);
@@ -75,7 +67,6 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 /* ── Cover strip ─────────────────────────── */
 .cover{
   background:#111;
-  /* Hauteur réduite pour laisser l'identité bien visible */
   height:140px;
   position:relative;overflow:hidden
 }
@@ -106,11 +97,8 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 /* ── Identity block ──────────────────────── */
 .pf-identity{
   display:flex;align-items:flex-end;gap:22px;
-  /* margin-top négatif = avatar chevauche le cover vers le haut
-     mais reste entièrement visible (88px avatar ÷ 2 = 44px → -36px safe) */
   margin-top:-36px;
   margin-bottom:26px;
-  /* padding-top pour que la section blanche soit assez haute */
   padding-top:0;
 }
 .pf-av-wrap{position:relative;flex-shrink:0}
@@ -129,11 +117,7 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   text-transform:uppercase;white-space:nowrap;border-radius:20px;
   border:2px solid #f5f5f3
 }
-.pf-info{
-  /* On ajoute un padding-top pour que le nom soit clairement sous le cover */
-  padding-top:46px;
-  padding-bottom:4px;
-}
+.pf-info{padding-top:46px;padding-bottom:4px}
 .pf-name{font-size:22px;font-weight:bold;color:#111;letter-spacing:-.3px;margin-bottom:3px}
 .pf-job{font-size:13px;color:#666;font-style:italic;margin-bottom:4px}
 .pf-co{font-size:11px;color:#1a7a3c;font-weight:bold;letter-spacing:1px;text-transform:uppercase}
@@ -145,6 +129,16 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   background:#fff;border:1px solid #e5e5e3;
   border-left:3px solid #1a7a3c;border-radius:0 6px 6px 0
 }
+
+/* ── Location ────────────────────────────── */
+.pf-location{
+  font-size:13px;color:#555;line-height:1.6;
+  padding:14px 20px;margin-bottom:20px;
+  background:#fff;border:1px solid #e5e5e3;
+  border-left:3px solid #22c55e;border-radius:0 6px 6px 0;
+  display:flex;align-items:center;gap:12px
+}
+.pf-location-icon{font-size:18px}
 
 /* ── Divider ─────────────────────────────── */
 .pf-divider{height:1px;background:linear-gradient(90deg,transparent,#ddd 30%,#ddd 70%,transparent);margin:20px 0}
@@ -159,7 +153,6 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   cursor:pointer;margin-bottom:16px;
   position:relative;overflow:hidden;transition:background .2s,transform .15s
 }
-/* Shimmer effect */
 .vcf-btn .shimmer{
   position:absolute;top:0;width:60px;height:100%;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
@@ -189,8 +182,8 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 .c-tile-label{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
 .c-tile-val{font-size:12px;font-weight:bold;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
 
-/* ── Social ──────────────────────────────── */
-.sec-label{font-size:9px;color:#bbb;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+/* ── Social & Additional links ───────────── */
+.sec-label{font-size:9px;color:#bbb;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;margin-top:16px}
 .social-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .social-btn{
   display:flex;align-items:center;gap:8px;
@@ -199,6 +192,42 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
   transition:all .2s;border-radius:4px;text-decoration:none
 }
 .social-btn:hover{border-color:#1a7a3c;color:#1a7a3c;box-shadow:0 2px 8px rgba(26,122,60,.1)}
+
+/* ── Appointment button ──────────────────── */
+.appointment-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:14px;
+  background:#1a7a3c;color:#fff;
+  border:none;border-radius:4px;
+  font-family:inherit;font-size:11px;font-weight:bold;letter-spacing:1.5px;
+  cursor:pointer;margin-top:16px;margin-bottom:8px;
+  transition:background .2s;text-decoration:none
+}
+.appointment-btn:hover{background:#0f5c2a}
+
+/* ── Google Reviews ──────────────────────── */
+.google-reviews{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;margin-top:16px;
+  background:#fff;border:1px solid #f9e08b;background:#fef9e7;
+  border-radius:6px;text-decoration:none
+}
+.google-reviews:hover{background:#fef4d8}
+.google-reviews-stars{color:#f4b942;font-size:14px;letter-spacing:2px}
+.google-reviews-text{font-size:12px;color:#555}
+
+/* ── Contact form preview ────────────────── */
+.contact-form-preview{
+  margin-top:16px;padding:16px;
+  background:#fff;border:1px solid #e5e5e3;border-radius:6px
+}
+.contact-form-preview h4{font-size:12px;margin-bottom:8px;color:#333}
+.contact-form-message{font-size:11px;color:#888;margin-bottom:12px;font-style:italic}
+.contact-form-btn{
+  display:inline-block;padding:8px 16px;background:#0d0d0d;color:#fff;
+  font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;
+  border-radius:4px;text-decoration:none
+}
 
 /* ── Footer ──────────────────────────────── */
 .pf-footer{text-align:center;padding-top:24px;border-top:1px solid #eaeae8;margin-top:24px}
@@ -240,107 +269,124 @@ body{background:#f5f5f3;font-family:var(--serif,'Georgia',serif);min-height:100v
 </head>
 <body>
 
-  <!-- ══ BANNER ══════════════════════════════ -->
-  <header class="banner">
-    <div class="banner-logo">
-      <div class="banner-logo-text">LEAD<em>WASE</em></div>
-      <div class="banner-sep"></div>
-      <div class="banner-tagline">Digital Identity</div>
-    </div>
-    <div class="banner-badge">
-      <div class="banner-badge-dot"></div>
-      <div class="banner-badge-txt">Profil vérifié</div>
-    </div>
-  </header>
-
-  <!-- ══ COVER ═══════════════════════════════ -->
-  <div class="cover">
-    <div class="cover-grid"></div>
-    <div class="cover-glow"></div>
-    <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
-    <div class="cover-line"></div>
+<header class="banner">
+  <div class="banner-logo">
+    <div class="banner-logo-text">LEAD<em>WASE</em></div>
+    <div class="banner-sep"></div>
+    <div class="banner-tagline">Digital Identity</div>
   </div>
-
-  <!-- ══ LOADING ═════════════════════════════ -->
-  <div class="pf-wrap" id="pf-loading">
-    <div style="margin-top:60px">
-      <div class="loader-ring"></div>
-      <p style="color:#aaa;font-style:italic;font-size:13px">Chargement du profil...</p>
-    </div>
+  <div class="banner-badge">
+    <div class="banner-badge-dot"></div>
+    <div class="banner-badge-txt">Profil vérifié</div>
   </div>
+</header>
 
-  <!-- ══ CONTENT ═════════════════════════════ -->
-  <div class="pf-wrap" id="pf-content" style="display:none">
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-ticker">LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · LEADWASE · DIGITAL IDENTITY · PROFESSIONAL NETWORK · </div>
+  <div class="cover-line"></div>
+</div>
 
-    <!-- Identity -->
-    <div class="pf-identity a1">
-      <div class="pf-av-wrap">
-        <div class="pf-av" id="pf-av">?</div>
-        <div class="pf-plan-tag" id="pf-plan">FREE</div>
-      </div>
-      <div class="pf-info">
-        <div class="pf-name" id="pf-name">–</div>
-        <div class="pf-job"  id="pf-job">–</div>
-        <div class="pf-co"   id="pf-co"></div>
-      </div>
+<div class="pf-wrap" id="pf-loading">
+  <div style="margin-top:60px">
+    <div class="loader-ring"></div>
+    <p style="color:#aaa;font-style:italic;font-size:13px">Chargement du profil...</p>
+  </div>
+</div>
+
+<div class="pf-wrap" id="pf-content" style="display:none">
+
+  <div class="pf-identity a1">
+    <div class="pf-av-wrap">
+      <div class="pf-av" id="pf-av">?</div>
+      <div class="pf-plan-tag" id="pf-plan">FREE</div>
     </div>
-
-    <!-- Bio -->
-    <div class="pf-bio a2" id="pf-bio" style="display:none"></div>
-
-    <div class="pf-divider"></div>
-
-    <!-- vCard -->
-    <div class="a3">
-      <button class="vcf-btn" id="vcf-btn">
-        <div class="shimmer"></div>
-        <span>📲</span>
-        Enregistrer le contact
-      </button>
-    </div>
-
-    <!-- Contact tiles -->
-    <div class="contact-grid a4">
-      <a class="c-tile" id="tile-phone" href="#">
-        <div class="c-tile-icon">📞</div>
-        <div style="min-width:0"><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div>
-      </a>
-      <a class="c-tile" id="tile-email" href="#">
-        <div class="c-tile-icon">✉️</div>
-        <div style="min-width:0"><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div>
-      </a>
-      <a class="c-tile" id="tile-co">
-        <div class="c-tile-icon">🏢</div>
-        <div style="min-width:0"><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div>
-      </a>
-      <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none">
-        <div class="c-tile-icon">🌐</div>
-        <div style="min-width:0"><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div>
-      </a>
-    </div>
-
-    <!-- Social links -->
-    <div id="pf-socials-wrap" style="display:none" class="a5">
-      <div class="sec-label">Réseaux sociaux</div>
-      <div class="social-links" id="pf-socials"></div>
-    </div>
-
-    <!-- Footer -->
-    <div class="pf-footer a5">
-      <p>Profil créé avec</p>
-      <a href="/">Lead<span>Wase</span> — Créez le vôtre</a>
+    <div class="pf-info">
+      <div class="pf-name" id="pf-name">–</div>
+      <div class="pf-job" id="pf-job">–</div>
+      <div class="pf-co" id="pf-co"></div>
     </div>
   </div>
 
-  <!-- ══ ERROR ════════════════════════════════ -->
-  <div class="pf-wrap" id="pf-error" style="display:none">
-    <div style="margin-top:60px">
-      <div style="font-size:48px;margin-bottom:16px">😕</div>
-      <h2 style="font-size:22px;font-weight:bold;color:#111;margin-bottom:10px">Profil introuvable</h2>
-      <p style="color:#888;font-style:italic;margin-bottom:24px">Ce profil n'existe pas ou a été supprimé.</p>
-      <a href="/" style="display:inline-block;padding:12px 28px;background:#111;color:#fff;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-radius:4px;text-decoration:none">Retour à l'accueil</a>
+  <div class="pf-bio a2" id="pf-bio" style="display:none"></div>
+  <div class="pf-location a2" id="pf-location" style="display:none">
+    <span class="pf-location-icon">📍</span>
+    <span id="pf-location-text"></span>
+  </div>
+
+  <div class="pf-divider"></div>
+
+  <div class="a3">
+    <button class="vcf-btn" id="vcf-btn">
+      <div class="shimmer"></div>
+      <span>📲</span>
+      Enregistrer le contact
+    </button>
+  </div>
+
+  <div class="contact-grid a4">
+    <a class="c-tile" id="tile-phone" href="#">
+      <div class="c-tile-icon">📞</div>
+      <div><div class="c-tile-label">Téléphone</div><div class="c-tile-val" id="pf-phone">–</div></div>
+    </a>
+    <a class="c-tile" id="tile-email" href="#">
+      <div class="c-tile-icon">✉️</div>
+      <div><div class="c-tile-label">Email</div><div class="c-tile-val" id="pf-email">–</div></div>
+    </a>
+    <a class="c-tile" id="tile-co" href="#" style="cursor:default">
+      <div class="c-tile-icon">🏢</div>
+      <div><div class="c-tile-label">Entreprise</div><div class="c-tile-val" id="pf-co2">–</div></div>
+    </a>
+    <a class="c-tile" id="tile-web" href="#" target="_blank" style="display:none">
+      <div class="c-tile-icon">🌐</div>
+      <div><div class="c-tile-label">Site web</div><div class="c-tile-val" id="pf-web">–</div></div>
+    </a>
+  </div>
+
+  <div id="pf-socials-wrap" style="display:none" class="a5">
+    <div class="sec-label">Réseaux sociaux</div>
+    <div class="social-links" id="pf-socials"></div>
+  </div>
+
+  <div id="pf-extra-links-wrap" style="display:none" class="a5">
+    <div class="sec-label">Liens supplémentaires</div>
+    <div class="social-links" id="pf-extra-links"></div>
+  </div>
+
+  <div id="pf-appointment-wrap" style="display:none" class="a5">
+    <a class="appointment-btn" id="appointment-link" href="#" target="_blank">📅 Prendre rendez-vous</a>
+  </div>
+
+  <div id="pf-google-review-wrap" style="display:none" class="a5">
+    <a class="google-reviews" id="google-review-link" href="#" target="_blank">
+      <span class="google-reviews-stars">★★★★★</span>
+      <span class="google-reviews-text">Voir nos avis sur Google →</span>
+    </a>
+  </div>
+
+  <div id="pf-contact-form-wrap" style="display:none" class="a5">
+    <div class="contact-form-preview">
+      <h4>📨 Formulaire de contact</h4>
+      <div class="contact-form-message" id="contact-form-message"></div>
+      <a class="contact-form-btn" id="contact-form-link" href="#">Envoyer un message</a>
     </div>
   </div>
+
+  <div class="pf-footer a6">
+    <p>Profil créé avec</p>
+    <a href="/">Lead<span>Wase</span> — Créez le vôtre</a>
+  </div>
+</div>
+
+<div class="pf-wrap" id="pf-error" style="display:none">
+  <div style="margin-top:60px">
+    <div style="font-size:48px;margin-bottom:16px">😕</div>
+    <h2 style="font-size:22px;font-weight:bold;color:#111;margin-bottom:10px">Profil introuvable</h2>
+    <p style="color:#888;font-style:italic;margin-bottom:24px">Ce profil n'existe pas ou a été supprimé.</p>
+    <a href="/" style="display:inline-block;padding:12px 28px;background:#111;color:#fff;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-radius:4px;text-decoration:none">Retour à l'accueil</a>
+  </div>
+</div>
 
 <script type="module">
 import { db } from './js/firebase-config.js';
@@ -349,77 +395,138 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-
 const id = new URLSearchParams(window.location.search).get('id');
 if (!id) showErr(); else load(id.toUpperCase());
 
-async function load(id) {
+async function load(leadwaseId) {
   try {
-    const snap = await getDoc(doc(db, 'profiles', id));
+    const snap = await getDoc(doc(db, 'profiles', leadwaseId));
     if (!snap.exists()) { showErr(); return; }
 
-    const p   = snap.data();
+    const p = snap.data();
     const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
+    const isPro = ['pro', 'business'].includes(p.plan);
 
-    document.title = (p.firstName || '') + ' ' + (p.lastName || '') + ' — LeadWase';
+    document.title = `${p.firstName || ''} ${p.lastName || ''} — LeadWase`;
 
-    document.getElementById('pf-av').textContent    = ini;
-    document.getElementById('pf-plan').textContent  = (p.plan || 'free').toUpperCase();
-    document.getElementById('pf-name').textContent  = (p.firstName || '') + ' ' + (p.lastName || '');
-    document.getElementById('pf-job').textContent   = p.jobTitle || '';
-    document.getElementById('pf-co').textContent    = p.company  || '';
-    document.getElementById('pf-co2').textContent   = p.company  || '–';
-    document.getElementById('pf-phone').textContent = p.phone    || '–';
-    document.getElementById('pf-email').textContent = p.email    || '–';
+    // Infos de base
+    document.getElementById('pf-av').textContent = ini;
+    document.getElementById('pf-plan').textContent = (p.plan || 'free').toUpperCase();
+    document.getElementById('pf-name').textContent = `${p.firstName || ''} ${p.lastName || ''}`.trim() || '–';
+    document.getElementById('pf-job').textContent = p.jobTitle || '';
+    document.getElementById('pf-co').textContent = p.company || '';
+    document.getElementById('pf-co2').textContent = p.company || '–';
+    document.getElementById('pf-phone').textContent = p.phone || '–';
+    document.getElementById('pf-email').textContent = p.email || '–';
 
-    if (p.bio) {
+    // Téléphone et email cliquables
+    if (p.phone) document.getElementById('tile-phone').href = `tel:${p.phone}`;
+    if (p.email) document.getElementById('tile-email').href = `mailto:${p.email}`;
+
+    // Bio
+    if (p.bio && p.bio.trim()) {
       const bioEl = document.getElementById('pf-bio');
-      bioEl.textContent   = p.bio;
+      bioEl.textContent = p.bio;
       bioEl.style.display = 'block';
     }
 
-    document.getElementById('tile-phone').href = p.phone ? 'tel:' + p.phone : '#';
-    document.getElementById('tile-email').href = p.email ? 'mailto:' + p.email : '#';
-
-    if (p.website) {
-      const tw = document.getElementById('tile-web');
-      tw.style.display = 'flex';
-      tw.href = p.website;
-      document.getElementById('pf-web').textContent = p.website.replace(/https?:\/\//, '');
+    // Localisation
+    if (p.location && p.location.trim()) {
+      const locEl = document.getElementById('pf-location');
+      document.getElementById('pf-location-text').textContent = p.location;
+      locEl.style.display = 'flex';
     }
 
-    if (p.plan !== 'free') {
+    // Site web
+    if (p.website && p.website.trim()) {
+      const webTile = document.getElementById('tile-web');
+      webTile.style.display = 'flex';
+      webTile.href = p.website.startsWith('http') ? p.website : `https://${p.website}`;
+      document.getElementById('pf-web').textContent = p.website.replace(/^https?:\/\//, '');
+    }
+
+    // Réseaux sociaux (uniquement pour Pro/Business)
+    if (isPro) {
       const socials = [
-        { k: 'linkedin',  i: '💼', l: 'LinkedIn'  },
-        { k: 'instagram', i: '📷', l: 'Instagram' },
-        { k: 'twitter',   i: '🐦', l: 'Twitter/X' },
-        { k: 'facebook',  i: '📘', l: 'Facebook'  },
+        { key: 'linkedin', icon: '💼', name: 'LinkedIn' },
+        { key: 'instagram', icon: '📷', name: 'Instagram' },
+        { key: 'tiktok', icon: '🎵', name: 'TikTok' },
+        { key: 'facebook', icon: '📘', name: 'Facebook' },
+        { key: 'youtube', icon: '📺', name: 'YouTube' },
+        { key: 'twitter', icon: '🐦', name: 'Twitter/X' }
       ];
-      const box = document.getElementById('pf-socials');
-      let has = false;
+      
+      const socialBox = document.getElementById('pf-socials');
+      socialBox.innerHTML = '';
+      let hasSocial = false;
+      
       socials.forEach(s => {
-        if (p[s.k]) {
-          has = true;
-          box.insertAdjacentHTML('beforeend',
-            `<a class="social-btn" href="${p[s.k]}" target="_blank">${s.i} ${s.l}</a>`);
+        if (p[s.key] && p[s.key].trim()) {
+          hasSocial = true;
+          const link = p[s.key].startsWith('http') ? p[s.key] : `https://${p[s.key]}`;
+          socialBox.insertAdjacentHTML('beforeend', 
+            `<a class="social-btn" href="${link}" target="_blank" rel="noopener noreferrer">${s.icon} ${s.name}</a>`
+          );
         }
       });
-      if (has) document.getElementById('pf-socials-wrap').style.display = 'block';
+      
+      if (hasSocial) document.getElementById('pf-socials-wrap').style.display = 'block';
+      
+      // WhatsApp (si présent)
+      if (p.whatsapp && p.whatsapp.trim()) {
+        const waLink = p.whatsapp.startsWith('http') ? p.whatsapp : `https://wa.me/${p.whatsapp.replace(/[^0-9]/g, '')}`;
+        const extraBox = document.getElementById('pf-extra-links');
+        extraBox.insertAdjacentHTML('beforeend',
+          `<a class="social-btn" href="${waLink}" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>`
+        );
+        document.getElementById('pf-extra-links-wrap').style.display = 'block';
+      }
+      
+      // Rendez-vous
+      if (p.rdvLink && p.rdvLink.trim()) {
+        const rdvBtn = document.getElementById('appointment-link');
+        rdvBtn.href = p.rdvLink.startsWith('http') ? p.rdvLink : `https://${p.rdvLink}`;
+        rdvBtn.textContent = p.rdvLabel || '📅 Prendre rendez-vous';
+        document.getElementById('pf-appointment-wrap').style.display = 'block';
+      }
+      
+      // Avis Google
+      if (p.googleReview && p.googleReview.trim()) {
+        const reviewLink = document.getElementById('google-review-link');
+        reviewLink.href = p.googleReview.startsWith('http') ? p.googleReview : `https://${p.googleReview}`;
+        document.getElementById('pf-google-review-wrap').style.display = 'block';
+      }
+      
+      // Formulaire de contact
+      if (p.contactActive && p.contactEmail) {
+        const contactMsg = document.getElementById('contact-form-message');
+        const contactLink = document.getElementById('contact-form-link');
+        contactMsg.textContent = p.contactMessage || 'Contactez-moi directement par email';
+        contactLink.href = `mailto:${p.contactEmail}?subject=Contact depuis votre profil LeadWase&body=${encodeURIComponent(p.contactMessage || 'Bonjour,')}`;
+        document.getElementById('pf-contact-form-wrap').style.display = 'block';
+      }
     }
 
+    // Gestion du fichier vCard
     document.getElementById('vcf-btn').onclick = () => {
       const vcard = [
         'BEGIN:VCARD',
         'VERSION:3.0',
-        'FN:'    + (p.firstName || '') + ' ' + (p.lastName || ''),
-        'TITLE:' + (p.jobTitle  || ''),
-        'ORG:'   + (p.company   || ''),
-        'TEL;TYPE=CELL:' + (p.phone   || ''),
-        'EMAIL:' + (p.email   || ''),
-        'URL:'   + (p.website || ''),
-        'NOTE:LeadWase — leadwase.com/profil/' + id,
-        'END:VCARD',
+        `FN:${p.firstName || ''} ${p.lastName || ''}`,
+        `TITLE:${p.jobTitle || ''}`,
+        `ORG:${p.company || ''}`,
+        `TEL;TYPE=CELL:${p.phone || ''}`,
+        `EMAIL:${p.email || ''}`,
+        `URL:${p.website || ''}`,
+        `ADR:${p.location || ''}`,
+        `NOTE:Profil LeadWase - leadwase.com/profil/${leadwaseId}`,
+        'END:VCARD'
       ].join('\n');
+      
+      const blob = new Blob([vcard], { type: 'text/vcard' });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href     = URL.createObjectURL(new Blob([vcard], { type: 'text/vcard' }));
-      a.download = (p.firstName || 'contact') + '_' + (p.lastName || '') + '.vcf';
+      a.href = url;
+      a.download = `${p.firstName || 'contact'}_${p.lastName || ''}.vcf`;
       a.click();
+      URL.revokeObjectURL(url);
     };
 
     document.getElementById('pf-loading').style.display = 'none';
@@ -433,7 +540,7 @@ async function load(id) {
 
 function showErr() {
   document.getElementById('pf-loading').style.display = 'none';
-  document.getElementById('pf-error').style.display   = 'block';
+  document.getElementById('pf-error').style.display = 'block';
 }
 </script>
 </body>
