@@ -138,7 +138,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 }
 
 /* ══════════════════════════════════════════════
-   ANALYTICS STYLE - IDENTIQUE DASHBOARD
+   ANALYTICS STYLE
 ══════════════════════════════════════════════ */
 .analytics-header {
   display: flex;
@@ -176,7 +176,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   border-color: var(--black);
 }
 
-/* Stats cards - comme dashboard */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -224,7 +223,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 }
 .stat-sub.up { color: var(--green); }
 
-/* Cards */
 .card {
   background: var(--white);
   border: 1px solid var(--gray5);
@@ -244,7 +242,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 }
 .card-title i { font-style: normal; margin-right: 6px; }
 
-/* Chart */
 .chart-container {
   padding: 24px;
 }
@@ -297,7 +294,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   text-align: center;
 }
 
-/* Two columns */
 .two-col-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -311,7 +307,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .section-box .card-head { border-bottom: 1px solid var(--gray5); }
 .section-body { padding: 20px 24px; }
 
-/* Source rows */
 .source-row {
   display: flex;
   align-items: center;
@@ -341,7 +336,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   font-size: 13px;
 }
 
-/* Visit rows */
 .visit-row {
   display: flex;
   align-items: center;
@@ -361,7 +355,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   font-weight: bold;
 }
 
-/* Access denied */
 #access-denied {
   position: fixed;
   inset: 0;
@@ -419,7 +412,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   font-size: 13px;
 }
 
-/* Responsive */
 @media (max-width: 800px) {
   .topbar { display: flex; }
   .sidebar { transform: translateX(-100%); top: 52px; }
@@ -571,6 +563,7 @@ onAuthStateChanged(auth, async user => {
     const profileResult = await findProfileByFirebaseUid(user.uid);
     
     if (!profileResult) {
+      console.error('Aucun profil trouvé pour cet utilisateur');
       window.location.href = '/dashboard.html';
       return;
     }
@@ -579,12 +572,26 @@ onAuthStateChanged(auth, async user => {
     lwId = profileResult.id;
     const userPlan = profile.plan || 'free';
     
+    console.log('Profil trouvé:', lwId, 'Plan:', userPlan);
+    
     if (!['pro', 'business'].includes(userPlan)) {
       accessDenied.style.display = 'flex';
+      loader.style.display = 'none';
       return;
     }
     
-    document.getElementById('sb-av').textContent = (profile.firstName || '?')[0];
+    // Mise à jour de la sidebar avec la photo de profil si disponible
+    const avatarDiv = document.getElementById('sb-av');
+    if (profile.photoURL) {
+      avatarDiv.style.backgroundImage = `url(${profile.photoURL})`;
+      avatarDiv.style.backgroundSize = 'cover';
+      avatarDiv.style.backgroundPosition = 'center';
+      avatarDiv.textContent = '';
+    } else {
+      avatarDiv.textContent = (profile.firstName || '?')[0];
+      avatarDiv.style.backgroundImage = '';
+    }
+    
     document.getElementById('sb-name').textContent = `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Utilisateur';
     document.getElementById('sb-plan').textContent = userPlan.toUpperCase();
     document.getElementById('sb-pub').href = `profil.html?id=${lwId}`;
@@ -619,31 +626,39 @@ async function loadAnalytics(days) {
 
   try {
     const visitsRef = collection(db, 'analytics', lwId, 'visits');
-    const visitsQ = query(visitsRef, where('visitedAt', '>=', sinceTs), limit(500));
+    const visitsQ = query(visitsRef, where('visitedAt', '>=', sinceTs), orderBy('visitedAt', 'desc'), limit(500));
     const visitsSnap = await getDocs(visitsQ);
-    const visits = visitsSnap.docs.map(d => d.data());
-
+    const visits = visitsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    console.log(`Nombre de visites récupérées: ${visits.length}`);
+    
+    // Statistiques totales
     const total = visits.length;
-    const unique = new Set(visits.map(v => v.visitorId || v.ip || 'unknown')).size;
-    const contacts = visits.filter(v => v.type === 'contact_click').length;
-    const shares = visits.filter(v => v.type === 'share').length;
-
+    const uniqueVisitors = new Set(visits.map(v => v.visitorId || v.ip || 'unknown')).size;
+    
+    // Types d'événements
+    const contacts = visits.filter(v => v.type && (v.type === 'click_phone' || v.type === 'click_email' || v.type === 'contact_click')).length;
+    const shares = visits.filter(v => v.type === 'vcard_download' || v.type === 'share').length;
+    const profileViews = visits.filter(v => v.type === 'profile_view').length;
+    
+    console.log(`Stats: total=${total}, uniques=${uniqueVisitors}, contacts=${contacts}, shares=${shares}`);
+    
     document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-unique').textContent = unique;
+    document.getElementById('stat-unique').textContent = uniqueVisitors;
     document.getElementById('stat-contacts').textContent = contacts;
     document.getElementById('stat-shares').textContent = shares;
 
     document.getElementById('stat-total-sub').textContent = total > 0 ? `sur ${days} jours` : 'aucune visite';
-    document.getElementById('stat-unique-sub').textContent = unique > 0 ? 'visiteurs distincts' : '';
-    document.getElementById('stat-contacts-sub').textContent = contacts > 0 ? 'clics sur contact' : '';
-    document.getElementById('stat-shares-sub').textContent = shares > 0 ? 'partages' : '';
+    document.getElementById('stat-unique-sub').textContent = uniqueVisitors > 0 ? 'visiteurs distincts' : '';
+    document.getElementById('stat-contacts-sub').textContent = contacts > 0 ? 'interactions contact' : '';
+    document.getElementById('stat-shares-sub').textContent = shares > 0 ? 'téléchargements/partages' : '';
 
     buildChart(visits, days);
     buildSources(visits);
-    buildRecentVisits(visits.slice(0, 10));
+    buildRecentVisits(visits.slice(0, 15));
 
   } catch(e) {
-    console.error('Erreur analytics:', e);
+    console.error('Erreur chargement analytics:', e);
     ['stat-total','stat-unique','stat-contacts','stat-shares'].forEach(id =>
       document.getElementById(id).textContent = '0');
     buildChart([], days);
@@ -694,9 +709,16 @@ function buildChart(visits, days) {
 function buildSources(visits) {
   const map = {};
   visits.forEach(v => {
-    const src = v.source || 'Direct';
+    let src = v.source || 'Direct';
+    if (src === '') src = 'Direct';
+    if (src.includes('google')) src = 'Google';
+    if (src.includes('facebook')) src = 'Facebook';
+    if (src.includes('linkedin')) src = 'LinkedIn';
+    if (src.includes('twitter')) src = 'Twitter';
+    if (src.includes('instagram')) src = 'Instagram';
     map[src] = (map[src] || 0) + 1;
   });
+  
   const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const max = sorted[0]?.[1] || 1;
   const el = document.getElementById('sources-list');
@@ -725,12 +747,23 @@ function buildRecentVisits(visits) {
   el.innerHTML = visits.map(v => {
     const d = v.visitedAt?.toDate ? v.visitedAt.toDate() : new Date(v.visitedAt);
     const lbl = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-    const country = v.country || 'Inconnu';
-    const device = v.device || 'Web';
+    let country = v.country || 'Inconnu';
+    let device = v.device || 'Web';
+    let typeLabel = '';
+    
+    if (v.type === 'profile_view') typeLabel = '👁️ Vue';
+    else if (v.type === 'click_phone') typeLabel = '📞 Téléphone';
+    else if (v.type === 'click_email') typeLabel = '✉️ Email';
+    else if (v.type === 'click_website') typeLabel = '🌐 Site web';
+    else if (v.type === 'click_social') typeLabel = '📱 Réseau social';
+    else if (v.type === 'vcard_download') typeLabel = '📇 VCard';
+    else if (v.type && v.type.startsWith('click_')) typeLabel = '🔗 Clic';
+    else typeLabel = '👁️ Vue';
+    
     const source = v.source || 'Direct';
     return `
       <div class="visit-row">
-        <span>${country} — ${device}</span>
+        <span>${country} — ${device}<br><small style="color:var(--gray4)">${typeLabel}</small></span>
         <span class="visit-src">${source}</span>
         <span class="visit-date">${lbl}</span>
       </div>
