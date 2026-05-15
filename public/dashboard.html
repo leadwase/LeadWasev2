@@ -772,23 +772,28 @@ onAuthStateChanged(auth, async user => {
 
 window.saveProfile = async () => {
   try {
-    if (!lwId) {
-      throw new Error("lwId est null ou undefined");
-    }
+    if (!lwId) throw new Error("lwId manquant");
 
-    const { updateDoc, doc: fbDoc } = await import(
-      "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
-    );
+    // 🔥 Récupérer l'utilisateur connecté
+    const user = auth.currentUser;
+    console.log('user.uid:', user.uid);
+    
+    // 🔥 Récupérer le document profil pour voir firebaseUid
+    const { doc: fbDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+    const profileSnap = await getDoc(fbDoc(db, 'profiles', lwId));
+    console.log('firebaseUid dans le document:', profileSnap.data()?.firebaseUid);
+    console.log('Est-ce que ça match?', profileSnap.data()?.firebaseUid === user.uid);
 
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
     const payload = {
       firstName: document.getElementById('e-first').value.trim(),
-      lastName:  document.getElementById('e-last').value.trim(),
-      jobTitle:  document.getElementById('e-job').value.trim(),
-      company:   document.getElementById('e-co').value.trim(),
-      phone:     document.getElementById('e-phone').value.trim(),
-      email:     document.getElementById('e-email').value.trim(),
-      website:   document.getElementById('e-web').value.trim(),
-      bio:       document.getElementById('e-bio').value.trim(),
+      lastName: document.getElementById('e-last').value.trim(),
+      jobTitle: document.getElementById('e-job').value.trim(),
+      company: document.getElementById('e-co').value.trim(),
+      phone: document.getElementById('e-phone').value.trim(),
+      email: document.getElementById('e-email').value.trim(),
+      website: document.getElementById('e-web').value.trim(),
+      bio: document.getElementById('e-bio').value.trim(),
       updatedAt: new Date(),
     };
 
@@ -796,6 +801,7 @@ window.saveProfile = async () => {
     await updateDoc(ref, payload);
     toast('Profil mis à jour !', 'success');
   } catch (e) {
+    console.error('Erreur complète:', e);
     toast('Erreur : ' + e.message, 'error');
   }
 };
