@@ -458,19 +458,14 @@ function displayAvatar(p) {
   const avText = document.getElementById('pf-av-text');
   const avImg = document.getElementById('pf-av-img');
   const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
-  
-  // Vérifier si une photo de profil existe (pour Pro/Business)
+  const photoBase64 = p.photoURL || null;
   const isPro = ['pro', 'business'].includes(p.plan);
-  const photoUrl = p.photoURL || p.profileImage || null;
   
-  if (isPro && photoUrl && photoUrl.trim()) {
-    // Afficher l'image
+  if (isPro && photoBase64 && photoBase64.startsWith('data:image')) {
     avText.style.display = 'none';
     avImg.style.display = 'block';
-    avImg.src = photoUrl;
-    avImg.alt = `${p.firstName || ''} ${p.lastName || ''}`;
+    avImg.src = photoBase64;
   } else {
-    // Afficher les initiales
     avText.style.display = 'flex';
     avImg.style.display = 'none';
     avText.textContent = ini;
