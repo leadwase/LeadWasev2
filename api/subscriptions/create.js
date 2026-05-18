@@ -22,8 +22,12 @@ export default async function handler(req, res) {
   try {
     const user   = await verifyToken(req);
     const { plan } = req.body;
-    const prices = { pro: 2999, business: 50 };
+    //const prices = { pro: 2999, business: 50 };
+    // const amount = prices[plan];
+    const { getPrices } = await import('../lib/getPrices.js');
+    const prices = await getPrices();
     const amount = prices[plan];
+   
     if (!amount) return res.status(400).json({ error: 'Plan invalide' });
 
     const subRef = await db.collection('subscriptions').add({
