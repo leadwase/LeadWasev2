@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore }                  from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
 import { notifyAdminNewOrder, notifyAdminB2BRequest, notifyClientPaymentSuccess } from '../brevo.js';
+import { getPrices } from '../lib/getPrices.js'; // ✅ Déplacé en haut
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -11,15 +12,21 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-// Plus besoin de vérifier le token — les commandes sont ouvertes sans connexion
-// async function verifyToken(req) { ... }
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
+  
   try {
     const { cardType, firstName, lastName, jobTitle, company, phone, email, address, quantity, description } = req.body;
 
-    // ── Commande B2B — enregistrement + email admin ────────────────
+    // Validation des données requises
+    if (!cardType || !firstName || !email) {
+      return res.status(400).json({ 
+        error: 'Champs requis manquants',
+        required: ['cardType', 'firstName', 'email']
+      });
+    }
+
+    // ── Commande B2B ────────────────────────────────
     if (cardType === 'b2b') {
       const orderRef = await db.collection('orders').add({
         cardType:    'b2b',
@@ -29,12 +36,11 @@ export default async function handler(req, res) {
         email,
         quantity:    quantity || '',
         description: description || '',
-        status:      'b2b_pending',   // statut distinct pour l'onglet B2B dans le dashboard
+        status:      'b2b_pending',
         amount:      null,
         createdAt:   new Date(),
       });
 
-      // Notif email admin — demande B2B
       await notifyAdminB2BRequest({
         orderId:     orderRef.id,
         company,
@@ -48,15 +54,25 @@ export default async function handler(req, res) {
       return res.json({ success: true, orderId: orderRef.id, type: 'b2b' });
     }
 
-    // ── Commande Classique ─────────────────────────────────────────
-    //const amount   = 25000;
-    import { getPrices } from '../lib/getPrices.js';
-    // ... dans le handler :
-    const prices = await getPrices();
+    // ── Commande Classique ──────────────────────────
+    let prices;
+    try {
+      prices = await getPrices();
+    } catch (priceError) {
+      console.error('Erreur getPrices:', priceError);
+      return res.status(500).json({ 
+        error: 'Erreur lors de la récupération des prix',
+        detail: priceError.message 
+      });
+    }
+
     const amount = prices.classic;
     
+    if (!amount) {
+      return res.status(500).json({ error: 'Prix non défini' });
+    }
+
     const orderRef = await db.collection('orders').add({
-      // uid: user.uid,  // plus de uid — commande sans connexion obligatoire
       cardType, firstName, lastName, jobTitle, company, phone, email, address,
       amount,
       status:    'pending',
@@ -64,7 +80,6 @@ export default async function handler(req, res) {
     });
 
     const payRef = await db.collection('payments').add({
-      // uid: user.uid,  // plus de uid — commande sans connexion obligatoire
       orderId:   orderRef.id,
       amount,
       status:    'pending',
@@ -73,36 +88,58 @@ export default async function handler(req, res) {
 
     const GW_URL = 'https://paymentgateway.lfdweb.com';
     const SITE   = process.env.SITE_URL || 'https://leadwase.com';
-    const gRes   = await fetch(`${GW_URL}/api/gateway/generate-link`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.GATEWAY_API_KEY },
-      body: JSON.stringify({
-        amount, country: 'bj',
-        description: `Carte LeadWase — ${firstName} ${lastName}`,
-        origin: SITE, sendWebhook: true,
-        metadata: {
-          transactionId: payRef.id,
-          orderId:       orderRef.id,
-          // uid: user.uid,  // plus de uid
-          origin:        SITE,
-          sendWebhook:   true,
+    
+    let gRes;
+    try {
+      gRes = await fetch(`${GW_URL}/api/gateway/generate-link`, {
+        method:  'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'x-api-key': process.env.GATEWAY_API_KEY 
         },
-      }),
-    });
+        body: JSON.stringify({
+          amount, 
+          country: 'bj',
+          description: `Carte LeadWase — ${firstName} ${lastName}`,
+          origin: SITE, 
+          sendWebhook: true,
+          metadata: {
+            transactionId: payRef.id,
+            orderId:       orderRef.id,
+            origin:        SITE,
+            sendWebhook:   true,
+          },
+        }),
+      });
+    } catch (fetchError) {
+      console.error('Erreur fetch gateway:', fetchError);
+      await orderRef.update({ 
+        status: 'gateway_error', 
+        gatewayResponse: fetchError.message 
+      });
+      return res.status(502).json({ 
+        error: 'Impossible de contacter la passerelle de paiement',
+        detail: fetchError.message 
+      });
+    }
 
-    // Log du statut HTTP brut pour détecter les erreurs 4xx/5xx de la gateway
     console.log('[gateway http status]', gRes.status);
 
     const gRaw = await gRes.text();
     console.log('[gateway response raw]', gRaw);
 
     let gData;
-    try { gData = JSON.parse(gRaw); }
-    catch { gData = { raw: gRaw }; }
+    try { 
+      gData = JSON.parse(gRaw); 
+    } catch { 
+      gData = { raw: gRaw }; 
+    }
 
-    // Vérifier que la gateway a bien renvoyé pid et url avant tout update()
     if (!gRes.ok || !gData.pid || !gData.url) {
-      await orderRef.update({ status: 'gateway_error', gatewayResponse: gRaw.slice(0, 500) });
+      await orderRef.update({ 
+        status: 'gateway_error', 
+        gatewayResponse: gRaw.slice(0, 500) 
+      });
       return res.status(502).json({
         error: `Gateway ${gRes.status} — ${gData.message || gData.error || 'réponse invalide'}`,
         detail: gData,
@@ -111,7 +148,20 @@ export default async function handler(req, res) {
 
     await payRef.update({ pid: gData.pid, payUrl: gData.url });
     await orderRef.update({ paymentId: payRef.id, pid: gData.pid });
-    res.json({ success: true, orderId: orderRef.id, payUrl: gData.url });
+    
+    return res.json({ success: true, orderId: orderRef.id, payUrl: gData.url });
 
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    // Log complet pour le débogage
+    console.error('❌ Erreur complète:', {
+      message: e.message,
+      stack: e.stack,
+      body: req.body
+    });
+    
+    return res.status(500).json({ 
+      error: 'Erreur serveur interne',
+      message: e.message 
+    });
+  }
 }
