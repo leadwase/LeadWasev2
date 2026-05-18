@@ -102,7 +102,6 @@ export default async function handler(req, res) {
       return res.json({ success: true, subscriptions });
     }
 
-    // ════════════════════════════════════════════
 // ════════════════════════════════════════════
 // GET ?route=credentials
 // ════════════════════════════════════════════
@@ -149,68 +148,55 @@ if (route === 'credentials' && req.method === 'GET') {
   return res.status(200).json({ success: true, credentials });
 }
 
-// ════════════════════════════════════════════
-// GET ?route=b2b
-// ════════════════════════════════════════════
-if (route === 'b2b' && req.method === 'GET') {
-  await verifyAdmin(req);
-  // Sans orderBy pour éviter le besoin d'index composite Firestore
-  const snap = await db.collection('orders')
-    .where('cardType', '==', 'b2b')
-    .get();
-  const orders = snap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .sort((a, b) => {
-      const ta = a.createdAt?._seconds || 0;
-      const tb = b.createdAt?._seconds || 0;
-      return tb - ta;
-    });
-  return res.json({ success: true, orders });
-}
+    // ════════════════════════════════════════════
+    // GET b2b
+    // ════════════════════════════════════════════
+    if (route === 'b2b' && req.method === 'GET') {
+      const snap = await db.collection('orders')
+        .where('cardType', '==', 'b2b')
+        .orderBy('createdAt', 'desc').limit(200).get();
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      return res.json({ success: true, orders });
+    }
 
     // ════════════════════════════════════════════
     // GET stats
     // ════════════════════════════════════════════
-// GET stats
-if (route === 'stats' && req.method === 'GET') {
-  const now   = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (route === 'stats' && req.method === 'GET') {
+      const now   = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  // 👇 IMPORTANT : Utilisez les paiements, pas les commandes !
-  const [ordersSnap, paymentsSnap, subsSnap, profilesSnap] = await Promise.all([
-    db.collection('orders').orderBy('createdAt', 'desc').limit(500).get(),
-    db.collection('payments').where('status', '==', 'success').get(),  // ✅ Comme l'ancien code
-    db.collection('subscriptions').get(),
-    db.collection('profiles').get(),
-  ]);
+      const [ordersSnap, subsSnap, profilesSnap] = await Promise.all([
+        db.collection('orders').orderBy('createdAt', 'desc').limit(500).get(),
+        db.collection('subscriptions').get(),
+        db.collection('profiles').get(),
+      ]);
 
-  const orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  
-  // 👇 Calculez les revenus à partir des paiements, PAS des commandes
-  const totalRevenue = paymentsSnap.docs.reduce((sum, doc) => {
-    return sum + (doc.data().amount || 0);
-  }, 0);
-  
-  const thisMonthOrders = orders.filter(o => {
-    const d = o.createdAt?._seconds ? new Date(o.createdAt._seconds*1000) : new Date(o.createdAt);
-    return d >= start;
-  });
-  
-  const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'paid');
+      const orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const subs   = subsSnap.docs.map(d => d.data());
 
-  return res.json({
-    success: true,
-    stats: {
-      totalOrders: thisMonthOrders.length,
-      totalRevenue: totalRevenue,  // ✅ Maintenant c'est le vrai montant !
-      activeSubscriptions: subsSnap.docs.filter(d => d.data().status === 'active').length,
-      pendingOrders: pendingOrders.length,
-      freeProfiles: profilesSnap.size,
-      proPlan: subsSnap.docs.filter(s => s.data().plan === 'pro' && s.data().status === 'active').length,
-      businessPlan: subsSnap.docs.filter(s => s.data().plan === 'business' && s.data().status === 'active').length,
-    },
-  });
-}
+      const thisMonth   = orders.filter(o => {
+        const d = o.createdAt?._seconds ? new Date(o.createdAt._seconds*1000) : new Date(o.createdAt);
+        return d >= start;
+      });
+      const paid        = orders.filter(o => o.status === 'paid' || o.status === 'delivered');
+      const totalRevenue= paid.reduce((s,o) => s + (o.amount||0), 0);
+      const pending     = orders.filter(o => o.status === 'pending');
+      const activeSubs  = subs.filter(s => s.status === 'active');
+
+      return res.json({
+        success: true,
+        stats: {
+          totalOrders:         thisMonth.length,
+          totalRevenue,
+          activeSubscriptions: activeSubs.length,
+          pendingOrders:       pending.length,
+          freeProfiles:        profilesSnap.size,
+          proPlan:             activeSubs.filter(s => s.plan === 'pro').length,
+          businessPlan:        activeSubs.filter(s => s.plan === 'business').length,
+        },
+      });
+    }
 
     // ════════════════════════════════════════════
     // GET settings-prices
