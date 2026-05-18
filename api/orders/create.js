@@ -49,7 +49,12 @@ export default async function handler(req, res) {
     }
 
     // ── Commande Classique ─────────────────────────────────────────
-    const amount   = 25000;
+    //const amount   = 25000;
+    import { getPrices } from '../lib/getPrices.js';
+    // ... dans le handler :
+    const prices = await getPrices();
+    const amount = prices.classic;
+    
     const orderRef = await db.collection('orders').add({
       // uid: user.uid,  // plus de uid — commande sans connexion obligatoire
       cardType, firstName, lastName, jobTitle, company, phone, email, address,
