@@ -152,28 +152,53 @@ export default async function handler(req, res) {
 
     // ════════════════════════════════════════════
     // GET stats
+    // ✅ CORRIGÉ : les revenus sont lus depuis la collection `payments`
+    //    (statut 'success') et non depuis le champ `amount` des orders
+    //    qui peut être mal renseigné (ex: 2 FCFA au lieu de 25 000 FCFA).
     // ════════════════════════════════════════════
     if (route === 'stats' && req.method === 'GET') {
       const now   = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), 1);
 
-      const [ordersSnap, subsSnap, profilesSnap] = await Promise.all([
+      const [ordersSnap, subsSnap, profilesSnap, paymentsSnap] = await Promise.all([
         db.collection('orders').orderBy('createdAt', 'desc').limit(500).get(),
         db.collection('subscriptions').get(),
         db.collection('profiles').get(),
+        // ✅ Uniquement les paiements confirmés
+        db.collection('payments').where('status', '==', 'success').get(),
       ]);
 
       const orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       const subs   = subsSnap.docs.map(d => d.data());
 
-      const thisMonth   = orders.filter(o => {
-        const d = o.createdAt?._seconds ? new Date(o.createdAt._seconds*1000) : new Date(o.createdAt);
+      // Commandes de ce mois (tous statuts confondus pour le compteur)
+      const thisMonth = orders.filter(o => {
+        const d = o.createdAt?._seconds
+          ? new Date(o.createdAt._seconds * 1000)
+          : new Date(o.createdAt);
         return d >= start;
       });
-      const paid        = orders.filter(o => o.status === 'paid' || o.status === 'delivered');
-      const totalRevenue= paid.reduce((s,o) => s + (o.amount||0), 0);
-      const pending     = orders.filter(o => o.status === 'pending');
-      const activeSubs  = subs.filter(s => s.status === 'active');
+
+      // IDs des commandes réellement payées
+      const paidOrderIds = new Set(
+        orders
+          .filter(o => o.status === 'paid' || o.status === 'delivered')
+          .map(o => o.id)
+      );
+
+      // ✅ Revenus = somme des payments 'success'
+      //    - liés à une commande payée (carte classique)
+      //    - OU liés à un abonnement (pro / business)
+      const totalRevenue = paymentsSnap.docs.reduce((sum, d) => {
+        const p      = d.data();
+        const amount = Number(p.amount) || 0;
+        if (p.orderId && paidOrderIds.has(p.orderId)) return sum + amount; // carte classique
+        if (p.subscriptionId) return sum + amount;                          // abonnement
+        return sum;
+      }, 0);
+
+      const pending    = orders.filter(o => o.status === 'pending');
+      const activeSubs = subs.filter(s => s.status === 'active');
 
       return res.json({
         success: true,
