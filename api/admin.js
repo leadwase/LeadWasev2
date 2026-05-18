@@ -103,25 +103,70 @@ export default async function handler(req, res) {
     }
 
     // ════════════════════════════════════════════
-    // GET credentials
-    // ════════════════════════════════════════════
-    if (route === 'credentials' && req.method === 'GET') {
-      const snap = await db.collection('credentials')
-        .orderBy('createdAt', 'desc').limit(500).get();
-      const credentials = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      return res.json({ success: true, credentials });
+// ════════════════════════════════════════════
+// GET ?route=credentials
+// ════════════════════════════════════════════
+if (route === 'credentials' && req.method === 'GET') {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, error: 'Non authentifié' });
+  }
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    await getAuth().verifyIdToken(token);
+  } catch (e) {
+    return res.status(403).json({ success: false, error: 'Token invalide' });
+  }
+
+  const credentialsSnapshot = await db.collection('credentials').get();
+  const credentials = [];
+
+  for (const doc of credentialsSnapshot.docs) {
+    const credData   = doc.data();
+    const leadwaseId = credData.leadwaseId || doc.id;
+
+    // Récupérer le profil associé pour avoir email + nom du client
+    let profile = null;
+    try {
+      const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+      if (profileDoc.exists) profile = profileDoc.data();
+    } catch (e) {
+      console.warn('Profil manquant pour', leadwaseId);
     }
 
-    // ════════════════════════════════════════════
-    // GET b2b
-    // ════════════════════════════════════════════
-    if (route === 'b2b' && req.method === 'GET') {
-      const snap = await db.collection('orders')
-        .where('cardType', '==', 'b2b')
-        .orderBy('createdAt', 'desc').limit(200).get();
-      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      return res.json({ success: true, orders });
-    }
+    credentials.push({
+      leadwaseId,
+      login:      leadwaseId,
+      password:   credData.passwordHash || credData.password || '—',
+      email:      profile?.email || '—',
+      clientName: profile
+        ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
+        : '—',
+      createdAt: credData.createdAt || null,
+    });
+  }
+
+  return res.status(200).json({ success: true, credentials });
+}
+
+// ════════════════════════════════════════════
+// GET ?route=b2b
+// ════════════════════════════════════════════
+if (route === 'b2b' && req.method === 'GET') {
+  await verifyAdmin(req);
+  // Sans orderBy pour éviter le besoin d'index composite Firestore
+  const snap = await db.collection('orders')
+    .where('cardType', '==', 'b2b')
+    .get();
+  const orders = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => {
+      const ta = a.createdAt?._seconds || 0;
+      const tb = b.createdAt?._seconds || 0;
+      return tb - ta;
+    });
+  return res.json({ success: true, orders });
+}
 
     // ════════════════════════════════════════════
     // GET stats
