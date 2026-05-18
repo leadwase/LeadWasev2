@@ -63,6 +63,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  // ✅ Vérification du token UNE SEULE FOIS pour toutes les routes
   try {
     await verifyToken(req);
   } catch (e) {
@@ -102,51 +103,41 @@ export default async function handler(req, res) {
       return res.json({ success: true, subscriptions });
     }
 
-// ════════════════════════════════════════════
-// GET ?route=credentials
-// ════════════════════════════════════════════
-if (route === 'credentials' && req.method === 'GET') {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, error: 'Non authentifié' });
-  }
-  const token = authHeader.split('Bearer ')[1];
-  try {
-    await getAuth().verifyIdToken(token);
-  } catch (e) {
-    return res.status(403).json({ success: false, error: 'Token invalide' });
-  }
+    // ════════════════════════════════════════════
+    // GET ?route=credentials
+    // ✅ CORRIGÉ : suppression du double check auth qui causait le 403
+    // ════════════════════════════════════════════
+    if (route === 'credentials' && req.method === 'GET') {
+      const credentialsSnapshot = await db.collection('credentials').get();
+      const credentials = [];
 
-  const credentialsSnapshot = await db.collection('credentials').get();
-  const credentials = [];
+      for (const doc of credentialsSnapshot.docs) {
+        const credData   = doc.data();
+        const leadwaseId = credData.leadwaseId || doc.id;
 
-  for (const doc of credentialsSnapshot.docs) {
-    const credData   = doc.data();
-    const leadwaseId = credData.leadwaseId || doc.id;
+        // Récupérer le profil associé pour avoir email + nom du client
+        let profile = null;
+        try {
+          const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+          if (profileDoc.exists) profile = profileDoc.data();
+        } catch (e) {
+          console.warn('Profil manquant pour', leadwaseId);
+        }
 
-    // Récupérer le profil associé pour avoir email + nom du client
-    let profile = null;
-    try {
-      const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
-      if (profileDoc.exists) profile = profileDoc.data();
-    } catch (e) {
-      console.warn('Profil manquant pour', leadwaseId);
+        credentials.push({
+          leadwaseId,
+          login:      leadwaseId,
+          password:   credData.passwordHash || credData.password || '—',
+          email:      profile?.email || '—',
+          clientName: profile
+            ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
+            : '—',
+          createdAt: credData.createdAt || null,
+        });
+      }
+
+      return res.status(200).json({ success: true, credentials });
     }
-
-    credentials.push({
-      leadwaseId,
-      login:      leadwaseId,
-      password:   credData.passwordHash || credData.password || '—',
-      email:      profile?.email || '—',
-      clientName: profile
-        ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
-        : '—',
-      createdAt: credData.createdAt || null,
-    });
-  }
-
-  return res.status(200).json({ success: true, credentials });
-}
 
     // ════════════════════════════════════════════
     // GET b2b
