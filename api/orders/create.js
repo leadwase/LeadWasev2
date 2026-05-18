@@ -1,7 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { notifyAdminNewOrder, notifyAdminB2BRequest, notifyClientPaymentSuccess } from '../brevo.js';
-import { getPrices } from '../lib/getPrices.js'; // ✅ Déplacé en haut
+import { getPrices } from '../../lib/getPrices.js';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
