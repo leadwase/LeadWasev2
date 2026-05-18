@@ -608,13 +608,22 @@ document.getElementById('topbar-date').textContent =
   new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
 // ── API helper ────────────────────────────────────────────────
-async function api(url, opts = {}) {
+// Toutes les routes admin passent par /api/admin?route=xxx
+// pour rester dans la limite de 12 fonctions Vercel Hobby.
+async function api(route, opts = {}) {
   TOKEN = await getIdToken(auth.currentUser);
-  const r = await fetch(url, {
+  // Compatibilité : si on passe une URL complète legacy on extrait la route
+  let r = route;
+  if (r.startsWith('/api/admin/settings/prices')) r = 'settings-prices';
+  else if (r.startsWith('/api/admin/'))             r = r.replace('/api/admin/', '');
+  else if (r.startsWith('/api/'))                   r = r.replace('/api/', '');
+
+  const url = `/api/admin?route=${r}`;
+  const res = await fetch(url, {
     ...opts,
     headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN, ...(opts.headers||{}) },
   });
-  return r.json();
+  return res.json();
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -712,7 +721,7 @@ const itemsPerPage     = 10;
 
 async function loadCredentials() {
   try {
-    const response = await api('/api/admin/credentials');
+    const response = await api('credentials');
     if (response.success && response.credentials) {
       allCredentials = response.credentials;
       document.getElementById('sb-cred-count').textContent = allCredentials.length;
@@ -800,7 +809,7 @@ async function initDashboard() {
 
 async function loadStats() {
   try {
-    const d = await api('/api/admin/stats');
+    const d = await api('stats');
     if (!d.success) return;
     const s = d.stats;
     document.getElementById('d-total').textContent   = s.totalOrders || 0;
@@ -816,7 +825,7 @@ async function loadStats() {
 
 async function initB2BCount() {
   try {
-    const d = await api('/api/admin/b2b');
+    const d = await api('b2b');
     if (d.success) {
       const count = d.orders.filter(o => o.status === 'b2b_pending').length;
       document.getElementById('sb-b2b-count').textContent = count;
@@ -827,7 +836,7 @@ async function initB2BCount() {
 async function loadDashOrders() {
   const tbody = document.getElementById('dash-orders-body');
   try {
-    const d = await api('/api/admin/orders');
+    const d = await api('orders');
     if (!d.success) throw new Error(d.error);
     const orders = d.orders.slice(0, 5);
     if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune commande</td></tr>'; return; }
@@ -841,7 +850,7 @@ window.loadAllOrders = async () => {
   const tbody = document.getElementById('all-orders-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Chargement...</td></tr>';
   try {
-    const d = await api('/api/admin/orders');
+    const d = await api('orders');
     if (!d.success) throw new Error(d.error);
     if (!d.orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucune commande</td></tr>'; return; }
     tbody.innerHTML = d.orders.map(o => orderRow(o, true)).join('');
@@ -874,7 +883,7 @@ window.loadProfiles = async () => {
   const tbody = document.getElementById('profiles-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Chargement...</td></tr>';
   try {
-    const d = await api('/api/admin/orders');
+    const d = await api('orders');
     if (!d.success) throw new Error(d.error);
     const delivered = d.orders.filter(o => o.leadwaseId);
     if (!delivered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun profil créé</td></tr>'; return; }
@@ -895,7 +904,7 @@ window.loadB2B = async () => {
   const tbody = document.getElementById('b2b-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
   try {
-    const d = await api('/api/admin/b2b');
+    const d = await api('b2b');
     if (!d.success) throw new Error(d.error);
     const orders = d.orders;
     const count  = orders.filter(o => o.status === 'b2b_pending').length;
@@ -923,7 +932,7 @@ window.loadPayments = async () => {
   tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Chargement...</td></tr>';
   try {
     const filterStatus = document.getElementById('pay-filter-status').value;
-    const d = await api('/api/admin/payments');
+    const d = await api('payments');
     if (!d.success) throw new Error(d.error || 'Erreur API paiements');
     let pays = d.payments || [];
 
@@ -975,7 +984,7 @@ window.loadSubs = async () => {
   try {
     const filterPlan   = document.getElementById('sub-filter-plan').value;
     const filterStatus = document.getElementById('sub-filter-status').value;
-    const d = await api('/api/admin/subscriptions');
+    const d = await api('subscriptions');
     if (!d.success) throw new Error(d.error || 'Erreur API abonnements');
     let subs = d.subscriptions || [];
 
@@ -1023,7 +1032,7 @@ window.loadSubs = async () => {
 // ── Paramètres — Gestion des prix ─────────────────────────────
 async function loadPrices() {
   try {
-    const d = await api('/api/admin/settings/prices');
+    const d = await api('settings-prices');
     const prices = d.prices || {};
     document.getElementById('price-classic').value  = prices.classic  || 25000;
     document.getElementById('price-pro').value      = prices.pro      || 3500;
@@ -1069,7 +1078,7 @@ window.savePrices = async () => {
   msg.className   = 'save-msg';
 
   try {
-    const d = await api('/api/admin/settings/prices', {
+    const d = await api('settings-prices', {
       method: 'POST',
       body: JSON.stringify({ prices: { classic, pro, business } }),
     });
@@ -1095,7 +1104,7 @@ window.prefillOrder = (orderId) => { nav('generer'); if(document.getElementById(
 
 window.showDetail = async (orderId) => {
   try {
-    const d = await api('/api/admin/orders');
+    const d = await api('orders');
     const o = d.orders?.find(x => x.id === orderId);
     if (!o) return;
     document.getElementById('modal-title').textContent = 'Commande #CMD-' + orderId.slice(-4).toUpperCase();
