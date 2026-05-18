@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const { plan } = req.body;
     //const prices = { pro: 2999, business: 50 };
     // const amount = prices[plan];
-    const { getPrices } = await import('../lib/getPrices.js');
+    const { getPrices } = await import('../../lib/getPrices.js');
     const prices = await getPrices();
     const amount = prices[plan];
    
