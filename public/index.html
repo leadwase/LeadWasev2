@@ -9,6 +9,8 @@
   .sec-h2, .sec-eyebrow, .sec-sub{
         text-align: center!important;
     align-items: center!important;
+    justify-content: center!important;
+    display: block!important;
   }
 .hero{display:grid;grid-template-columns:1fr 1fr;/*min-height:calc(100vh - 64px);*/overflow:hidden}
 .hero-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
@@ -109,7 +111,7 @@
 .faq-item.open .faq-ico{transform:rotate(45deg)}
 
 /* sec-eyebrow sans tirets */
-.sec-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:0}
+.sec-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block;text-align:center}
 
 @media(max-width:900px){
   .hero{grid-template-columns:1fr}.hero-right{display:none}.hero-left{padding:60px 24px}
@@ -227,7 +229,7 @@
 
 <section id="comment-ca-marche" class="sec sec-black">
   <div style="text-align:center;margin-bottom:52px">
-    <div class="sec-eyebrow" style="justify-content:center;color:var(--green3)">Simple &amp; Rapide</div>
+    <div class="sec-eyebrow" style="color:var(--green3)">Simple &amp; Rapide</div>
     <h2 class="sec-h2">Comment ça marche ?</h2>
   </div>
   <div class="steps-row">
@@ -250,7 +252,7 @@
 
 <section class="sec sec-white">
   <div style="text-align:center;margin-bottom:48px">
-    <div class="sec-eyebrow" style="justify-content:center">Foire aux questions</div>
+    <div class="sec-eyebrow">Foire aux questions</div>
     <h2 class="sec-h2">Questions fréquentes</h2>
   </div>
   <div class="faq-list">
