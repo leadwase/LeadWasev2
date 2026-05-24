@@ -38,7 +38,7 @@ a{text-decoration:none;color:inherit}
 .sec-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--green)}
 .sec-h2{font-size:clamp(28px,3.5vw,44px);font-weight:bold;letter-spacing:-.5px;color:var(--black);margin-bottom:16px;line-height:1.1}
 .sec-black .sec-h2{color:var(--white)}
-.sec-sub{font-size:15px;color:var(--gray2);line-height:1.8;max-width:520px;margin-bottom:48px;font-style:italic}
+.sec-sub{font-size:15px;color:var(--gray2);line-height:1.8;/*max-width:520px;*/margin-bottom:48px;font-style:italic}
 .sec-black .sec-sub{color:var(--gray3)}
 
 /* Formulaires */
