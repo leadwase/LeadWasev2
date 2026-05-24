@@ -13,16 +13,12 @@
   --green2:      #22A050;
   --green3:      #2DC56A;
   --green-light: #E8F5EE;
-  --gray1:       #2A2A2A;
   --gray2:       #555555;
   --gray3:       #999999;
-  --gray4:       #CCCCCC;
   --gray5:       #EEEEEE;
   --serif: 'Times New Roman', Times, serif;
 }
-
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
 body {
   font-family: var(--serif);
   background: var(--off);
@@ -36,13 +32,13 @@ body {
 /* ── Confetti ── */
 .confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
 .confetti-piece {
-  position:absolute; top:-16px; width:8px; height:8px;
+  position:absolute; top:-16px;
   opacity:0; animation: fall linear forwards;
 }
 @keyframes fall {
-  0%   { opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+  0%   { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
   80%  { opacity:1; }
-  100% { opacity:0; transform: translateY(100vh) rotate(720deg) scale(.5); }
+  100% { opacity:0; transform:translateY(100vh) rotate(720deg) scale(.5); }
 }
 
 /* ── Header ── */
@@ -66,8 +62,8 @@ body {
 @keyframes spin { to { transform:rotate(360deg); } }
 
 /* ── Animations ── */
-@keyframes popIn { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:scale(1); } }
-@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes popIn  { from { opacity:0; transform:scale(.4); }    to { opacity:1; transform:scale(1); } }
+@keyframes slideUp{ from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 @keyframes drawCheck { to { stroke-dashoffset:0; } }
 
 /* ── Success icon ── */
@@ -91,47 +87,47 @@ body {
 .main-title em { color:var(--green); font-style:italic; }
 .main-sub { font-size:16px; color:var(--gray2); line-height:1.8; font-style:italic; max-width:460px; margin:0 auto; }
 
-/* ── Box générique ── */
-.box { background:var(--white); border:1px solid var(--gray5); margin-bottom:20px; }
-.box-anim-1 { animation:slideUp .5s ease both .45s; }
-.box-anim-2 { animation:slideUp .5s ease both .55s; }
-.box-anim-3 { animation:slideUp .5s ease both .60s; }
-.box-anim-4 { animation:slideUp .5s ease both .65s; }
-.box-anim-5 { animation:slideUp .5s ease both .70s; }
-.box-anim-6 { animation:slideUp .5s ease both .80s; }
+/* ── Boîtes animées ── */
+.a1 { animation:slideUp .5s ease both .45s; }
+.a2 { animation:slideUp .5s ease both .55s; }
+.a3 { animation:slideUp .5s ease both .60s; }
+.a4 { animation:slideUp .5s ease both .65s; }
+.a5 { animation:slideUp .5s ease both .70s; }
+.a6 { animation:slideUp .5s ease both .80s; }
 
 /* ── Recap box ── */
+.box { background:var(--white); border:1px solid var(--gray5); margin-bottom:20px; }
 .box-header { background:var(--black); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
 .bh-left { font-size:13px; font-weight:bold; color:var(--white); letter-spacing:1px; text-transform:uppercase; }
-.bh-ref { font-family:'Courier New',monospace; font-size:13px; color:var(--green3); letter-spacing:2px; }
+.bh-ref  { font-family:'Courier New',monospace; font-size:13px; color:var(--green3); letter-spacing:2px; }
 .box-body { padding:28px; }
-.detail-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dotted var(--gray5); font-size:14px; }
-.detail-row:last-child { border-bottom:none; }
-.dl { color:var(--gray2); }
-.dv { font-weight:bold; color:var(--black); }
-.dv.green { color:var(--green); }
+.row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dotted var(--gray5); font-size:14px; }
+.row:last-child { border-bottom:none; }
+.rl { color:var(--gray2); }
+.rv { font-weight:bold; color:var(--black); }
+.rv.green { color:var(--green); }
 
-/* ── Credentials box (noir) ── */
+/* ── Credentials box ── */
 .cred-box { background:var(--black); padding:36px 28px; margin-bottom:20px; position:relative; overflow:hidden; }
 .cred-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--green),var(--green3),var(--green)); }
 .cred-title { font-size:14px; font-weight:bold; color:var(--white); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
-.cred-sub { font-size:12px; color:var(--gray3); font-style:italic; margin-bottom:28px; line-height:1.6; }
-.cred-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
-.cred-item { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); padding:20px; }
+.cred-sub   { font-size:12px; color:var(--gray3); font-style:italic; margin-bottom:28px; line-height:1.6; }
+.cred-grid  { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.cred-item  { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); padding:20px; }
 .cred-label { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gray3); margin-bottom:10px; }
 .cred-value { font-family:'Courier New',monospace; font-size:20px; color:var(--green3); letter-spacing:3px; font-weight:bold; word-break:break-all; }
 .cred-value.pwd { font-size:18px; color:var(--white); letter-spacing:2px; }
-.cred-warning { display:flex; align-items:flex-start; gap:12px; background:rgba(245,166,35,.08); border:1px solid rgba(245,166,35,.2); padding:16px; }
-.cred-warning-icon { font-size:18px; flex-shrink:0; }
-.cred-warning p { font-size:12px; color:rgba(245,166,35,.9); line-height:1.7; }
-.cred-warning strong { font-weight:bold; }
+.cred-warn  { display:flex; align-items:flex-start; gap:12px; background:rgba(245,166,35,.08); border:1px solid rgba(245,166,35,.2); padding:16px; }
+.cred-warn-icon { font-size:18px; flex-shrink:0; }
+.cred-warn p { font-size:12px; color:rgba(245,166,35,.9); line-height:1.7; }
+.cred-warn strong { font-weight:bold; }
 
-/* ── Subscription hero box ── */
+/* ── Subscription hero ── */
 .sub-hero { background:linear-gradient(135deg,#1a7a3c 0%,#0d5c2e 100%); padding:36px 28px; margin-bottom:20px; position:relative; overflow:hidden; text-align:center; }
 .sub-hero::before { content:'⭐'; position:absolute; top:10px; right:20px; font-size:40px; opacity:.15; }
 .sub-eyebrow { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:8px; }
-.sub-title { font-size:24px; font-weight:bold; color:var(--white); margin-bottom:12px; }
-.sub-badge { display:inline-block; background:rgba(255,255,255,.2); padding:6px 18px; border-radius:30px; font-size:14px; font-weight:bold; color:var(--white); margin-bottom:16px; letter-spacing:1px; }
+.sub-title   { font-size:24px; font-weight:bold; color:var(--white); margin-bottom:12px; }
+.sub-badge   { display:inline-block; background:rgba(255,255,255,.2); padding:6px 18px; border-radius:30px; font-size:14px; font-weight:bold; color:var(--white); margin-bottom:16px; letter-spacing:1px; }
 .sub-message { font-size:14px; color:rgba(255,255,255,.85); line-height:1.7; margin-bottom:20px; font-style:italic; }
 .sub-features { text-align:left; display:inline-block; }
 .sub-features li { font-size:13px; color:rgba(255,255,255,.85); padding:5px 0; list-style:none; }
@@ -140,50 +136,50 @@ body {
 /* ── Login CTA ── */
 .login-cta { background:var(--white); border:2px solid var(--green); padding:32px 28px; margin-bottom:20px; text-align:center; position:relative; overflow:hidden; }
 .login-cta::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--green),var(--green3)); }
-.lc-icon { font-size:40px; margin-bottom:14px; }
+.lc-icon  { font-size:40px; margin-bottom:14px; }
 .lc-title { font-size:20px; font-weight:bold; color:var(--black); margin-bottom:8px; }
-.lc-sub { font-size:14px; color:var(--gray2); line-height:1.7; font-style:italic; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto; }
+.lc-sub   { font-size:14px; color:var(--gray2); line-height:1.7; font-style:italic; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto; }
 .lc-steps { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; text-align:left; max-width:360px; margin-left:auto; margin-right:auto; }
-.lc-step { display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--gray2); }
-.lc-step-num { width:24px; height:24px; border-radius:50%; background:var(--green); color:var(--white); font-size:11px; font-weight:bold; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.lc-step  { display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--gray2); }
+.lc-num   { width:24px; height:24px; border-radius:50%; background:var(--green); color:var(--white); font-size:11px; font-weight:bold; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
 /* ── Next steps ── */
 .next-steps { background:var(--white); border:1px solid var(--gray5); padding:32px 28px; margin-bottom:20px; }
 .ns-title { font-size:16px; font-weight:bold; color:var(--black); margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid var(--gray5); }
-.ns-list { display:flex; flex-direction:column; gap:0; }
-.ns-step { display:flex; gap:18px; padding:16px 0; border-bottom:1px dotted var(--gray5); align-items:flex-start; }
+.ns-list  { display:flex; flex-direction:column; }
+.ns-step  { display:flex; gap:18px; padding:16px 0; border-bottom:1px dotted var(--gray5); align-items:flex-start; }
 .ns-step:last-child { border-bottom:none; padding-bottom:0; }
 .ns-dot-col { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
-.ns-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; flex-shrink:0; }
+.ns-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; }
 .ns-dot.done    { background:var(--green); color:var(--white); }
 .ns-dot.current { background:var(--black); color:var(--white); }
 .ns-dot.pending { background:var(--gray5); color:var(--gray3); }
 .ns-line { width:1px; flex:1; min-height:20px; background:var(--gray5); margin:4px 0; }
-.ns-content { padding-top:4px; }
+.ns-content   { padding-top:4px; }
 .ns-step-title { font-size:14px; font-weight:bold; color:var(--black); margin-bottom:3px; }
 .ns-step-desc  { font-size:12px; color:var(--gray2); line-height:1.7; font-style:italic; }
-.ns-badge { display:inline-block; margin-top:4px; font-size:10px; color:var(--green); font-weight:bold; letter-spacing:.5px; background:var(--green-light); padding:2px 8px; }
+.ns-badge { display:inline-block; margin-top:4px; font-size:10px; color:var(--green); font-weight:bold; background:var(--green-light); padding:2px 8px; }
 
-/* ── Info bar (vert clair) ── */
+/* ── Info bar ── */
 .info-bar { background:var(--green-light); border:1px solid rgba(26,122,60,.2); border-left:3px solid var(--green); padding:20px 24px; margin-bottom:20px; display:flex; gap:14px; align-items:flex-start; }
-.info-bar-icon { font-size:22px; flex-shrink:0; }
-.info-bar-title { font-size:14px; font-weight:bold; color:var(--black); margin-bottom:4px; }
-.info-bar-sub   { font-size:12px; color:var(--gray2); line-height:1.7; font-style:italic; }
+.info-icon  { font-size:22px; flex-shrink:0; }
+.info-title { font-size:14px; font-weight:bold; color:var(--black); margin-bottom:4px; }
+.info-sub   { font-size:12px; color:var(--gray2); line-height:1.7; font-style:italic; }
 
 /* ── Redirect bar ── */
-.redirect-bar { background:var(--black); padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; animation:slideUp .5s ease both .65s; }
-.redirect-bar-text  { font-size:13px; color:var(--gray3); font-style:italic; }
-.redirect-bar-count { font-size:22px; font-weight:bold; color:var(--green3); font-family:'Courier New',monospace; flex-shrink:0; }
-.redirect-progress  { width:100%; height:3px; background:rgba(255,255,255,.08); margin-top:4px; }
-.redirect-progress-fill { height:100%; background:var(--green3); transition:width 1s linear; }
+.redirect-bar { background:var(--black); padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.redirect-text  { font-size:13px; color:var(--gray3); font-style:italic; }
+.redirect-count { font-size:22px; font-weight:bold; color:var(--green3); font-family:'Courier New',monospace; flex-shrink:0; }
+.redirect-prog  { width:100%; height:3px; background:rgba(255,255,255,.08); margin-top:4px; }
+.redirect-fill  { height:100%; background:var(--green3); transition:width 1s linear; }
 
 /* ── Actions ── */
 .actions-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; animation:slideUp .5s ease both .8s; }
 .btn-primary {
   padding:16px; background:var(--green); color:var(--white); border:none;
   font-family:var(--serif); font-size:14px; font-weight:bold; letter-spacing:1px;
-  text-transform:uppercase; cursor:pointer; transition:all .2s; text-align:center;
-  border-radius:2px; text-decoration:none; display:inline-block;
+  text-transform:uppercase; cursor:pointer; transition:all .2s;
+  text-align:center; border-radius:2px; text-decoration:none; display:inline-block;
 }
 .btn-primary:hover { background:var(--green2); transform:translateY(-2px); box-shadow:0 6px 18px rgba(26,122,60,.3); }
 .btn-secondary {
@@ -195,26 +191,17 @@ body {
 
 /* ── Footer ── */
 .page-footer { width:100%; background:var(--black); padding:20px 40px; text-align:center; z-index:2; margin-top:auto; }
-.footer-copy { font-size:11px; color:var(--gray2); letter-spacing:.5px; }
+.footer-copy { font-size:11px; color:var(--gray3); letter-spacing:.5px; }
 .footer-copy em { color:var(--green3); font-style:normal; }
 
-/* ── Fallback / Error ── */
+/* ── Fallback ── */
 .fallback-box { background:var(--white); border:1px solid var(--gray5); border-left:3px solid #c0392b; padding:28px; margin-bottom:20px; text-align:center; }
 .fallback-icon  { font-size:48px; margin-bottom:16px; }
 .fallback-title { font-size:20px; font-weight:bold; margin-bottom:8px; }
 .fallback-sub   { font-size:14px; color:var(--gray2); font-style:italic; line-height:1.7; }
 
-@media print {
-  .confetti-wrap, .actions-row, .page-footer, .redirect-bar { display:none; }
-  body { background:white; }
-  .main-wrap { padding:20px; }
-}
-@media (max-width:600px) {
-  .header { padding:14px 20px; }
-  .main-wrap { padding:32px 16px 60px; }
-  .cred-grid { grid-template-columns:1fr; }
-  .actions-row { grid-template-columns:1fr; }
-}
+@media print { .confetti-wrap,.actions-row,.page-footer,.redirect-bar { display:none; } body { background:white; } .main-wrap { padding:20px; } }
+@media (max-width:600px) { .header { padding:14px 20px; } .main-wrap { padding:32px 16px 60px; } .cred-grid { grid-template-columns:1fr; } .actions-row { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -223,13 +210,13 @@ body {
 
 <header class="header">
   <a class="logo" href="/">Lead<em>Wase</em></a>
-  <div class="header-label"><span id="header-label-text">Confirmation</span></div>
+  <div class="header-label"><span id="header-label">Confirmation</span></div>
 </header>
 
-<div class="main-wrap" id="main-container">
-  <div style="text-align:center; padding:60px 20px">
+<div class="main-wrap" id="main">
+  <div style="text-align:center;padding:60px 20px">
     <div class="loader"></div>
-    <p style="color:var(--gray3); font-style:italic">Chargement de votre confirmation…</p>
+    <p style="color:var(--gray3);font-style:italic">Chargement de votre confirmation…</p>
   </div>
 </div>
 
@@ -237,29 +224,13 @@ body {
   <div class="footer-copy">© 2026 <em>LeadWase</em> · Votre identité digitale professionnelle · Tous droits réservés</div>
 </footer>
 
-<script type="module">
-import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey:            "AIzaSyA8X6ZqQFw3qRjQxYjY7JqLm6ZqQFw3qRjQ",
-  authDomain:        "leadwase.firebaseapp.com",
-  projectId:         "leadwase",
-  storageBucket:     "leadwase.firebasestorage.app",
-  messagingSenderId: "123456789012",
-  appId:             "1:123456789012:web:abc123def456",
-};
-
-const app  = initializeApp(firebaseConfig);
-const db   = getFirestore(app);
-const auth = getAuth(app);
-
+<script>
 // ── Utilitaires ──────────────────────────────────────────────────────────────
-function formatDate(ts) {
-  if (!ts) return '—';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+function formatDate(ms) {
+  if (!ms) return '—';
+  return new Date(ms).toLocaleDateString('fr-FR', {
+    day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
 }
 function formatNum(n) { return (n || 0).toLocaleString('fr-FR'); }
 
@@ -289,118 +260,92 @@ function makeConfetti() {
   }
 }
 
-function successIcon() {
-  return `
-    <div class="success-icon-wrap">
-      <div class="success-circle">
-        <svg viewBox="0 0 40 40">
-          <path class="check-path" d="M8 20 L16 28 L32 12"/>
-        </svg>
-      </div>
-    </div>`;
-}
-
 function startCountdown(seconds, url) {
   const bar = document.createElement('div');
   bar.className = 'redirect-bar';
   bar.innerHTML = `
     <div style="flex:1">
-      <div class="redirect-bar-text">Redirection automatique vers votre tableau de bord…</div>
-      <div class="redirect-progress"><div class="redirect-progress-fill" id="rp-fill" style="width:100%"></div></div>
+      <div class="redirect-text">Redirection automatique vers votre tableau de bord…</div>
+      <div class="redirect-prog"><div class="redirect-fill" id="rf" style="width:100%"></div></div>
     </div>
-    <div class="redirect-bar-count" id="rp-count">${seconds}</div>`;
-  document.getElementById('main-container').prepend(bar);
-
+    <div class="redirect-count" id="rc">${seconds}</div>`;
+  document.getElementById('main').prepend(bar);
   let rem = seconds;
-  const fill  = document.getElementById('rp-fill');
-  const count = document.getElementById('rp-count');
   const iv = setInterval(() => {
     rem--;
-    count.textContent = rem;
-    fill.style.width = (rem / seconds * 100) + '%';
+    document.getElementById('rc').textContent = rem;
+    document.getElementById('rf').style.width = (rem / seconds * 100) + '%';
     if (rem <= 0) { clearInterval(iv); window.location.href = url; }
   }, 1000);
 }
 
+function successIcon() {
+  return `<div class="success-icon-wrap">
+    <div class="success-circle">
+      <svg viewBox="0 0 40 40">
+        <path class="check-path" d="M8 20 L16 28 L32 12"/>
+      </svg>
+    </div>
+  </div>`;
+}
+
 // ════════════════════════════════════════════════════════════════════════════
-// RENDU — ABONNEMENT (PRO / BUSINESS)
-// Déclenché uniquement quand subscriptionId est présent dans l'URL ou sessionStorage
-// N'affiche RIEN lié à une commande carte
+// RENDU — ABONNEMENT
+// Affiché UNIQUEMENT quand subscriptionId est présent.
+// Aucune mention de carte, commande, livraison.
 // ════════════════════════════════════════════════════════════════════════════
-function renderSubscription(sub, subId) {
-  document.getElementById('header-label-text').textContent = 'Abonnement activé';
+function renderSubscription(data, subId) {
+  document.getElementById('header-label').textContent = 'Abonnement activé';
   sessionStorage.removeItem('last_subscription_id');
 
-  const planName  = sub.plan === 'pro' ? 'PRO' : 'BUSINESS';
-  const planPrice = sub.plan === 'pro' ? '2 999 FCFA/mois' : '4 566 FCFA/mois';
+  const planName  = data.plan === 'pro' ? 'PRO' : 'BUSINESS';
+  const planPrice = data.plan === 'pro' ? '2 999 FCFA/mois' : '4 566 FCFA/mois';
   const subRef    = 'SUB-' + subId.slice(-6).toUpperCase();
+  const dateAct   = formatDate(data.paidAt || data.activatedAt || data.createdAt);
 
-  // Fonctionnalités selon le plan
-  const features = sub.plan === 'pro'
-    ? [
-        'Photo de profil',
-        'Réseaux sociaux (LinkedIn, Instagram, TikTok…)',
-        'WhatsApp direct',
-        'Analytics de visites',
-      ]
-    : [
-        'Photo de profil',
-        'Réseaux sociaux (LinkedIn, Instagram, TikTok…)',
-        'WhatsApp direct',
-        'Analytics de visites',
-        'Localisation / Adresse',
-        'Prise de rendez-vous',
-        'Avis Google',
-        'Formulaire de contact',
-        'Support prioritaire',
-      ];
+  const features = data.plan === 'pro'
+    ? ['Photo de profil','Réseaux sociaux (LinkedIn, Instagram, TikTok…)','WhatsApp direct','Analytics de visites']
+    : ['Photo de profil','Réseaux sociaux (LinkedIn, Instagram, TikTok…)','WhatsApp direct','Analytics de visites','Localisation / Adresse','Prise de rendez-vous','Avis Google','Formulaire de contact','Support prioritaire'];
 
-  document.getElementById('main-container').innerHTML = `
+  document.getElementById('main').innerHTML = `
     ${successIcon()}
 
-    <!-- Titre -->
     <div class="title-block">
       <div class="eyebrow">Abonnement activé</div>
       <h1 class="main-title">Bienvenue sur<br>votre formule <em>${planName} !</em></h1>
       <p class="main-sub">Votre abonnement est maintenant actif. Toutes les fonctionnalités sont débloquées immédiatement.</p>
     </div>
 
-    <!-- Récapitulatif abonnement -->
-    <div class="box box-anim-1">
+    <div class="box a1">
       <div class="box-header">
         <span class="bh-left">Récapitulatif abonnement</span>
         <span class="bh-ref">#${subRef}</span>
       </div>
       <div class="box-body">
-        <div class="detail-row"><span class="dl">Formule</span><span class="dv">${planName}</span></div>
-        <div class="detail-row"><span class="dl">Montant</span><span class="dv green">${planPrice} ✓</span></div>
-        <div class="detail-row"><span class="dl">Date d'activation</span><span class="dv">${formatDate(sub.createdAt || sub.activatedAt || sub.paidAt)}</span></div>
-        <div class="detail-row"><span class="dl">Renouvellement</span><span class="dv">Mensuel automatique</span></div>
-        <div class="detail-row"><span class="dl">Statut</span><span class="dv green">Actif ✓</span></div>
+        <div class="row"><span class="rl">Formule</span><span class="rv">${planName}</span></div>
+        <div class="row"><span class="rl">Montant</span><span class="rv green">${planPrice} ✓</span></div>
+        <div class="row"><span class="rl">Date d'activation</span><span class="rv">${dateAct}</span></div>
+        <div class="row"><span class="rl">Renouvellement</span><span class="rv">Mensuel automatique</span></div>
+        <div class="row"><span class="rl">Statut</span><span class="rv green">Actif ✓</span></div>
       </div>
     </div>
 
-    <!-- Fonctionnalités débloquées -->
-    <div class="sub-hero box-anim-2">
+    <div class="sub-hero a2">
       <div class="sub-eyebrow">Fonctionnalités débloquées</div>
       <div class="sub-title">🎉 Félicitations !</div>
       <div class="sub-badge">${planName} — ${planPrice}</div>
       <div class="sub-message">Vous avez maintenant accès à :</div>
-      <ul class="sub-features">
-        ${features.map(f => `<li>${f}</li>`).join('')}
-      </ul>
+      <ul class="sub-features">${features.map(f=>`<li>${f}</li>`).join('')}</ul>
     </div>
 
-    <!-- Info accès immédiat -->
-    <div class="info-bar box-anim-3">
-      <span class="info-bar-icon">✨</span>
+    <div class="info-bar a3">
+      <span class="info-icon">✨</span>
       <div>
-        <div class="info-bar-title">Accès immédiat à toutes vos fonctionnalités</div>
-        <div class="info-bar-sub">Votre plan ${planName} est actif. Rendez-vous sur votre tableau de bord pour commencer à personnaliser votre profil.</div>
+        <div class="info-title">Accès immédiat à toutes vos fonctionnalités</div>
+        <div class="info-sub">Votre plan ${planName} est actif. Rendez-vous sur votre tableau de bord pour personnaliser votre profil.</div>
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="actions-row">
       <a href="dashboard.html" class="btn-primary">📱 Accéder à mon espace</a>
       <a href="offres.html"    class="btn-secondary">⭐ Voir les offres</a>
@@ -412,52 +357,50 @@ function renderSubscription(sub, subId) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// RENDU — CARTE PHYSIQUE · utilisateur NON connecté
-// Déclenché uniquement quand orderId est présent dans l'URL ou sessionStorage
-// N'affiche RIEN lié à un abonnement
+// RENDU — CARTE · utilisateur NON connecté
+// Affiché UNIQUEMENT quand orderId est présent et aucun subscriptionId.
+// Aucune mention d'abonnement, plan, fonctionnalités.
 // ════════════════════════════════════════════════════════════════════════════
-function renderOrderNotConnected(order, orderId, cred) {
-  document.getElementById('header-label-text').textContent = 'Carte confirmée';
+function renderOrderNotConnected(data, cred, orderId) {
+  document.getElementById('header-label').textContent = 'Carte confirmée';
   sessionStorage.removeItem('last_order_id');
 
   const orderRef   = 'CMD-' + orderId.slice(-6).toUpperCase();
-  const amountFmt  = order.amount ? formatNum(order.amount) + ' FCFA' : 'Sur devis';
-  const loginEmail = cred?.loginEmail || null;
+  const amountFmt  = data.amount ? formatNum(data.amount) + ' FCFA' : 'Sur devis';
+  const fullName   = (data.firstName + ' ' + data.lastName).trim() || '—';
+  const loginEmail = cred?.loginEmail   || null;
   const pwd        = cred?.passwordHash || null;
-  const fullName   = `${order.firstName || ''} ${order.lastName || ''}`.trim();
+  const dateAchat  = formatDate(data.createdAt);
 
-  document.getElementById('main-container').innerHTML = `
+  document.getElementById('main').innerHTML = `
     ${successIcon()}
 
-    <!-- Titre -->
     <div class="title-block">
       <div class="eyebrow">Carte enregistrée</div>
       <h1 class="main-title">Merci pour<br>votre <em>achat !</em></h1>
       <p class="main-sub">Votre carte LeadWase est en préparation. Voici le récapitulatif de votre achat.</p>
     </div>
 
-    <!-- Récapitulatif achat carte -->
-    <div class="box box-anim-1">
+    <div class="box a1">
       <div class="box-header">
         <span class="bh-left">Récapitulatif — Carte LeadWase</span>
         <span class="bh-ref">#${orderRef}</span>
       </div>
       <div class="box-body">
-        <div class="detail-row"><span class="dl">Produit</span><span class="dv">Carte LeadWase Classique</span></div>
-        <div class="detail-row"><span class="dl">Nom</span><span class="dv">${fullName || '—'}</span></div>
-        <div class="detail-row"><span class="dl">Téléphone</span><span class="dv">${order.phone || '—'}</span></div>
-        <div class="detail-row"><span class="dl">Adresse de livraison</span><span class="dv">${order.address || 'À renseigner'}</span></div>
-        <div class="detail-row"><span class="dl">Mode de paiement</span><span class="dv">Mobile Money / Wave</span></div>
-        <div class="detail-row"><span class="dl">Montant réglé</span><span class="dv green">${amountFmt} ✓</span></div>
-        <div class="detail-row"><span class="dl">Date d'achat</span><span class="dv">${formatDate(order.createdAt)}</span></div>
+        <div class="row"><span class="rl">Produit</span><span class="rv">Carte LeadWase Classique</span></div>
+        <div class="row"><span class="rl">Nom</span><span class="rv">${fullName}</span></div>
+        <div class="row"><span class="rl">Téléphone</span><span class="rv">${data.phone || '—'}</span></div>
+        <div class="row"><span class="rl">Adresse de livraison</span><span class="rv">${data.address || 'À renseigner'}</span></div>
+        <div class="row"><span class="rl">Mode de paiement</span><span class="rv">Mobile Money / Wave</span></div>
+        <div class="row"><span class="rl">Montant réglé</span><span class="rv green">${amountFmt} ✓</span></div>
+        <div class="row"><span class="rl">Date d'achat</span><span class="rv">${dateAchat}</span></div>
       </div>
     </div>
 
-    <!-- Identifiants de connexion (affichés seulement si disponibles) -->
     ${loginEmail && pwd ? `
-    <div class="cred-box box-anim-2">
+    <div class="cred-box a2">
       <div class="cred-title">🔑 Vos identifiants de connexion</div>
-      <p class="cred-sub">Ces identifiants seront également joints à votre carte physique. Conservez-les précieusement — ils donnent accès à votre profil digital LeadWase.</p>
+      <p class="cred-sub">Ces identifiants seront joints à votre carte physique. Conservez-les précieusement — ils donnent accès à votre profil digital LeadWase.</p>
       <div class="cred-grid">
         <div class="cred-item">
           <div class="cred-label">Identifiant unique</div>
@@ -468,108 +411,74 @@ function renderOrderNotConnected(order, orderId, cred) {
           <div class="cred-value pwd">${pwd}</div>
         </div>
       </div>
-      <div class="cred-warning">
-        <span class="cred-warning-icon">⚠️</span>
+      <div class="cred-warn">
+        <span class="cred-warn-icon">⚠️</span>
         <p><strong>Important :</strong> Notez ou prenez en photo ces informations maintenant. Ils vous permettront de vous connecter sur <strong>leadwase.com</strong> et de personnaliser votre profil digital dès réception de votre carte.</p>
       </div>
     </div>
     ` : ''}
 
-    <!-- CTA connexion -->
-    <div class="login-cta box-anim-3">
+    <div class="login-cta a3">
       <div class="lc-icon">🔐</div>
       <div class="lc-title">Prêt à personnaliser votre profil ?</div>
       <p class="lc-sub">Dès réception de votre carte, connectez-vous avec vos identifiants pour activer et personnaliser votre profil digital.</p>
       <div class="lc-steps">
-        <div class="lc-step">
-          <div class="lc-step-num">1</div>
-          <div>Recevez votre carte LeadWase sous 48h avec votre document d'identifiants</div>
-        </div>
-        <div class="lc-step">
-          <div class="lc-step-num">2</div>
-          <div>Rendez-vous sur <strong>leadwase.com</strong> et cliquez sur <strong>Connexion</strong></div>
-        </div>
-        <div class="lc-step">
-          <div class="lc-step-num">3</div>
-          <div>Entrez votre identifiant <strong>${loginEmail || 'LW-XXXXX'}</strong> et votre mot de passe</div>
-        </div>
-        <div class="lc-step">
-          <div class="lc-step-num">4</div>
-          <div>Personnalisez votre profil et commencez à partager votre carte !</div>
-        </div>
+        <div class="lc-step"><div class="lc-num">1</div><div>Recevez votre carte LeadWase sous 48h avec votre document d'identifiants</div></div>
+        <div class="lc-step"><div class="lc-num">2</div><div>Rendez-vous sur <strong>leadwase.com</strong> et cliquez sur <strong>Connexion</strong></div></div>
+        <div class="lc-step"><div class="lc-num">3</div><div>Entrez votre identifiant <strong>${loginEmail || 'LW-XXXXX'}</strong> et votre mot de passe</div></div>
+        <div class="lc-step"><div class="lc-num">4</div><div>Personnalisez votre profil et commencez à partager votre carte !</div></div>
       </div>
-      <a href="connexion.html" class="btn-primary" style="display:inline-block;padding:14px 32px">
-        🔑 Se connecter maintenant
-      </a>
+      <a href="connexion.html" class="btn-primary" style="display:inline-block;padding:14px 32px">🔑 Se connecter maintenant</a>
     </div>
 
-    <!-- Prochaines étapes -->
-    <div class="next-steps box-anim-4">
+    <div class="next-steps a4">
       <div class="ns-title">📋 Prochaines étapes</div>
       <div class="ns-list">
-
         <div class="ns-step">
-          <div class="ns-dot-col">
-            <div class="ns-dot done">✓</div>
-            <div class="ns-line"></div>
-          </div>
+          <div class="ns-dot-col"><div class="ns-dot done">✓</div><div class="ns-line"></div></div>
           <div class="ns-content">
             <div class="ns-step-title">Achat enregistré</div>
             <div class="ns-step-desc">Votre achat a bien été reçu et le paiement confirmé.</div>
-            <span class="ns-badge">Fait — ${formatDate(order.createdAt)}</span>
+            <span class="ns-badge">Fait — ${dateAchat}</span>
           </div>
         </div>
-
         <div class="ns-step">
-          <div class="ns-dot-col">
-            <div class="ns-dot current">2</div>
-            <div class="ns-line"></div>
-          </div>
+          <div class="ns-dot-col"><div class="ns-dot current">2</div><div class="ns-line"></div></div>
           <div class="ns-content">
             <div class="ns-step-title">Préparation de votre carte</div>
             <div class="ns-step-desc">Notre équipe prépare votre carte LeadWase personnalisée avec votre QR code unique.</div>
             <span class="ns-badge">En cours — sous 24h</span>
           </div>
         </div>
-
         <div class="ns-step">
-          <div class="ns-dot-col">
-            <div class="ns-dot pending">3</div>
-            <div class="ns-line"></div>
-          </div>
+          <div class="ns-dot-col"><div class="ns-dot pending">3</div><div class="ns-line"></div></div>
           <div class="ns-content">
             <div class="ns-step-title">Expédition & Livraison</div>
             <div class="ns-step-desc">Votre carte est expédiée avec votre document d'identifiants de connexion.</div>
             <span class="ns-badge">Prévu — sous 48h</span>
           </div>
         </div>
-
         <div class="ns-step">
-          <div class="ns-dot-col">
-            <div class="ns-dot pending">4</div>
-          </div>
+          <div class="ns-dot-col"><div class="ns-dot pending">4</div></div>
           <div class="ns-content">
             <div class="ns-step-title">Activation de votre profil</div>
             <div class="ns-step-desc">Connectez-vous sur leadwase.com avec vos identifiants et personnalisez votre profil digital.</div>
             <span class="ns-badge">À votre réception</span>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- Livraison -->
-    <div class="info-bar box-anim-5">
-      <span class="info-bar-icon">📦</span>
+    <div class="info-bar a5">
+      <span class="info-icon">📦</span>
       <div>
-        <div class="info-bar-title">Livraison estimée : 48h après validation</div>
-        <div class="info-bar-sub">Votre carte sera livrée à l'adresse indiquée. Vous serez contacté par SMS ou appel avant la livraison.</div>
+        <div class="info-title">Livraison estimée : 48h après validation</div>
+        <div class="info-sub">Votre carte sera livrée à l'adresse indiquée. Vous serez contacté par SMS ou appel avant la livraison.</div>
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="actions-row">
-      <button class="btn-primary"   onclick="window.print()">🖨 Imprimer la confirmation</button>
+      <button class="btn-primary" onclick="window.print()">🖨 Imprimer la confirmation</button>
       <a href="connexion.html" class="btn-secondary">🔑 Se connecter</a>
     </div>
   `;
@@ -578,53 +487,47 @@ function renderOrderNotConnected(order, orderId, cred) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// RENDU — CARTE PHYSIQUE · utilisateur CONNECTÉ
-// Déclenché uniquement quand orderId est présent dans l'URL ou sessionStorage
-// N'affiche RIEN lié à un abonnement
+// RENDU — CARTE · utilisateur CONNECTÉ
 // ════════════════════════════════════════════════════════════════════════════
-function renderOrderConnected(order, orderId) {
-  document.getElementById('header-label-text').textContent = 'Carte confirmée';
+function renderOrderConnected(data, orderId) {
+  document.getElementById('header-label').textContent = 'Carte confirmée';
   sessionStorage.removeItem('last_order_id');
 
   const orderRef  = 'CMD-' + orderId.slice(-6).toUpperCase();
-  const amountFmt = order.amount ? formatNum(order.amount) + ' FCFA' : 'Sur devis';
-  const fullName  = `${order.firstName || ''} ${order.lastName || ''}`.trim();
+  const amountFmt = data.amount ? formatNum(data.amount) + ' FCFA' : 'Sur devis';
+  const fullName  = (data.firstName + ' ' + data.lastName).trim() || '—';
 
-  document.getElementById('main-container').innerHTML = `
+  document.getElementById('main').innerHTML = `
     ${successIcon()}
 
-    <!-- Titre -->
     <div class="title-block">
       <div class="eyebrow">Carte enregistrée</div>
       <h1 class="main-title">Merci pour<br>votre <em>achat !</em></h1>
       <p class="main-sub">Votre carte LeadWase est en préparation. Vous pouvez dès maintenant compléter votre profil.</p>
     </div>
 
-    <!-- Récapitulatif achat carte -->
-    <div class="box box-anim-1">
+    <div class="box a1">
       <div class="box-header">
         <span class="bh-left">Récapitulatif — Carte LeadWase</span>
         <span class="bh-ref">#${orderRef}</span>
       </div>
       <div class="box-body">
-        <div class="detail-row"><span class="dl">Produit</span><span class="dv">Carte LeadWase Classique</span></div>
-        <div class="detail-row"><span class="dl">Nom</span><span class="dv">${fullName || '—'}</span></div>
-        <div class="detail-row"><span class="dl">Montant réglé</span><span class="dv green">${amountFmt} ✓</span></div>
-        <div class="detail-row"><span class="dl">Date d'achat</span><span class="dv">${formatDate(order.createdAt)}</span></div>
-        <div class="detail-row"><span class="dl">Statut</span><span class="dv green">En préparation ✓</span></div>
+        <div class="row"><span class="rl">Produit</span><span class="rv">Carte LeadWase Classique</span></div>
+        <div class="row"><span class="rl">Nom</span><span class="rv">${fullName}</span></div>
+        <div class="row"><span class="rl">Montant réglé</span><span class="rv green">${amountFmt} ✓</span></div>
+        <div class="row"><span class="rl">Date d'achat</span><span class="rv">${formatDate(data.createdAt)}</span></div>
+        <div class="row"><span class="rl">Statut</span><span class="rv green">En préparation ✓</span></div>
       </div>
     </div>
 
-    <!-- Livraison -->
-    <div class="info-bar box-anim-2">
-      <span class="info-bar-icon">📦</span>
+    <div class="info-bar a2">
+      <span class="info-icon">📦</span>
       <div>
-        <div class="info-bar-title">Livraison estimée : 48h après validation</div>
-        <div class="info-bar-sub">Vous êtes déjà connecté. Votre carte sera livrée sous 48h à l'adresse indiquée. Profitez-en pour compléter votre profil dès maintenant.</div>
+        <div class="info-title">Livraison estimée : 48h après validation</div>
+        <div class="info-sub">Vous êtes déjà connecté. Votre carte sera livrée sous 48h à l'adresse indiquée. Profitez-en pour compléter votre profil.</div>
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="actions-row">
       <a href="dashboard.html" class="btn-primary">📱 Aller à mon profil</a>
       <button class="btn-secondary" onclick="window.print()">🖨 Imprimer</button>
@@ -635,11 +538,11 @@ function renderOrderConnected(order, orderId) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// RENDU — FALLBACK (aucun paramètre reconnu)
+// RENDU — FALLBACK
 // ════════════════════════════════════════════════════════════════════════════
-function renderFallback() {
-  document.getElementById('header-label-text').textContent = 'Confirmation';
-  document.getElementById('main-container').innerHTML = `
+function renderFallback(msg) {
+  document.getElementById('header-label').textContent = 'Confirmation';
+  document.getElementById('main').innerHTML = `
     <div class="title-block">
       <div class="eyebrow">Paiement reçu</div>
       <h1 class="main-title">Paiement <em>confirmé</em></h1>
@@ -647,94 +550,99 @@ function renderFallback() {
     </div>
     <div class="fallback-box">
       <div class="fallback-icon">📋</div>
-      <div class="fallback-title">Détails non disponibles</div>
-      <div class="fallback-sub">Les détails de votre transaction ne sont pas disponibles pour le moment. Si vous avez des questions, contactez notre support.</div>
+      <div class="fallback-title">Détails temporairement indisponibles</div>
+      <div class="fallback-sub">${msg || 'Les détails de votre transaction seront disponibles sous peu. Vérifiez votre email ou contactez le support.'}</div>
     </div>
     <div class="actions-row">
-      <a href="connexion.html"              class="btn-primary">🔑 Se connecter</a>
+      <a href="connexion.html"                   class="btn-primary">🔑 Se connecter</a>
       <a href="mailto:supportleadwase@gmail.com" class="btn-secondary">💬 Contacter le support</a>
     </div>
   `;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// POINT D'ENTRÉE — lecture des paramètres URL et routage strict
+// POINT D'ENTRÉE
 //
-// Règle absolue :
-//   • subscriptionId présent  →  flux ABONNEMENT  →  renderSubscription()
-//   • orderId présent          →  flux CARTE        →  renderOrder*()
-//   • aucun des deux           →  renderFallback()
+// Règle de routage stricte :
+//   1. subscriptionId présent → renderSubscription()   [jamais de mot "commande"]
+//   2. orderId présent        → renderOrder*()          [jamais de mot "abonnement"]
+//   3. aucun des deux         → renderFallback()
 //
-// Le paramètre "type" sert uniquement de signal de secours si les IDs
-// manquent mais qu'une sessionStorage a été posée par la page précédente.
+// Toutes les données viennent de /api/get-confirmation (admin SDK),
+// jamais directement de Firestore côté client (bloqué par les Rules).
 // ════════════════════════════════════════════════════════════════════════════
-async function loadConfirmation(user) {
-  const params = new URLSearchParams(window.location.search);
-
-  // ── Lire les IDs depuis l'URL en priorité, puis sessionStorage ──
+async function init() {
+  const params         = new URLSearchParams(window.location.search);
   const subscriptionId = params.get('subscriptionId') || sessionStorage.getItem('last_subscription_id') || null;
   const orderId        = params.get('orderId')        || sessionStorage.getItem('last_order_id')        || null;
 
   // ── CAS 1 : ABONNEMENT ───────────────────────────────────────────────────
-  // Condition stricte : subscriptionId doit être présent.
-  // Si orderId est aussi présent (ne devrait pas arriver), subscriptionId prend priorité.
   if (subscriptionId) {
     try {
-      const snap = await getDoc(doc(db, 'subscriptions', subscriptionId));
-      if (snap.exists()) {
-        renderSubscription(snap.data(), subscriptionId);
+      const res  = await fetch(`/api/get-confirmation?subscriptionId=${encodeURIComponent(subscriptionId)}`);
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        renderFallback(json.error || 'Abonnement introuvable.');
         return;
       }
+      renderSubscription(json.data, subscriptionId);
     } catch (e) {
-      console.error('Erreur lecture abonnement:', e);
+      console.error(e);
+      renderFallback('Impossible de charger votre abonnement.');
     }
-    // subscriptionId invalide → fallback
-    renderFallback();
     return;
   }
 
-  // ── CAS 2 : CARTE PHYSIQUE ───────────────────────────────────────────────
-  // On entre ici SEULEMENT si subscriptionId est absent.
+  // ── CAS 2 : COMMANDE CARTE ───────────────────────────────────────────────
   if (orderId) {
     try {
-      const snap = await getDoc(doc(db, 'orders', orderId));
-      if (snap.exists()) {
-        const order = snap.data();
-
-        if (user) {
-          // Utilisateur connecté → vue simplifiée, accès direct au profil
-          renderOrderConnected(order, orderId);
-        } else {
-          // Utilisateur non connecté → afficher identifiants + étapes
-          let cred = null;
-          if (order.leadwaseId) {
-            try {
-              const credSnap = await getDoc(doc(db, 'credentials', order.leadwaseId));
-              if (credSnap.exists()) cred = credSnap.data();
-            } catch (e) {
-              console.warn('Credentials non trouvés:', e);
-            }
-          }
-          renderOrderNotConnected(order, orderId, cred);
-        }
+      const res  = await fetch(`/api/get-confirmation?orderId=${encodeURIComponent(orderId)}`);
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        renderFallback(json.error || 'Achat introuvable.');
         return;
       }
+
+      // Déterminer si l'utilisateur est connecté via Firebase Auth
+      // (import dynamique pour ne pas bloquer si Firebase échoue)
+      let isConnected = false;
+      try {
+        const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+        const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+        const firebaseConfig = {
+          apiKey:            "AIzaSyA8X6ZqQFw3qRjQxYjY7JqLm6ZqQFw3qRjQ",
+          authDomain:        "leadwase.firebaseapp.com",
+          projectId:         "leadwase",
+          storageBucket:     "leadwase.firebasestorage.app",
+          messagingSenderId: "123456789012",
+          appId:             "1:123456789012:web:abc123def456",
+        };
+        const app  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        isConnected = await new Promise(resolve => {
+          const unsub = onAuthStateChanged(auth, user => { unsub(); resolve(!!user); });
+        });
+      } catch (authErr) {
+        console.warn('Auth check échoué, on considère non connecté:', authErr);
+      }
+
+      if (isConnected) {
+        renderOrderConnected(json.data, orderId);
+      } else {
+        renderOrderNotConnected(json.data, json.credentials, orderId);
+      }
     } catch (e) {
-      console.error('Erreur lecture carte:', e);
+      console.error(e);
+      renderFallback('Impossible de charger votre achat.');
     }
-    // orderId invalide → fallback
-    renderFallback();
     return;
   }
 
-  // ── CAS 3 : Aucun ID reconnu ─────────────────────────────────────────────
-  renderFallback();
+  // ── CAS 3 : Aucun ID ─────────────────────────────────────────────────────
+  renderFallback('Aucun identifiant de transaction trouvé. Vérifiez le lien reçu par email.');
 }
 
-// Auth listener → unique point d'entrée
-onAuthStateChanged(auth, user => {
-  loadConfirmation(user);
-});
+init();
 </script>
 </body>
 </html>
