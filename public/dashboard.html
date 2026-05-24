@@ -159,6 +159,41 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .dash-pub { font-size: 13px; color: var(--green); text-decoration: underline; font-style: italic; }
 
 /* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+.tabs-bar {
+  display: flex;
+  border-bottom: 2px solid var(--gray5);
+  margin-bottom: 22px;
+  gap: 0;
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 13px 20px;
+  font-family: var(--serif);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--gray3);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  position: relative;
+  top: 1px;
+}
+.tab-btn:hover { color: var(--black); background: var(--gray6); }
+.tab-btn.active { color: var(--green); border-bottom-color: var(--green); background: var(--white); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ══════════════════════════════════════════════
    CARD
 ══════════════════════════════════════════════ */
 .card {
@@ -260,6 +295,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 }
 .f-input:focus, .f-textarea:focus { border-color: var(--green3); }
 .f-textarea { min-height: 76px; resize: vertical; }
+.f-hint { font-size: 10px; color: var(--gray3); font-style: italic; margin-top: 2px; }
 
 .save-btn {
   padding: 10px 26px;
@@ -272,6 +308,174 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   display: inline-block; text-decoration: none; text-align: center;
 }
 .save-btn:hover { background: var(--green); }
+.save-btn:disabled { background: var(--gray4); cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════
+   CREDENTIALS TAB
+══════════════════════════════════════════════ */
+.credentials-card {
+  background: var(--white);
+  border: 1px solid var(--gray5);
+  padding: 32px;
+  margin-bottom: 18px;
+}
+.credentials-card h2 {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--black);
+  margin-bottom: 6px;
+}
+.credentials-card .section-desc {
+  font-size: 12px;
+  color: var(--gray3);
+  font-style: italic;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.login-info-box {
+  background: var(--gray6);
+  border: 1px solid var(--gray5);
+  border-left: 3px solid var(--green3);
+  padding: 14px 16px;
+  margin-bottom: 24px;
+}
+.login-info-box .lib-label {
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray3);
+  margin-bottom: 6px;
+}
+.login-info-box .lib-value {
+  font-size: 13px;
+  color: var(--black);
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+.pwd-section {
+  border-top: 1px solid var(--gray5);
+  padding-top: 22px;
+}
+.pwd-section h3 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+.pwd-section .pwd-desc {
+  font-size: 12px;
+  color: var(--gray3);
+  font-style: italic;
+  margin-bottom: 18px;
+}
+
+.pwd-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  max-width: 440px;
+}
+
+.pwd-input-wrap {
+  position: relative;
+}
+.pwd-input-wrap .f-input {
+  padding-right: 40px;
+}
+.pwd-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--gray3);
+  padding: 2px;
+  transition: color .15s;
+}
+.pwd-toggle-btn:hover { color: var(--black); }
+
+.pwd-strength {
+  margin-top: 6px;
+}
+.pwd-strength-bar {
+  height: 3px;
+  background: var(--gray5);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.pwd-strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width .3s ease, background .3s ease;
+  width: 0%;
+}
+.pwd-strength-label {
+  font-size: 10px;
+  color: var(--gray3);
+  font-style: italic;
+}
+
+.pwd-rules {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--gray6);
+  border: 1px solid var(--gray5);
+  border-radius: 2px;
+}
+.pwd-rule {
+  font-size: 11px;
+  color: var(--gray3);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .2s;
+}
+.pwd-rule:last-child { margin-bottom: 0; }
+.pwd-rule.ok { color: var(--green); }
+.pwd-rule.fail { color: var(--gray4); }
+.rule-icon { font-size: 10px; }
+
+.danger-zone {
+  background: var(--white);
+  border: 1px solid #fcd4d4;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.danger-zone h3 {
+  font-size: 13px;
+  font-weight: bold;
+  color: #c0392b;
+  margin-bottom: 8px;
+}
+.danger-zone p {
+  font-size: 12px;
+  color: var(--gray3);
+  font-style: italic;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.danger-btn {
+  padding: 9px 22px;
+  background: transparent;
+  border: 1px solid #c0392b;
+  color: #c0392b;
+  font-family: var(--serif);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all .2s;
+}
+.danger-btn:hover { background: #c0392b; color: var(--white); }
 
 /* ══════════════════════════════════════════════
    SECTION CARDS
@@ -433,10 +637,13 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   .upgrade-btns { flex-direction: column; }
   .ucta { min-width: 0; }
   .profile-top { flex-direction: column; gap: 12px; }
+  .tabs-bar { overflow-x: auto; }
+  .tab-btn { padding: 11px 14px; font-size: 11px; }
+  .pwd-grid { max-width: 100%; }
 }
 @media (max-width: 480px) {
   .dash { padding: 10px; }
-  .card, .locked-card, .links-card, .extras-card, .plan-compare { padding: 14px; }
+  .card, .locked-card, .links-card, .extras-card, .plan-compare, .credentials-card { padding: 14px; }
   .pf-av { width: 54px; height: 54px; font-size: 18px; }
   .plan-table { font-size: 11px; }
   .plan-table th, .plan-table td { padding: 6px 6px; }
@@ -493,186 +700,279 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
         <a class="dash-pub" href="#" id="pub-link">Voir mon profil public →</a>
       </div>
 
-      <!-- ── Profil + Infos ── -->
-      <div class="card">
-        <div class="profile-top">
-          <div class="pf-av" id="pf-av">
-            <span id="pf-av-text">?</span>
-            <img id="pf-av-img" style="display:none; width:100%; height:100%; object-fit:cover" alt="Photo de profil">
-          </div>
-          <div>
-            <div class="pf-name" id="pf-name">–</div>
-            <div class="pf-job" id="pf-job">–</div>
-            <div class="pf-co" id="pf-co"></div>
-            <div class="pf-id" id="pf-id">–</div>
-            <div class="plan-badge" id="pf-plan">FREE</div>
-          </div>
-        </div>
-
-        <!-- Upload photo (Pro et Business uniquement) -->
-        <div id="photo-upload-section" style="display:none" class="photo-upload">
-          <label>
-            📷 Changer la photo de profil
-            <input type="file" id="profile-photo" accept="image/jpeg,image/png,image/jpg">
-          </label>
-          <div class="photo-preview" id="photo-preview"></div>
-        </div>
-
-        <div class="edit-sec">
-          <h3>✏️ Modifier mes informations</h3>
-          <div class="edit-grid">
-            <div class="f-group"><label class="f-label">Prénom</label><input class="f-input" id="e-first"></div>
-            <div class="f-group"><label class="f-label">Nom</label><input class="f-input" id="e-last"></div>
-            <div class="f-group"><label class="f-label">Titre / Poste</label><input class="f-input" id="e-job"></div>
-            <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="e-co"></div>
-            <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" type="tel" id="e-phone"></div>
-            <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="e-email"></div>
-          </div>
-          <div class="edit-grid edit-solo" style="margin-top:12px">
-            <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
-            <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
-          </div>
-          <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
-        </div>
+      <!-- ── ONGLETS ── -->
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('profil', this)">👤 Profil</button>
+        <button class="tab-btn" onclick="switchTab('identifiants', this)">🔑 Identifiants</button>
       </div>
 
-      <!-- ── Analytics teaser (Pro/Business) ── -->
-      <div class="analytics-teaser" id="analytics-teaser" style="display:none">
-        <div class="analytics-teaser-info">
-          <h3>📊 Analytics — Statistiques de votre profil</h3>
-          <p>Consultez vos visites, vos contacts les plus actifs et l'évolution de votre réseau.</p>
+      <!-- ══════════════════════════════════════════════
+           ONGLET PROFIL
+      ══════════════════════════════════════════════ -->
+      <div class="tab-panel active" id="tab-profil">
+
+        <!-- ── Profil + Infos ── -->
+        <div class="card">
+          <div class="profile-top">
+            <div class="pf-av" id="pf-av">
+              <span id="pf-av-text">?</span>
+              <img id="pf-av-img" style="display:none; width:100%; height:100%; object-fit:cover" alt="Photo de profil">
+            </div>
+            <div>
+              <div class="pf-name" id="pf-name">–</div>
+              <div class="pf-job" id="pf-job">–</div>
+              <div class="pf-co" id="pf-co"></div>
+              <div class="pf-id" id="pf-id">–</div>
+              <div class="plan-badge" id="pf-plan">FREE</div>
+            </div>
+          </div>
+
+          <!-- Upload photo (Pro et Business uniquement) -->
+          <div id="photo-upload-section" style="display:none" class="photo-upload">
+            <label>
+              📷 Changer la photo de profil
+              <input type="file" id="profile-photo" accept="image/jpeg,image/png,image/jpg">
+            </label>
+            <div class="photo-preview" id="photo-preview"></div>
+          </div>
+
+          <div class="edit-sec">
+            <h3>✏️ Modifier mes informations</h3>
+            <div class="edit-grid">
+              <div class="f-group"><label class="f-label">Prénom</label><input class="f-input" id="e-first"></div>
+              <div class="f-group"><label class="f-label">Nom</label><input class="f-input" id="e-last"></div>
+              <div class="f-group"><label class="f-label">Titre / Poste</label><input class="f-input" id="e-job"></div>
+              <div class="f-group"><label class="f-label">Entreprise</label><input class="f-input" id="e-co"></div>
+              <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" type="tel" id="e-phone"></div>
+              <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="e-email"></div>
+            </div>
+            <div class="edit-grid edit-solo" style="margin-top:12px">
+              <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
+              <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
+            </div>
+            <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
+          </div>
         </div>
-        <a class="analytics-btn" href="analytics.html">Voir mes stats →</a>
-      </div>
 
-      <!-- ── Réseaux sociaux (Pro/Business) ── -->
-      <div class="links-card" id="links-sec" style="display:none">
-        <h3>🔗 Réseaux sociaux &amp; liens</h3>
-        <div class="link-row"><div class="link-icon">💼</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">LinkedIn</label><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div></div>
-        <div class="link-row"><div class="link-icon">📷</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Instagram</label><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div></div>
-        <div class="link-row"><div class="link-icon">🎵</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">TikTok</label><input class="f-input" id="l-tk" placeholder="https://tiktok.com/@..."></div></div>
-        <div class="link-row"><div class="link-icon">📘</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Facebook</label><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div></div>
-        <div class="link-row"><div class="link-icon">📺</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">YouTube</label><input class="f-input" id="l-yt" placeholder="https://youtube.com/@..."></div></div>
-        <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Twitter / X</label><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
-        <div class="link-row"><div class="link-icon">💬</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div></div>
-        <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
-      </div>
-
-      <!-- ── Extras (Business uniquement) ── -->
-      <div class="extras-card" id="extras-sec" style="display:none">
-
-        <div class="extras-section" id="location-section" style="display:none">
-          <h3>📍 Localisation</h3>
-          <div class="edit-grid edit-solo">
-            <div class="f-group"><label class="f-label">Adresse complète</label><input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin"></div>
+        <!-- ── Analytics teaser (Pro/Business) ── -->
+        <div class="analytics-teaser" id="analytics-teaser" style="display:none">
+          <div class="analytics-teaser-info">
+            <h3>📊 Analytics — Statistiques de votre profil</h3>
+            <p>Consultez vos visites, vos contacts les plus actifs et l'évolution de votre réseau.</p>
           </div>
-          <div class="map-preview">🗺️ Aperçu carte Google Maps</div>
+          <a class="analytics-btn" href="analytics.html">Voir mes stats →</a>
         </div>
 
-        <div class="extras-section" id="rdv-section" style="display:none">
-          <h3>📅 Prise de rendez-vous</h3>
-          <div class="edit-grid">
-            <div class="f-group"><label class="f-label">Lien Calendly / Cal.com</label><input class="f-input" id="e-rdv" placeholder="https://calendly.com/..."></div>
-            <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
-          </div>
-          <div style="margin-top:10px">
-            <span style="font-size:11px;color:var(--gray3)">Aperçu bouton :</span><br>
-            <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
-          </div>
+        <!-- ── Réseaux sociaux (Pro/Business) ── -->
+        <div class="links-card" id="links-sec" style="display:none">
+          <h3>🔗 Réseaux sociaux &amp; liens</h3>
+          <div class="link-row"><div class="link-icon">💼</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">LinkedIn</label><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div></div>
+          <div class="link-row"><div class="link-icon">📷</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Instagram</label><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div></div>
+          <div class="link-row"><div class="link-icon">🎵</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">TikTok</label><input class="f-input" id="l-tk" placeholder="https://tiktok.com/@..."></div></div>
+          <div class="link-row"><div class="link-icon">📘</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Facebook</label><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div></div>
+          <div class="link-row"><div class="link-icon">📺</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">YouTube</label><input class="f-input" id="l-yt" placeholder="https://youtube.com/@..."></div></div>
+          <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Twitter / X</label><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
+          <div class="link-row"><div class="link-icon">💬</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div></div>
+          <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
         </div>
 
-        <div class="extras-section" id="google-review-section" style="display:none">
-          <h3>⭐ Avis Google</h3>
-          <div class="edit-grid edit-solo">
-            <div class="f-group"><label class="f-label">Lien vers vos avis Google</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
+        <!-- ── Extras (Business uniquement) ── -->
+        <div class="extras-card" id="extras-sec" style="display:none">
+
+          <div class="extras-section" id="location-section" style="display:none">
+            <h3>📍 Localisation</h3>
+            <div class="edit-grid edit-solo">
+              <div class="f-group"><label class="f-label">Adresse complète</label><input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin"></div>
+            </div>
+            <div class="map-preview">🗺️ Aperçu carte Google Maps</div>
           </div>
-          <div class="review-preview" id="review-preview" style="display:none">
-            <span class="stars">★★★★★</span>
-            <span>Voir nos avis sur Google →</span>
+
+          <div class="extras-section" id="rdv-section" style="display:none">
+            <h3>📅 Prise de rendez-vous</h3>
+            <div class="edit-grid">
+              <div class="f-group"><label class="f-label">Lien Calendly / Cal.com</label><input class="f-input" id="e-rdv" placeholder="https://calendly.com/..."></div>
+              <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
+            </div>
+            <div style="margin-top:10px">
+              <span style="font-size:11px;color:var(--gray3)">Aperçu bouton :</span><br>
+              <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
+            </div>
           </div>
-          <div class="ai-box" id="ai-review-box" style="display:none">
-            <strong style="font-size:11px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
-            <p>Activez la réponse IA automatique à vos nouveaux avis Google.</p>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
-              <input type="checkbox" id="ai-review-toggle" style="accent-color:var(--green);width:13px;height:13px">
-              Activer les réponses automatiques
+
+          <div class="extras-section" id="google-review-section" style="display:none">
+            <h3>⭐ Avis Google</h3>
+            <div class="edit-grid edit-solo">
+              <div class="f-group"><label class="f-label">Lien vers vos avis Google</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
+            </div>
+            <div class="review-preview" id="review-preview" style="display:none">
+              <span class="stars">★★★★★</span>
+              <span>Voir nos avis sur Google →</span>
+            </div>
+            <div class="ai-box" id="ai-review-box" style="display:none">
+              <strong style="font-size:11px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
+              <p>Activez la réponse IA automatique à vos nouveaux avis Google.</p>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+                <input type="checkbox" id="ai-review-toggle" style="accent-color:var(--green);width:13px;height:13px">
+                Activer les réponses automatiques
+              </label>
+            </div>
+          </div>
+
+          <div class="extras-section" id="contact-section" style="display:none">
+            <h3>📨 Formulaire de contact</h3>
+            <div class="edit-grid">
+              <div class="f-group"><label class="f-label">Lien du formulaire</label><input class="f-input" id="e-contact-link" placeholder="https://form.typeform.com/... ou https://exemple.com/contact"></div>
+              <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:10px;cursor:pointer;color:var(--gray2)">
+              <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
+              Afficher le formulaire sur mon profil public
             </label>
           </div>
+
+          <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
         </div>
 
-        <div class="extras-section" id="contact-section" style="display:none">
-          <h3>📨 Formulaire de contact</h3>
-          <div class="edit-grid">
-            <div class="f-group"><label class="f-label">Lien du formulaire</label><input class="f-input" id="e-contact-link" placeholder="https://form.typeform.com/... ou https://exemple.com/contact"></div>
-            <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
+        <!-- ── Fonctionnalités verrouillées (Free) ── -->
+        <div class="locked-card" id="locked-sec">
+          <div class="locked-title">🔒 Fonctionnalités non disponibles sur Free</div>
+          <div class="locked-item">🔒 Liens réseaux sociaux (LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter, WhatsApp)</div>
+          <div class="locked-item">🔒 Photo de profil</div>
+          <div class="locked-item">🔒 Localisation / Adresse</div>
+          <div class="locked-item">🔒 Prise de rendez-vous</div>
+          <div class="locked-item">🔒 Avis Google</div>
+          <div class="locked-item">🔒 Formulaire de contact</div>
+          <div class="locked-item">🔒 Analytics — statistiques de visites</div>
+        </div>
+
+        <!-- ── Tableau comparatif plans ── -->
+        <div class="plan-compare">
+          <h3>📋 Fonctionnalités par abonnement</h3>
+          <div style="overflow-x:auto">
+            <table class="plan-table">
+              <thead>
+                <tr><th>Fonctionnalité</th><th>FREE</th><th>PRO</th><th>BUSINESS</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Profil public (Nom, Poste, Tel, Email)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>Carte NFC &amp; QR Code</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>Site web personnel</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>Photo de profil</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>WhatsApp direct</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>Analytics de visites</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td><strong>Localisation / Adresse</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td><strong>Prise de rendez-vous</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td><strong>Avis Google</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td><strong>Formulaire de contact</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>Support prioritaire</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+              </tbody>
+            </table>
           </div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:10px;cursor:pointer;color:var(--gray2)">
-            <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
-            Afficher le formulaire sur mon profil public
-          </label>
         </div>
 
-        <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
-      </div>
-
-      <!-- ── Fonctionnalités verrouillées (Free) ── -->
-      <div class="locked-card" id="locked-sec">
-        <div class="locked-title">🔒 Fonctionnalités non disponibles sur Free</div>
-        <div class="locked-item">🔒 Liens réseaux sociaux (LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter, WhatsApp)</div>
-        <div class="locked-item">🔒 Photo de profil</div>
-        <div class="locked-item">🔒 Localisation / Adresse</div>
-        <div class="locked-item">🔒 Prise de rendez-vous</div>
-        <div class="locked-item">🔒 Avis Google</div>
-        <div class="locked-item">🔒 Formulaire de contact</div>
-        <div class="locked-item">🔒 Analytics — statistiques de visites</div>
-      </div>
-
-      <!-- ── Tableau comparatif plans ── -->
-      <div class="plan-compare">
-        <h3>📋 Fonctionnalités par abonnement</h3>
-        <div style="overflow-x:auto">
-          <table class="plan-table">
-            <thead>
-              <tr><th>Fonctionnalité</th><th>FREE</th><th>PRO</th><th>BUSINESS</th></tr></thead>
-            <tbody>
-              <tr><td>Profil public (Nom, Poste, Tel, Email)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>Carte NFC &amp; QR Code</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>Site web personnel</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>Photo de profil</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>WhatsApp direct</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td>Analytics de visites</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
-              <tr><td><strong>Localisation / Adresse</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-              <tr><td><strong>Prise de rendez-vous</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-              <tr><td><strong>Avis Google</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-              <tr><td><strong>Formulaire de contact</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-              <tr><td>Support prioritaire</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-            </tbody>
-          </table>
+        <div class="upgrade" id="upgrade-sec">
+          <h3>🚀 Passez à Pro ou Business</h3>
+          <p>Débloquez les réseaux sociaux, WhatsApp, la localisation, les rendez-vous, les avis Google, les analytics et bien plus encore.</p>
+          <div class="upgrade-btns">
+            <a class="ucta ucta-pro" href="offres.html">Passer à Pro — 2 999 XOF/mois</a>
+            <a class="ucta ucta-biz" href="offres.html">Voir Business — 4 566 XOF/mois</a>
+          </div>
         </div>
-      </div>
 
-      <div class="upgrade" id="upgrade-sec">
-        <h3>🚀 Passez à Pro ou Business</h3>
-        <p>Débloquez les réseaux sociaux, WhatsApp, la localisation, les rendez-vous, les avis Google, les analytics et bien plus encore.</p>
-        <div class="upgrade-btns">
-          <a class="ucta ucta-pro" href="offres.html">Passer à Pro — 2 999 XOF/mois</a>
-          <a class="ucta ucta-biz" href="offres.html">Voir Business — 4 566 XOF/mois</a>
+      </div><!-- /tab-profil -->
+
+      <!-- ══════════════════════════════════════════════
+           ONGLET IDENTIFIANTS
+      ══════════════════════════════════════════════ -->
+      <div class="tab-panel" id="tab-identifiants">
+
+        <!-- Infos de connexion -->
+        <div class="credentials-card">
+          <h2>🔑 Mes identifiants de connexion</h2>
+          <p class="section-desc">Consultez vos informations de connexion et modifiez votre mot de passe. Ces identifiants vous permettent d'accéder à votre espace LeadWase.</p>
+
+          <div class="login-info-box">
+            <div class="lib-label">Identifiant LeadWase</div>
+            <div class="lib-value" id="cred-lwid">–</div>
+          </div>
+          <div class="login-info-box" style="margin-top:10px">
+            <div class="lib-label">Email de connexion</div>
+            <div class="lib-value" id="cred-email">–</div>
+          </div>
+
+          <!-- Section changement de mot de passe -->
+          <div class="pwd-section">
+            <h3>🔒 Modifier mon mot de passe</h3>
+            <p class="pwd-desc">Choisissez un mot de passe sécurisé d'au moins 8 caractères. Il sera utilisé lors de votre prochaine connexion.</p>
+
+            <div class="pwd-grid">
+              <!-- Mot de passe actuel -->
+              <div class="f-group">
+                <label class="f-label">Mot de passe actuel</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-current" placeholder="Votre mot de passe actuel" autocomplete="current-password">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-current', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+              </div>
+
+              <!-- Nouveau mot de passe -->
+              <div class="f-group">
+                <label class="f-label">Nouveau mot de passe</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-new" placeholder="Nouveau mot de passe" autocomplete="new-password" oninput="checkPwdStrength(this.value)">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-new', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+                <div class="pwd-strength">
+                  <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="pwd-strength-fill"></div></div>
+                  <div class="pwd-strength-label" id="pwd-strength-label">Saisissez un mot de passe</div>
+                </div>
+                <div class="pwd-rules" id="pwd-rules">
+                  <div class="pwd-rule" id="rule-length"><span class="rule-icon">○</span> Au moins 8 caractères</div>
+                  <div class="pwd-rule" id="rule-upper"><span class="rule-icon">○</span> Une majuscule</div>
+                  <div class="pwd-rule" id="rule-number"><span class="rule-icon">○</span> Un chiffre</div>
+                  <div class="pwd-rule" id="rule-special"><span class="rule-icon">○</span> Un caractère spécial (!@#$%...)</div>
+                </div>
+              </div>
+
+              <!-- Confirmer le nouveau mot de passe -->
+              <div class="f-group">
+                <label class="f-label">Confirmer le nouveau mot de passe</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-confirm" placeholder="Répétez le nouveau mot de passe" autocomplete="new-password" oninput="checkPwdMatch()">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-confirm', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+                <div class="f-hint" id="pwd-match-hint"></div>
+              </div>
+            </div>
+
+            <button class="save-btn" id="pwd-save-btn" onclick="changePassword()" style="margin-top:18px">Changer le mot de passe</button>
+          </div>
         </div>
-      </div>
 
-    </div>
+        <!-- Zone danger -->
+        <div class="danger-zone">
+          <h3>⚠️ Zone sensible</h3>
+          <p>Si vous avez oublié votre mot de passe actuel, vous pouvez demander une réinitialisation par email. Un lien vous sera envoyé à l'adresse de connexion de votre compte.</p>
+          <button class="danger-btn" onclick="sendResetEmail()">Envoyer un lien de réinitialisation</button>
+        </div>
+
+      </div><!-- /tab-identifiants -->
+
+    </div><!-- /dash -->
   </main>
 </div>
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
 let currentPlan = 'free';
 let currentProfileData = null;
+let currentUser = null;
+let currentLoginEmail = null;
 
 function lwIdFromInternalEmail(email) {
   if (!email) return null;
@@ -692,17 +992,14 @@ async function compressImage(file, maxWidth = 200, quality = 0.6) {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
         }
-        
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        
         const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
         resolve(compressedBase64);
       };
@@ -715,17 +1012,13 @@ async function compressImage(file, maxWidth = 200, quality = 0.6) {
 // ── Upload photo avec compression ────────────────────────────────────────────
 async function uploadProfileImage(file) {
   if (!lwId) return null;
-  
   if (!file.type.startsWith('image/')) {
     toast('Veuillez sélectionner une image', 'error');
     return null;
   }
-  
   toast('Compression de l\'image en cours...', 'success');
-  
   try {
     let compressedBase64 = await compressImage(file, 200, 0.6);
-    
     if (compressedBase64.length > 350000) {
       compressedBase64 = await compressImage(file, 150, 0.5);
       if (compressedBase64.length > 350000) {
@@ -733,17 +1026,14 @@ async function uploadProfileImage(file) {
         return null;
       }
     }
-    
     const profileRef = doc(db, 'profiles', lwId);
-    await updateDoc(profileRef, { 
+    await updateDoc(profileRef, {
       photoURL: compressedBase64,
       updatedAt: new Date()
     });
-    
     displayAvatar({ ...currentProfileData, photoURL: compressedBase64 });
     toast('Photo de profil mise à jour !', 'success');
     return compressedBase64;
-    
   } catch (err) {
     console.error(err);
     toast('Erreur lors du traitement de l\'image', 'error');
@@ -758,7 +1048,6 @@ function displayAvatar(p) {
   const ini = ((p.firstName || '?')[0] + (p.lastName || '?')[0]).toUpperCase();
   const photoBase64 = p.photoURL || null;
   const isPro = ['pro', 'business'].includes(p.plan);
-  
   if (isPro && photoBase64 && photoBase64.startsWith('data:image')) {
     avText.style.display = 'none';
     avImg.style.display = 'block';
@@ -776,7 +1065,7 @@ function toast(msg, type) {
   t.className = 'toast ' + type;
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 3500);
 }
 
 // ── Code public (masqué) ─────────────────────────────────────────────────────
@@ -813,12 +1102,178 @@ window.toggleReviewPreview = (val) => {
   document.getElementById('review-preview').style.display = val.trim() ? 'flex' : 'none';
 };
 
+// ── Gestion des onglets ──────────────────────────────────────────────────────
+window.switchTab = (tabId, btn) => {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ── Afficher/masquer mot de passe ─────────────────────────────────────────────
+window.togglePwd = (inputId, btn) => {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+};
+
+// ── Force du mot de passe ─────────────────────────────────────────────────────
+window.checkPwdStrength = (val) => {
+  const fill = document.getElementById('pwd-strength-fill');
+  const label = document.getElementById('pwd-strength-label');
+
+  const rules = {
+    length:  val.length >= 8,
+    upper:   /[A-Z]/.test(val),
+    number:  /[0-9]/.test(val),
+    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val),
+  };
+
+  // Mise à jour des règles visuelles
+  const ruleMap = { length: 'rule-length', upper: 'rule-upper', number: 'rule-number', special: 'rule-special' };
+  Object.entries(rules).forEach(([key, ok]) => {
+    const el = document.getElementById(ruleMap[key]);
+    if (!el) return;
+    el.className = 'pwd-rule ' + (ok ? 'ok' : 'fail');
+    el.querySelector('.rule-icon').textContent = ok ? '✓' : '○';
+  });
+
+  const score = Object.values(rules).filter(Boolean).length;
+  const pct = [0, 25, 50, 75, 100][score];
+  const colors = ['#e5e5ea', '#e74c3c', '#f39c12', '#2ecc71', '#1a7a3c'];
+  const labels = ['', 'Très faible', 'Faible', 'Moyen', 'Fort'];
+
+  fill.style.width = pct + '%';
+  fill.style.background = colors[score];
+  label.textContent = val.length === 0 ? 'Saisissez un mot de passe' : labels[score];
+  label.style.color = colors[score];
+
+  checkPwdMatch();
+};
+
+// ── Correspondance des mots de passe ─────────────────────────────────────────
+window.checkPwdMatch = () => {
+  const newVal = document.getElementById('pwd-new').value;
+  const confirmVal = document.getElementById('pwd-confirm').value;
+  const hint = document.getElementById('pwd-match-hint');
+  if (!confirmVal) { hint.textContent = ''; return; }
+  if (newVal === confirmVal) {
+    hint.textContent = '✓ Les mots de passe correspondent';
+    hint.style.color = 'var(--green)';
+  } else {
+    hint.textContent = '✗ Les mots de passe ne correspondent pas';
+    hint.style.color = '#c0392b';
+  }
+};
+
+// ── Changement de mot de passe ────────────────────────────────────────────────
+window.changePassword = async () => {
+  const current = document.getElementById('pwd-current').value;
+  const newPwd  = document.getElementById('pwd-new').value;
+  const confirm = document.getElementById('pwd-confirm').value;
+  const btn     = document.getElementById('pwd-save-btn');
+
+  if (!current || !newPwd || !confirm) {
+    toast('Veuillez remplir tous les champs', 'error');
+    return;
+  }
+  if (newPwd.length < 8) {
+    toast('Le nouveau mot de passe doit contenir au moins 8 caractères', 'error');
+    return;
+  }
+  if (newPwd !== confirm) {
+    toast('Les mots de passe ne correspondent pas', 'error');
+    return;
+  }
+  if (newPwd === current) {
+    toast('Le nouveau mot de passe doit être différent de l\'ancien', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Mise à jour...';
+
+  try {
+    if (!currentUser || !currentLoginEmail) throw new Error('Utilisateur non connecté');
+
+    // Ré-authentification obligatoire avant changement de mot de passe
+    const credential = EmailAuthProvider.credential(currentLoginEmail, current);
+    await reauthenticateWithCredential(currentUser, credential);
+
+    // Mise à jour du mot de passe Firebase Auth
+    await updatePassword(currentUser, newPwd);
+
+    // Mise à jour du hash dans Firestore (collection credentials)
+    try {
+      const credRef = doc(db, 'credentials', lwId);
+      await updateDoc(credRef, {
+        passwordHash: newPwd, // Remplacer par un vrai hash si vous hashez côté client
+        updatedAt: new Date()
+      });
+    } catch(firestoreErr) {
+      // Non bloquant si credentials n'existe pas encore
+      console.warn('Firestore credentials update skipped:', firestoreErr);
+    }
+
+    toast('✅ Mot de passe modifié avec succès !', 'success');
+
+    // Réinitialiser les champs
+    document.getElementById('pwd-current').value = '';
+    document.getElementById('pwd-new').value = '';
+    document.getElementById('pwd-confirm').value = '';
+    document.getElementById('pwd-strength-fill').style.width = '0%';
+    document.getElementById('pwd-strength-label').textContent = 'Saisissez un mot de passe';
+    document.getElementById('pwd-match-hint').textContent = '';
+    document.querySelectorAll('.pwd-rule').forEach(r => {
+      r.className = 'pwd-rule';
+      r.querySelector('.rule-icon').textContent = '○';
+    });
+
+  } catch (err) {
+    console.error('Erreur changement mdp:', err);
+    if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+      toast('Mot de passe actuel incorrect', 'error');
+    } else if (err.code === 'auth/weak-password') {
+      toast('Le nouveau mot de passe est trop faible', 'error');
+    } else if (err.code === 'auth/requires-recent-login') {
+      toast('Session expirée. Veuillez vous reconnecter puis réessayer.', 'error');
+    } else {
+      toast('Erreur : ' + (err.message || 'inconnue'), 'error');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Changer le mot de passe';
+  }
+};
+
+// ── Réinitialisation par email ────────────────────────────────────────────────
+window.sendResetEmail = async () => {
+  if (!currentLoginEmail) {
+    toast('Email de connexion introuvable', 'error');
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, currentLoginEmail);
+    toast('📧 Lien de réinitialisation envoyé à ' + currentLoginEmail, 'success');
+  } catch (err) {
+    console.error(err);
+    toast('Erreur lors de l\'envoi : ' + err.message, 'error');
+  }
+};
+
 // ── Auth State ───────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = '/connexion.html';
     return;
   }
+
+  currentUser = user;
 
   const uDoc = await getDoc(doc(db, 'users', user.uid));
   const ud = uDoc.exists() ? uDoc.data() : {};
@@ -880,6 +1335,20 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('e-web').value = p.website || '';
   document.getElementById('e-bio').value = p.bio || '';
 
+  // ── Onglet Identifiants — remplissage ──────────────────────────────────────
+  // Email de connexion depuis Firestore credentials ou depuis l'auth Firebase
+  currentLoginEmail = user.email; // email Firebase Auth (lw-XXXXX@leadwase.internal)
+  try {
+    const credDoc = await getDoc(doc(db, 'credentials', lwId));
+    if (credDoc.exists()) {
+      const cd = credDoc.data();
+      currentLoginEmail = cd.loginEmail || user.email;
+    }
+  } catch(e) { /* pas bloquant */ }
+
+  document.getElementById('cred-lwid').textContent = lwId || '–';
+  document.getElementById('cred-email').textContent = currentLoginEmail || '–';
+
   if (isPro) {
     document.getElementById('locked-sec').style.display = 'none';
     document.getElementById('upgrade-sec').style.display = 'none';
@@ -897,22 +1366,18 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('l-wa').value = p.whatsapp || '';
 
     document.getElementById('extras-sec').style.display = 'block';
-    
+
     if (isBusiness) {
       document.getElementById('location-section').style.display = 'block';
       document.getElementById('e-location').value = p.location || '';
-      
       document.getElementById('rdv-section').style.display = 'block';
       document.getElementById('e-rdv').value = p.rdvLink || '';
       document.getElementById('e-rdv-label').value = p.rdvLabel || 'Prendre rendez-vous';
-      
       document.getElementById('google-review-section').style.display = 'block';
       document.getElementById('e-google-review').value = p.googleReview || '';
       if (p.googleReview) document.getElementById('review-preview').style.display = 'flex';
-      
       document.getElementById('ai-review-box').style.display = 'block';
       document.getElementById('ai-review-toggle').checked = p.aiReviewEnabled || false;
-      
       document.getElementById('contact-section').style.display = 'block';
       document.getElementById('e-contact-link').value = p.contactLink || '';
       document.getElementById('e-contact-msg').value = p.contactMessage || '';
@@ -923,22 +1388,17 @@ onAuthStateChanged(auth, async user => {
   // Upload photo
   const photoInput = document.getElementById('profile-photo');
   const photoPreview = document.getElementById('photo-preview');
-  
   if (p.photoURL) {
     photoPreview.innerHTML = `<img src="${p.photoURL}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px">`;
   }
-  
   photoInput.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    // Prévisualisation
     const reader = new FileReader();
     reader.onload = (ev) => {
       photoPreview.innerHTML = `<img src="${ev.target.result}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px"> <span style="font-size:11px">Nouvelle photo</span>`;
     };
     reader.readAsDataURL(file);
-    
     await uploadProfileImage(file);
   };
 
@@ -950,22 +1410,19 @@ onAuthStateChanged(auth, async user => {
 window.saveProfile = async () => {
   try {
     if (!lwId) throw new Error("lwId manquant");
-    
     const payload = {
       firstName: document.getElementById('e-first').value.trim(),
-      lastName: document.getElementById('e-last').value.trim(),
-      jobTitle: document.getElementById('e-job').value.trim(),
-      company: document.getElementById('e-co').value.trim(),
-      phone: document.getElementById('e-phone').value.trim(),
-      email: document.getElementById('e-email').value.trim(),
-      website: document.getElementById('e-web').value.trim(),
-      bio: document.getElementById('e-bio').value.trim(),
+      lastName:  document.getElementById('e-last').value.trim(),
+      jobTitle:  document.getElementById('e-job').value.trim(),
+      company:   document.getElementById('e-co').value.trim(),
+      phone:     document.getElementById('e-phone').value.trim(),
+      email:     document.getElementById('e-email').value.trim(),
+      website:   document.getElementById('e-web').value.trim(),
+      bio:       document.getElementById('e-bio').value.trim(),
       updatedAt: new Date(),
     };
-
     const profileRef = doc(db, 'profiles', lwId);
     await updateDoc(profileRef, payload);
-    
     displayAvatar({ ...currentProfileData, ...payload });
     toast('Profil mis à jour !', 'success');
   } catch (e) {
@@ -978,16 +1435,15 @@ window.saveProfile = async () => {
 window.saveLinks = async () => {
   try {
     const payload = {
-      linkedin: document.getElementById('l-li').value.trim(),
+      linkedin:  document.getElementById('l-li').value.trim(),
       instagram: document.getElementById('l-ig').value.trim(),
-      tiktok: document.getElementById('l-tk').value.trim(),
-      facebook: document.getElementById('l-fb').value.trim(),
-      youtube: document.getElementById('l-yt').value.trim(),
-      twitter: document.getElementById('l-tw').value.trim(),
-      whatsapp: document.getElementById('l-wa').value.trim(),
+      tiktok:    document.getElementById('l-tk').value.trim(),
+      facebook:  document.getElementById('l-fb').value.trim(),
+      youtube:   document.getElementById('l-yt').value.trim(),
+      twitter:   document.getElementById('l-tw').value.trim(),
+      whatsapp:  document.getElementById('l-wa').value.trim(),
       updatedAt: new Date(),
     };
-
     const profileRef = doc(db, 'profiles', lwId);
     await updateDoc(profileRef, payload);
     toast('Liens mis à jour !', 'success');
@@ -1000,18 +1456,16 @@ window.saveLinks = async () => {
 window.saveExtras = async () => {
   try {
     const data = { updatedAt: new Date() };
-    
     if (currentPlan === 'business') {
-      data.location = document.getElementById('e-location').value.trim();
-      data.rdvLink = document.getElementById('e-rdv').value.trim();
-      data.rdvLabel = document.getElementById('e-rdv-label').value.trim();
-      data.googleReview = document.getElementById('e-google-review').value.trim();
-      data.contactLink = document.getElementById('e-contact-link').value.trim();
+      data.location       = document.getElementById('e-location').value.trim();
+      data.rdvLink        = document.getElementById('e-rdv').value.trim();
+      data.rdvLabel       = document.getElementById('e-rdv-label').value.trim();
+      data.googleReview   = document.getElementById('e-google-review').value.trim();
+      data.contactLink    = document.getElementById('e-contact-link').value.trim();
       data.contactMessage = document.getElementById('e-contact-msg').value.trim();
-      data.contactActive = document.getElementById('e-contact-active').checked;
+      data.contactActive  = document.getElementById('e-contact-active').checked;
       data.aiReviewEnabled = document.getElementById('ai-review-toggle').checked;
     }
-    
     const profileRef = doc(db, 'profiles', lwId);
     await updateDoc(profileRef, data);
     if (data.googleReview) document.getElementById('review-preview').style.display = 'flex';
