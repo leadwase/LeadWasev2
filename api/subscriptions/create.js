@@ -74,7 +74,8 @@ export default async function handler(req, res) {
 
     await payRef.update({ pid: gData.pid });
     await subRef.update({ paymentId: payRef.id, pid: gData.pid });
-    res.json({ success: true, payUrl: gData.url });
+    //res.json({ success: true, payUrl: gData.url });
+    res.json({ success: true, payUrl: gData.url, subscriptionId: subRef.id });
 
   } catch (e) { res.status(500).json({ error: e.message }); }
 }
