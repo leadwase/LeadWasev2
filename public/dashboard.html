@@ -1335,7 +1335,6 @@ onAuthStateChanged(auth, async user => {
   } catch(e) { /* pas bloquant */ }
 
   document.getElementById('cred-lwid').textContent = lwId || '–';
-  document.getElementById('cred-email').textContent = currentLoginEmail || '–';
 
   if (isPro) {
     document.getElementById('locked-sec').style.display = 'none';
