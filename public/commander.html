@@ -252,6 +252,7 @@
       });
       const d = await r.json();
       if (d.payUrl) {
+        sessionStorage.setItem('last_order_id', d.orderId); // ← ajouter
         window.location.href = d.payUrl;
       } else {
         showPopup('❌', 'Erreur', d.error || 'Commande non traitée', null);
