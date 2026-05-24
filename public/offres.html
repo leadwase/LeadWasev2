@@ -208,7 +208,10 @@ window.subscribe = async plan => {
       body: JSON.stringify({ plan })
     });
     const d = await r.json();
-    if (d.payUrl) window.location.href = d.payUrl;
+    if (d.payUrl) {
+      sessionStorage.setItem('last_subscription_id', d.subscriptionId); // ← ajouter
+      window.location.href = d.payUrl;
+    }
     else { 
       alert('Erreur : ' + (d.error || 'Impossible')); 
       btn.disabled = false; 
