@@ -149,6 +149,7 @@ export default async function handler(req, res) {
     await payRef.update({ pid: gData.pid, payUrl: gData.url });
     await orderRef.update({ paymentId: payRef.id, pid: gData.pid });
     
+   // return res.json({ success: true, orderId: orderRef.id, payUrl: gData.url });
     return res.json({ success: true, orderId: orderRef.id, payUrl: gData.url });
 
   } catch (e) {
