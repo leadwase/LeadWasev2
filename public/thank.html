@@ -6,18 +6,18 @@
 <title>LeadWase — Confirmation</title>
 <style>
 :root {
-  --black:  #0A0A0A;
-  --white:  #FFFFFF;
-  --off:    #F8F8F6;
-  --green:  #1A7A3C;
-  --green2: #22A050;
-  --green3: #2DC56A;
+  --black:       #0A0A0A;
+  --white:       #FFFFFF;
+  --off:         #F8F8F6;
+  --green:       #1A7A3C;
+  --green2:      #22A050;
+  --green3:      #2DC56A;
   --green-light: #E8F5EE;
-  --gray1:  #2A2A2A;
-  --gray2:  #555555;
-  --gray3:  #999999;
-  --gray4:  #CCCCCC;
-  --gray5:  #EEEEEE;
+  --gray1:       #2A2A2A;
+  --gray2:       #555555;
+  --gray3:       #999999;
+  --gray4:       #CCCCCC;
+  --gray5:       #EEEEEE;
   --serif: 'Times New Roman', Times, serif;
 }
 
@@ -31,616 +31,189 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  overflow-x: hidden;
 }
 
 /* ── Confetti ── */
-.confetti-wrap {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
+.confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
 .confetti-piece {
-  position: absolute;
-  top: -16px;
-  width: 8px;
-  height: 8px;
-  opacity: 0;
-  animation: fall linear forwards;
+  position:absolute; top:-16px; width:8px; height:8px;
+  opacity:0; animation: fall linear forwards;
 }
 @keyframes fall {
-  0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
-  80%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
+  0%   { opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+  80%  { opacity:1; }
+  100% { opacity:0; transform: translateY(100vh) rotate(720deg) scale(.5); }
 }
 
 /* ── Header ── */
 .header {
-  width: 100%;
-  background: var(--black);
-  border-bottom: 3px solid var(--green);
-  padding: 16px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  z-index: 10;
+  width:100%; background:var(--black);
+  border-bottom:3px solid var(--green);
+  padding:16px 40px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative; z-index:10;
 }
-.logo {
-  font-family: var(--serif);
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--white);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-.logo em { color: var(--green3); font-style: normal; }
-.header-step {
-  font-size: 11px;
-  color: var(--gray3);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.header-step span { color: var(--green3); }
+.logo { font-family:var(--serif); font-size:20px; font-weight:bold; color:var(--white); letter-spacing:2px; text-transform:uppercase; text-decoration:none; }
+.logo em { color:var(--green3); font-style:normal; }
+.header-label { font-size:11px; color:var(--gray3); letter-spacing:2px; text-transform:uppercase; }
+.header-label span { color:var(--green3); }
 
 /* ── Main ── */
-.main-wrap {
-  width: 100%;
-  max-width: 680px;
-  padding: 48px 24px 80px;
-  position: relative;
-  z-index: 2;
-}
+.main-wrap { width:100%; max-width:680px; padding:48px 24px 80px; position:relative; z-index:2; }
 
 /* ── Loader ── */
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--gray5);
-  border-top-color: var(--green);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin: 0 auto 20px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.loader { width:40px; height:40px; border:3px solid var(--gray5); border-top-color:var(--green); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 20px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Animations ── */
+@keyframes popIn { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:scale(1); } }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes drawCheck { to { stroke-dashoffset:0; } }
 
 /* ── Success icon ── */
-.success-icon-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-  animation: popIn .6s cubic-bezier(.34,1.56,.64,1) both;
-  animation-delay: .2s;
-}
-@keyframes popIn {
-  from { opacity:0; transform: scale(0.4); }
-  to   { opacity:1; transform: scale(1); }
-}
+.success-icon-wrap { display:flex; justify-content:center; margin-bottom:32px; animation:popIn .6s cubic-bezier(.34,1.56,.64,1) both .2s; }
 .success-circle {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: var(--green);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 0 12px rgba(26,122,60,0.1), 0 0 0 24px rgba(26,122,60,0.05);
+  width:88px; height:88px; border-radius:50%; background:var(--green);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 0 12px rgba(26,122,60,.1), 0 0 0 24px rgba(26,122,60,.05);
 }
-.success-circle svg {
-  width: 40px; height: 40px;
-  stroke: var(--white); stroke-width: 3;
-  fill: none; stroke-linecap: round; stroke-linejoin: round;
-}
-.check-path {
-  stroke-dasharray: 60;
-  stroke-dashoffset: 60;
-  animation: drawCheck .5s ease forwards;
-  animation-delay: .6s;
-}
-@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+.success-circle svg { width:40px; height:40px; stroke:var(--white); stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.check-path { stroke-dasharray:60; stroke-dashoffset:60; animation:drawCheck .5s ease forwards .6s; }
 
 /* ── Title block ── */
-.title-block {
-  text-align: center;
-  margin-bottom: 36px;
-  animation: slideUp .5s ease both;
-  animation-delay: .3s;
+.title-block { text-align:center; margin-bottom:36px; animation:slideUp .5s ease both .3s; }
+.eyebrow {
+  font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--green);
+  margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:8px;
 }
-@keyframes slideUp {
-  from { opacity:0; transform: translateY(20px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-.confirm-eyebrow {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.confirm-eyebrow::before, .confirm-eyebrow::after {
-  content: '';
-  display: block;
-  width: 28px; height: 1px;
-  background: var(--green);
-}
-.confirm-title {
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: bold;
-  color: var(--black);
-  line-height: 1.05;
-  letter-spacing: -1px;
-  margin-bottom: 12px;
-}
-.confirm-title em { color: var(--green); font-style: italic; }
-.confirm-sub {
-  font-size: 16px;
-  color: var(--gray2);
-  line-height: 1.8;
-  font-style: italic;
-  max-width: 460px;
-  margin: 0 auto;
-}
+.eyebrow::before, .eyebrow::after { content:''; display:block; width:28px; height:1px; background:var(--green); }
+.main-title { font-size:clamp(32px,5vw,52px); font-weight:bold; color:var(--black); line-height:1.05; letter-spacing:-1px; margin-bottom:12px; }
+.main-title em { color:var(--green); font-style:italic; }
+.main-sub { font-size:16px; color:var(--gray2); line-height:1.8; font-style:italic; max-width:460px; margin:0 auto; }
 
-/* ── Order box ── */
-.order-box {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  margin-bottom: 20px;
-  animation: slideUp .5s ease both;
-  animation-delay: .45s;
-}
-.order-box-header {
-  background: var(--black);
-  padding: 16px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.obh-left {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--white);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.obh-num {
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  color: var(--green3);
-  letter-spacing: 2px;
-}
-.order-box-body { padding: 28px; }
-.order-detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px dotted var(--gray5);
-  font-size: 14px;
-}
-.order-detail-row:last-child { border-bottom: none; }
-.odl { color: var(--gray2); }
-.odv { font-weight: bold; color: var(--black); }
-.odv.green { color: var(--green); }
+/* ── Box générique ── */
+.box { background:var(--white); border:1px solid var(--gray5); margin-bottom:20px; }
+.box-anim-1 { animation:slideUp .5s ease both .45s; }
+.box-anim-2 { animation:slideUp .5s ease both .55s; }
+.box-anim-3 { animation:slideUp .5s ease both .60s; }
+.box-anim-4 { animation:slideUp .5s ease both .65s; }
+.box-anim-5 { animation:slideUp .5s ease both .70s; }
+.box-anim-6 { animation:slideUp .5s ease both .80s; }
 
-/* ── Credentials box ── */
-.credentials-box {
-  background: var(--black);
-  padding: 36px 28px;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-  animation: slideUp .5s ease both;
-  animation-delay: .55s;
-}
-.credentials-box::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--green) 0%, var(--green3) 50%, var(--green) 100%);
-}
-.cred-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--white);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.cred-sub {
-  font-size: 12px;
-  color: var(--gray3);
-  font-style: italic;
-  margin-bottom: 28px;
-  line-height: 1.6;
-}
-.cred-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-.cred-item {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 20px;
-}
-.cred-label {
-  font-size: 9px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--gray3);
-  margin-bottom: 10px;
-}
-.cred-value {
-  font-family: 'Courier New', monospace;
-  font-size: 20px;
-  color: var(--green3);
-  letter-spacing: 3px;
-  font-weight: bold;
-  word-break: break-all;
-}
-.cred-value.pwd {
-  font-size: 18px;
-  color: var(--white);
-  letter-spacing: 2px;
-}
-.cred-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(245,166,35,0.08);
-  border: 1px solid rgba(245,166,35,0.2);
-  padding: 16px;
-}
-.cred-warning-icon { font-size: 18px; flex-shrink: 0; }
-.cred-warning p { font-size: 12px; color: rgba(245,166,35,0.9); line-height: 1.7; }
-.cred-warning strong { font-weight: bold; }
+/* ── Recap box ── */
+.box-header { background:var(--black); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
+.bh-left { font-size:13px; font-weight:bold; color:var(--white); letter-spacing:1px; text-transform:uppercase; }
+.bh-ref { font-family:'Courier New',monospace; font-size:13px; color:var(--green3); letter-spacing:2px; }
+.box-body { padding:28px; }
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dotted var(--gray5); font-size:14px; }
+.detail-row:last-child { border-bottom:none; }
+.dl { color:var(--gray2); }
+.dv { font-weight:bold; color:var(--black); }
+.dv.green { color:var(--green); }
 
-/* ── Login CTA box (for orders — not logged in) ── */
-.login-cta-box {
-  background: var(--white);
-  border: 2px solid var(--green);
-  padding: 32px 28px;
-  margin-bottom: 20px;
-  text-align: center;
-  animation: slideUp .5s ease both;
-  animation-delay: .6s;
-  position: relative;
-  overflow: hidden;
-}
-.login-cta-box::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--green), var(--green3));
-}
-.login-cta-icon { font-size: 40px; margin-bottom: 14px; }
-.login-cta-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--black);
-  margin-bottom: 8px;
-}
-.login-cta-sub {
-  font-size: 14px;
-  color: var(--gray2);
-  line-height: 1.7;
-  font-style: italic;
-  margin-bottom: 24px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.login-cta-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
-  text-align: left;
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.login-cta-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 13px;
-  color: var(--gray2);
-}
-.login-cta-step-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--green);
-  color: var(--white);
-  font-size: 11px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
+/* ── Credentials box (noir) ── */
+.cred-box { background:var(--black); padding:36px 28px; margin-bottom:20px; position:relative; overflow:hidden; }
+.cred-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--green),var(--green3),var(--green)); }
+.cred-title { font-size:14px; font-weight:bold; color:var(--white); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+.cred-sub { font-size:12px; color:var(--gray3); font-style:italic; margin-bottom:28px; line-height:1.6; }
+.cred-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.cred-item { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); padding:20px; }
+.cred-label { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gray3); margin-bottom:10px; }
+.cred-value { font-family:'Courier New',monospace; font-size:20px; color:var(--green3); letter-spacing:3px; font-weight:bold; word-break:break-all; }
+.cred-value.pwd { font-size:18px; color:var(--white); letter-spacing:2px; }
+.cred-warning { display:flex; align-items:flex-start; gap:12px; background:rgba(245,166,35,.08); border:1px solid rgba(245,166,35,.2); padding:16px; }
+.cred-warning-icon { font-size:18px; flex-shrink:0; }
+.cred-warning p { font-size:12px; color:rgba(245,166,35,.9); line-height:1.7; }
+.cred-warning strong { font-weight:bold; }
 
-/* ── Subscription box ── */
-.subscription-box {
-  background: linear-gradient(135deg, #1a7a3c 0%, #0d5c2e 100%);
-  padding: 36px 28px;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-  animation: slideUp .5s ease both;
-  animation-delay: .55s;
-  text-align: center;
-}
-.subscription-box::before {
-  content: '⭐';
-  position: absolute;
-  top: 10px; right: 20px;
-  font-size: 40px;
-  opacity: 0.15;
-}
-.sub-eyebrow {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 8px;
-}
-.sub-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--white);
-  margin-bottom: 12px;
-}
-.sub-plan {
-  display: inline-block;
-  background: rgba(255,255,255,0.2);
-  padding: 6px 18px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--white);
-  margin-bottom: 16px;
-  letter-spacing: 1px;
-}
-.sub-message {
-  font-size: 14px;
-  color: rgba(255,255,255,0.85);
-  line-height: 1.7;
-  margin-bottom: 20px;
-  font-style: italic;
-}
-.sub-features {
-  text-align: left;
-  display: inline-block;
-  margin: 0 auto;
-}
-.sub-features li {
-  font-size: 13px;
-  color: rgba(255,255,255,0.85);
-  padding: 5px 0;
-  list-style: none;
-}
-.sub-features li::before {
-  content: '✓';
-  margin-right: 10px;
-  font-weight: bold;
-}
+/* ── Subscription hero box ── */
+.sub-hero { background:linear-gradient(135deg,#1a7a3c 0%,#0d5c2e 100%); padding:36px 28px; margin-bottom:20px; position:relative; overflow:hidden; text-align:center; }
+.sub-hero::before { content:'⭐'; position:absolute; top:10px; right:20px; font-size:40px; opacity:.15; }
+.sub-eyebrow { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:8px; }
+.sub-title { font-size:24px; font-weight:bold; color:var(--white); margin-bottom:12px; }
+.sub-badge { display:inline-block; background:rgba(255,255,255,.2); padding:6px 18px; border-radius:30px; font-size:14px; font-weight:bold; color:var(--white); margin-bottom:16px; letter-spacing:1px; }
+.sub-message { font-size:14px; color:rgba(255,255,255,.85); line-height:1.7; margin-bottom:20px; font-style:italic; }
+.sub-features { text-align:left; display:inline-block; }
+.sub-features li { font-size:13px; color:rgba(255,255,255,.85); padding:5px 0; list-style:none; }
+.sub-features li::before { content:'✓'; margin-right:10px; font-weight:bold; color:var(--green3); }
 
-/* ── Redirect bar ── */
-.redirect-bar {
-  background: var(--black);
-  padding: 16px 24px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  animation: slideUp .5s ease both;
-  animation-delay: .65s;
-}
-.redirect-bar-text {
-  font-size: 13px;
-  color: var(--gray3);
-  font-style: italic;
-}
-.redirect-bar-count {
-  font-size: 22px;
-  font-weight: bold;
-  color: var(--green3);
-  font-family: 'Courier New', monospace;
-  flex-shrink: 0;
-}
-.redirect-progress {
-  width: 100%;
-  height: 3px;
-  background: rgba(255,255,255,0.08);
-  margin-top: 4px;
-}
-.redirect-progress-fill {
-  height: 100%;
-  background: var(--green3);
-  transition: width 1s linear;
-}
+/* ── Login CTA ── */
+.login-cta { background:var(--white); border:2px solid var(--green); padding:32px 28px; margin-bottom:20px; text-align:center; position:relative; overflow:hidden; }
+.login-cta::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--green),var(--green3)); }
+.lc-icon { font-size:40px; margin-bottom:14px; }
+.lc-title { font-size:20px; font-weight:bold; color:var(--black); margin-bottom:8px; }
+.lc-sub { font-size:14px; color:var(--gray2); line-height:1.7; font-style:italic; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto; }
+.lc-steps { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; text-align:left; max-width:360px; margin-left:auto; margin-right:auto; }
+.lc-step { display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--gray2); }
+.lc-step-num { width:24px; height:24px; border-radius:50%; background:var(--green); color:var(--white); font-size:11px; font-weight:bold; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
 /* ── Next steps ── */
-.next-steps {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  padding: 32px 28px;
-  margin-bottom: 20px;
-  animation: slideUp .5s ease both;
-  animation-delay: .65s;
-}
-.ns-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--black);
-  margin-bottom: 24px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--gray5);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.ns-steps { display: flex; flex-direction: column; gap: 0; }
-.ns-step {
-  display: flex;
-  gap: 18px;
-  padding: 16px 0;
-  border-bottom: 1px dotted var(--gray5);
-  align-items: flex-start;
-}
-.ns-step:last-child { border-bottom: none; padding-bottom: 0; }
-.ns-dot-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
-.ns-dot {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-.ns-dot.done { background: var(--green); color: var(--white); }
-.ns-dot.pending { background: var(--gray5); color: var(--gray3); }
-.ns-dot.waiting { background: var(--black); color: var(--white); }
-.ns-line {
-  width: 1px;
-  flex: 1;
-  min-height: 20px;
-  background: var(--gray5);
-  margin: 4px 0;
-}
-.ns-content { padding-top: 4px; }
-.ns-step-title { font-size: 14px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
-.ns-step-desc { font-size: 12px; color: var(--gray2); line-height: 1.7; font-style: italic; }
-.ns-step-time {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: var(--green);
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  background: var(--green-light);
-  padding: 2px 8px;
-}
+.next-steps { background:var(--white); border:1px solid var(--gray5); padding:32px 28px; margin-bottom:20px; }
+.ns-title { font-size:16px; font-weight:bold; color:var(--black); margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid var(--gray5); }
+.ns-list { display:flex; flex-direction:column; gap:0; }
+.ns-step { display:flex; gap:18px; padding:16px 0; border-bottom:1px dotted var(--gray5); align-items:flex-start; }
+.ns-step:last-child { border-bottom:none; padding-bottom:0; }
+.ns-dot-col { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+.ns-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; flex-shrink:0; }
+.ns-dot.done    { background:var(--green); color:var(--white); }
+.ns-dot.current { background:var(--black); color:var(--white); }
+.ns-dot.pending { background:var(--gray5); color:var(--gray3); }
+.ns-line { width:1px; flex:1; min-height:20px; background:var(--gray5); margin:4px 0; }
+.ns-content { padding-top:4px; }
+.ns-step-title { font-size:14px; font-weight:bold; color:var(--black); margin-bottom:3px; }
+.ns-step-desc  { font-size:12px; color:var(--gray2); line-height:1.7; font-style:italic; }
+.ns-badge { display:inline-block; margin-top:4px; font-size:10px; color:var(--green); font-weight:bold; letter-spacing:.5px; background:var(--green-light); padding:2px 8px; }
 
-/* ── Delivery box ── */
-.delivery-box {
-  background: var(--green-light);
-  border: 1px solid rgba(26,122,60,0.2);
-  border-left: 3px solid var(--green);
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  animation: slideUp .5s ease both;
-  animation-delay: .7s;
-}
-.del-icon { font-size: 22px; flex-shrink: 0; }
-.del-title { font-size: 14px; font-weight: bold; color: var(--black); margin-bottom: 4px; }
-.del-sub { font-size: 12px; color: var(--gray2); line-height: 1.7; font-style: italic; }
+/* ── Info bar (vert clair) ── */
+.info-bar { background:var(--green-light); border:1px solid rgba(26,122,60,.2); border-left:3px solid var(--green); padding:20px 24px; margin-bottom:20px; display:flex; gap:14px; align-items:flex-start; }
+.info-bar-icon { font-size:22px; flex-shrink:0; }
+.info-bar-title { font-size:14px; font-weight:bold; color:var(--black); margin-bottom:4px; }
+.info-bar-sub   { font-size:12px; color:var(--gray2); line-height:1.7; font-style:italic; }
+
+/* ── Redirect bar ── */
+.redirect-bar { background:var(--black); padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; animation:slideUp .5s ease both .65s; }
+.redirect-bar-text  { font-size:13px; color:var(--gray3); font-style:italic; }
+.redirect-bar-count { font-size:22px; font-weight:bold; color:var(--green3); font-family:'Courier New',monospace; flex-shrink:0; }
+.redirect-progress  { width:100%; height:3px; background:rgba(255,255,255,.08); margin-top:4px; }
+.redirect-progress-fill { height:100%; background:var(--green3); transition:width 1s linear; }
 
 /* ── Actions ── */
-.actions-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  animation: slideUp .5s ease both;
-  animation-delay: .8s;
+.actions-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; animation:slideUp .5s ease both .8s; }
+.btn-primary {
+  padding:16px; background:var(--green); color:var(--white); border:none;
+  font-family:var(--serif); font-size:14px; font-weight:bold; letter-spacing:1px;
+  text-transform:uppercase; cursor:pointer; transition:all .2s; text-align:center;
+  border-radius:2px; text-decoration:none; display:inline-block;
 }
-.action-btn-primary {
-  padding: 16px;
-  background: var(--green);
-  color: var(--white);
-  border: none;
-  font-family: var(--serif);
-  font-size: 14px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  text-align: center;
-  border-radius: 2px;
-  text-decoration: none;
-  display: inline-block;
+.btn-primary:hover { background:var(--green2); transform:translateY(-2px); box-shadow:0 6px 18px rgba(26,122,60,.3); }
+.btn-secondary {
+  padding:16px; background:var(--white); color:var(--black); border:1px solid var(--gray5);
+  font-family:var(--serif); font-size:14px; letter-spacing:.5px; cursor:pointer;
+  transition:all .2s; text-align:center; border-radius:2px; text-decoration:none; display:inline-block;
 }
-.action-btn-primary:hover { background: var(--green2); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,122,60,0.3); }
-.action-btn-secondary {
-  padding: 16px;
-  background: var(--white);
-  color: var(--black);
-  border: 1px solid var(--gray5);
-  font-family: var(--serif);
-  font-size: 14px;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all .2s;
-  text-align: center;
-  border-radius: 2px;
-  text-decoration: none;
-  display: inline-block;
-}
-.action-btn-secondary:hover { border-color: var(--black); }
+.btn-secondary:hover { border-color:var(--black); }
 
 /* ── Footer ── */
-.page-footer {
-  width: 100%;
-  background: var(--black);
-  padding: 20px 40px;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-  margin-top: auto;
-}
-.footer-copy { font-size: 11px; color: var(--gray2); letter-spacing: 0.5px; }
-.footer-copy em { color: var(--green3); font-style: normal; }
+.page-footer { width:100%; background:var(--black); padding:20px 40px; text-align:center; z-index:2; margin-top:auto; }
+.footer-copy { font-size:11px; color:var(--gray2); letter-spacing:.5px; }
+.footer-copy em { color:var(--green3); font-style:normal; }
 
-/* ── Error box ── */
-.error-box {
-  background: var(--white);
-  border: 1px solid var(--gray5);
-  border-left: 3px solid #c0392b;
-  padding: 28px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-.error-icon { font-size: 48px; margin-bottom: 16px; }
-.error-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
-.error-sub { font-size: 14px; color: var(--gray2); font-style: italic; line-height: 1.7; }
+/* ── Fallback / Error ── */
+.fallback-box { background:var(--white); border:1px solid var(--gray5); border-left:3px solid #c0392b; padding:28px; margin-bottom:20px; text-align:center; }
+.fallback-icon  { font-size:48px; margin-bottom:16px; }
+.fallback-title { font-size:20px; font-weight:bold; margin-bottom:8px; }
+.fallback-sub   { font-size:14px; color:var(--gray2); font-style:italic; line-height:1.7; }
 
 @media print {
-  .confetti-wrap, .actions-row, .page-footer, .redirect-bar { display: none; }
-  body { background: white; }
-  .main-wrap { padding: 20px; }
+  .confetti-wrap, .actions-row, .page-footer, .redirect-bar { display:none; }
+  body { background:white; }
+  .main-wrap { padding:20px; }
 }
-@media (max-width: 600px) {
-  .header { padding: 14px 20px; }
-  .main-wrap { padding: 32px 16px 60px; }
-  .cred-grid { grid-template-columns: 1fr; }
-  .actions-row { grid-template-columns: 1fr; }
+@media (max-width:600px) {
+  .header { padding:14px 20px; }
+  .main-wrap { padding:32px 16px 60px; }
+  .cred-grid { grid-template-columns:1fr; }
+  .actions-row { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -650,13 +223,13 @@ body {
 
 <header class="header">
   <a class="logo" href="/">Lead<em>Wase</em></a>
-  <div class="header-step"><span>Confirmation</span></div>
+  <div class="header-label"><span id="header-label-text">Confirmation</span></div>
 </header>
 
 <div class="main-wrap" id="main-container">
   <div style="text-align:center; padding:60px 20px">
     <div class="loader"></div>
-    <p style="color:var(--gray3); font-style:italic">Chargement de votre confirmation...</p>
+    <p style="color:var(--gray3); font-style:italic">Chargement de votre confirmation…</p>
   </div>
 </div>
 
@@ -665,25 +238,24 @@ body {
 </footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-// ── Firebase config ── (remplace par ta vraie config)
 const firebaseConfig = {
-  apiKey: "AIzaSyA8X6ZqQFw3qRjQxYjY7JqLm6ZqQFw3qRjQ",
-  authDomain: "leadwase.firebaseapp.com",
-  projectId: "leadwase",
-  storageBucket: "leadwase.firebasestorage.app",
+  apiKey:            "AIzaSyA8X6ZqQFw3qRjQxYjY7JqLm6ZqQFw3qRjQ",
+  authDomain:        "leadwase.firebaseapp.com",
+  projectId:         "leadwase",
+  storageBucket:     "leadwase.firebasestorage.app",
   messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abc123def456"
+  appId:             "1:123456789012:web:abc123def456",
 };
 
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Utilitaires ──────────────────────────────────────────────────────────────
 function formatDate(ts) {
   if (!ts) return '—';
   const d = ts.toDate ? ts.toDate() : new Date(ts);
@@ -717,37 +289,7 @@ function makeConfetti() {
   }
 }
 
-// ── Countdown redirect ───────────────────────────────────────────────────────
-function startRedirectCountdown(seconds, url) {
-  const container = document.getElementById('main-container');
-  const bar = document.createElement('div');
-  bar.className = 'redirect-bar';
-  bar.innerHTML = `
-    <div style="flex:1">
-      <div class="redirect-bar-text">Redirection automatique vers votre tableau de bord...</div>
-      <div class="redirect-progress"><div class="redirect-progress-fill" id="rp-fill" style="width:100%"></div></div>
-    </div>
-    <div class="redirect-bar-count" id="rp-count">${seconds}</div>
-  `;
-  container.prepend(bar);
-
-  let remaining = seconds;
-  const fill = document.getElementById('rp-fill');
-  const count = document.getElementById('rp-count');
-
-  const iv = setInterval(() => {
-    remaining--;
-    count.textContent = remaining;
-    fill.style.width = (remaining / seconds * 100) + '%';
-    if (remaining <= 0) {
-      clearInterval(iv);
-      window.location.href = url;
-    }
-  }, 1000);
-}
-
-// ── Render helpers ───────────────────────────────────────────────────────────
-function successIconHtml() {
+function successIcon() {
   return `
     <div class="success-icon-wrap">
       <div class="success-circle">
@@ -755,146 +297,167 @@ function successIconHtml() {
           <path class="check-path" d="M8 20 L16 28 L32 12"/>
         </svg>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AFFICHAGE — ABONNEMENT (utilisateur connecté)
-// ═══════════════════════════════════════════════════════════════════════════
-function renderSubscriptionConnected(sub, subId) {
-  const container   = document.getElementById('main-container');
-  const planName    = sub.plan === 'pro' ? 'PRO' : 'BUSINESS';
-  const planPrice   = sub.plan === 'pro' ? '2 999 FCFA/mois' : '4 566 FCFA/mois';
-  const subRef      = 'SUB-' + subId.slice(-6).toUpperCase();
-  const features    = sub.plan === 'pro'
-    ? ['Photo de profil', 'Réseaux sociaux (LinkedIn, Instagram, TikTok…)', 'WhatsApp direct', 'Analytics de visites']
-    : ['Photo de profil', 'Réseaux sociaux', 'WhatsApp direct', 'Analytics de visites', 'Localisation / Adresse', 'Prise de rendez-vous', 'Avis Google', 'Formulaire de contact', 'Support prioritaire'];
+function startCountdown(seconds, url) {
+  const bar = document.createElement('div');
+  bar.className = 'redirect-bar';
+  bar.innerHTML = `
+    <div style="flex:1">
+      <div class="redirect-bar-text">Redirection automatique vers votre tableau de bord…</div>
+      <div class="redirect-progress"><div class="redirect-progress-fill" id="rp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="redirect-bar-count" id="rp-count">${seconds}</div>`;
+  document.getElementById('main-container').prepend(bar);
 
-  container.innerHTML = `
-    ${successIconHtml()}
+  let rem = seconds;
+  const fill  = document.getElementById('rp-fill');
+  const count = document.getElementById('rp-count');
+  const iv = setInterval(() => {
+    rem--;
+    count.textContent = rem;
+    fill.style.width = (rem / seconds * 100) + '%';
+    if (rem <= 0) { clearInterval(iv); window.location.href = url; }
+  }, 1000);
+}
 
+// ════════════════════════════════════════════════════════════════════════════
+// RENDU — ABONNEMENT (PRO / BUSINESS)
+// Déclenché uniquement quand subscriptionId est présent dans l'URL ou sessionStorage
+// N'affiche RIEN lié à une commande carte
+// ════════════════════════════════════════════════════════════════════════════
+function renderSubscription(sub, subId) {
+  document.getElementById('header-label-text').textContent = 'Abonnement activé';
+  sessionStorage.removeItem('last_subscription_id');
+
+  const planName  = sub.plan === 'pro' ? 'PRO' : 'BUSINESS';
+  const planPrice = sub.plan === 'pro' ? '2 999 FCFA/mois' : '4 566 FCFA/mois';
+  const subRef    = 'SUB-' + subId.slice(-6).toUpperCase();
+
+  // Fonctionnalités selon le plan
+  const features = sub.plan === 'pro'
+    ? [
+        'Photo de profil',
+        'Réseaux sociaux (LinkedIn, Instagram, TikTok…)',
+        'WhatsApp direct',
+        'Analytics de visites',
+      ]
+    : [
+        'Photo de profil',
+        'Réseaux sociaux (LinkedIn, Instagram, TikTok…)',
+        'WhatsApp direct',
+        'Analytics de visites',
+        'Localisation / Adresse',
+        'Prise de rendez-vous',
+        'Avis Google',
+        'Formulaire de contact',
+        'Support prioritaire',
+      ];
+
+  document.getElementById('main-container').innerHTML = `
+    ${successIcon()}
+
+    <!-- Titre -->
     <div class="title-block">
-      <div class="confirm-eyebrow">Abonnement activé</div>
-      <h1 class="confirm-title">Bienvenue sur<br>votre formule <em>${planName} !</em></h1>
-      <p class="confirm-sub">Votre abonnement est maintenant actif. Toutes les fonctionnalités sont débloquées immédiatement.</p>
+      <div class="eyebrow">Abonnement activé</div>
+      <h1 class="main-title">Bienvenue sur<br>votre formule <em>${planName} !</em></h1>
+      <p class="main-sub">Votre abonnement est maintenant actif. Toutes les fonctionnalités sont débloquées immédiatement.</p>
     </div>
 
-    <div class="order-box">
-      <div class="order-box-header">
-        <span class="obh-left">Récapitulatif abonnement</span>
-        <span class="obh-num">#${subRef}</span>
+    <!-- Récapitulatif abonnement -->
+    <div class="box box-anim-1">
+      <div class="box-header">
+        <span class="bh-left">Récapitulatif abonnement</span>
+        <span class="bh-ref">#${subRef}</span>
       </div>
-      <div class="order-box-body">
-        <div class="order-detail-row">
-          <span class="odl">Formule</span>
-          <span class="odv">${planName}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Montant</span>
-          <span class="odv green">${planPrice} ✓</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Date d'activation</span>
-          <span class="odv">${formatDate(sub.createdAt || sub.activatedAt)}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Statut</span>
-          <span class="odv green">Actif ✓</span>
-        </div>
+      <div class="box-body">
+        <div class="detail-row"><span class="dl">Formule</span><span class="dv">${planName}</span></div>
+        <div class="detail-row"><span class="dl">Montant</span><span class="dv green">${planPrice} ✓</span></div>
+        <div class="detail-row"><span class="dl">Date d'activation</span><span class="dv">${formatDate(sub.createdAt || sub.activatedAt || sub.paidAt)}</span></div>
+        <div class="detail-row"><span class="dl">Renouvellement</span><span class="dv">Mensuel automatique</span></div>
+        <div class="detail-row"><span class="dl">Statut</span><span class="dv green">Actif ✓</span></div>
       </div>
     </div>
 
-    <div class="subscription-box">
+    <!-- Fonctionnalités débloquées -->
+    <div class="sub-hero box-anim-2">
       <div class="sub-eyebrow">Fonctionnalités débloquées</div>
       <div class="sub-title">🎉 Félicitations !</div>
-      <div class="sub-plan">${planName} — ${planPrice}</div>
+      <div class="sub-badge">${planName} — ${planPrice}</div>
       <div class="sub-message">Vous avez maintenant accès à :</div>
       <ul class="sub-features">
         ${features.map(f => `<li>${f}</li>`).join('')}
       </ul>
     </div>
 
-    <div class="delivery-box">
-      <span class="del-icon">✨</span>
-      <div class="del-text">
-        <div class="del-title">Déblocage immédiat</div>
-        <div class="del-sub">Toutes les fonctionnalités ${planName} sont disponibles immédiatement. Vous allez être redirigé vers votre tableau de bord.</div>
+    <!-- Info accès immédiat -->
+    <div class="info-bar box-anim-3">
+      <span class="info-bar-icon">✨</span>
+      <div>
+        <div class="info-bar-title">Accès immédiat à toutes vos fonctionnalités</div>
+        <div class="info-bar-sub">Votre plan ${planName} est actif. Rendez-vous sur votre tableau de bord pour commencer à personnaliser votre profil.</div>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="actions-row">
-      <a href="dashboard.html" class="action-btn-primary">📱 Accéder à mon espace</a>
-      <a href="offres.html" class="action-btn-secondary">⭐ Voir les offres</a>
+      <a href="dashboard.html" class="btn-primary">📱 Accéder à mon espace</a>
+      <a href="offres.html"    class="btn-secondary">⭐ Voir les offres</a>
     </div>
   `;
 
   setTimeout(makeConfetti, 600);
-  // Redirection auto vers dashboard après 6 secondes
-  setTimeout(() => startRedirectCountdown(6, 'dashboard.html'), 800);
-  sessionStorage.removeItem('last_subscription_id');
+  setTimeout(() => startCountdown(6, 'dashboard.html'), 800);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AFFICHAGE — COMMANDE CARTE (utilisateur NON connecté)
-// ═══════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
+// RENDU — CARTE PHYSIQUE · utilisateur NON connecté
+// Déclenché uniquement quand orderId est présent dans l'URL ou sessionStorage
+// N'affiche RIEN lié à un abonnement
+// ════════════════════════════════════════════════════════════════════════════
 function renderOrderNotConnected(order, orderId, cred) {
-  const container  = document.getElementById('main-container');
+  document.getElementById('header-label-text').textContent = 'Carte confirmée';
+  sessionStorage.removeItem('last_order_id');
+
   const orderRef   = 'CMD-' + orderId.slice(-6).toUpperCase();
   const amountFmt  = order.amount ? formatNum(order.amount) + ' FCFA' : 'Sur devis';
-  const loginEmail = cred ? (cred.loginEmail || '—') : null;
-  const password   = cred ? (cred.passwordHash || '—') : null;
+  const loginEmail = cred?.loginEmail || null;
+  const pwd        = cred?.passwordHash || null;
+  const fullName   = `${order.firstName || ''} ${order.lastName || ''}`.trim();
 
-  container.innerHTML = `
-    ${successIconHtml()}
+  document.getElementById('main-container').innerHTML = `
+    ${successIcon()}
 
+    <!-- Titre -->
     <div class="title-block">
-      <div class="confirm-eyebrow">Commande enregistrée</div>
-      <h1 class="confirm-title">Merci pour<br>votre <em>commande !</em></h1>
-      <p class="confirm-sub">Votre carte LeadWase est en préparation. Voici le récapitulatif de votre commande.</p>
+      <div class="eyebrow">Carte enregistrée</div>
+      <h1 class="main-title">Merci pour<br>votre <em>achat !</em></h1>
+      <p class="main-sub">Votre carte LeadWase est en préparation. Voici le récapitulatif de votre achat.</p>
     </div>
 
-    <div class="order-box">
-      <div class="order-box-header">
-        <span class="obh-left">Récapitulatif de commande</span>
-        <span class="obh-num">#${orderRef}</span>
+    <!-- Récapitulatif achat carte -->
+    <div class="box box-anim-1">
+      <div class="box-header">
+        <span class="bh-left">Récapitulatif — Carte LeadWase</span>
+        <span class="bh-ref">#${orderRef}</span>
       </div>
-      <div class="order-box-body">
-        <div class="order-detail-row">
-          <span class="odl">Produit</span>
-          <span class="odv">Carte Classique LeadWase</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Nom</span>
-          <span class="odv">${(order.firstName||'')} ${(order.lastName||'')}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Téléphone</span>
-          <span class="odv">${order.phone || '—'}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Adresse de livraison</span>
-          <span class="odv">${order.address || 'À renseigner'}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Mode de paiement</span>
-          <span class="odv">Mobile Money / Wave</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Montant payé</span>
-          <span class="odv green">${amountFmt} ✓</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Date de commande</span>
-          <span class="odv">${formatDate(order.createdAt)}</span>
-        </div>
+      <div class="box-body">
+        <div class="detail-row"><span class="dl">Produit</span><span class="dv">Carte LeadWase Classique</span></div>
+        <div class="detail-row"><span class="dl">Nom</span><span class="dv">${fullName || '—'}</span></div>
+        <div class="detail-row"><span class="dl">Téléphone</span><span class="dv">${order.phone || '—'}</span></div>
+        <div class="detail-row"><span class="dl">Adresse de livraison</span><span class="dv">${order.address || 'À renseigner'}</span></div>
+        <div class="detail-row"><span class="dl">Mode de paiement</span><span class="dv">Mobile Money / Wave</span></div>
+        <div class="detail-row"><span class="dl">Montant réglé</span><span class="dv green">${amountFmt} ✓</span></div>
+        <div class="detail-row"><span class="dl">Date d'achat</span><span class="dv">${formatDate(order.createdAt)}</span></div>
       </div>
     </div>
 
-    ${loginEmail ? `
-    <div class="credentials-box">
+    <!-- Identifiants de connexion (affichés seulement si disponibles) -->
+    ${loginEmail && pwd ? `
+    <div class="cred-box box-anim-2">
       <div class="cred-title">🔑 Vos identifiants de connexion</div>
-      <p class="cred-sub">Ces identifiants vous seront également remis avec votre carte physique. Conservez-les précieusement — ils sont votre accès à votre profil digital.</p>
+      <p class="cred-sub">Ces identifiants seront également joints à votre carte physique. Conservez-les précieusement — ils donnent accès à votre profil digital LeadWase.</p>
       <div class="cred-grid">
         <div class="cred-item">
           <div class="cred-label">Identifiant unique</div>
@@ -902,7 +465,7 @@ function renderOrderNotConnected(order, orderId, cred) {
         </div>
         <div class="cred-item">
           <div class="cred-label">Mot de passe</div>
-          <div class="cred-value pwd">${password}</div>
+          <div class="cred-value pwd">${pwd}</div>
         </div>
       </div>
       <div class="cred-warning">
@@ -912,240 +475,263 @@ function renderOrderNotConnected(order, orderId, cred) {
     </div>
     ` : ''}
 
-    <div class="login-cta-box">
-      <div class="login-cta-icon">🔐</div>
-      <div class="login-cta-title">Prêt à personnaliser votre profil ?</div>
-      <p class="login-cta-sub">Dès réception de votre carte, connectez-vous avec vos identifiants pour activer et personnaliser votre profil digital.</p>
-      <div class="login-cta-steps">
-        <div class="login-cta-step">
-          <div class="login-cta-step-num">1</div>
+    <!-- CTA connexion -->
+    <div class="login-cta box-anim-3">
+      <div class="lc-icon">🔐</div>
+      <div class="lc-title">Prêt à personnaliser votre profil ?</div>
+      <p class="lc-sub">Dès réception de votre carte, connectez-vous avec vos identifiants pour activer et personnaliser votre profil digital.</p>
+      <div class="lc-steps">
+        <div class="lc-step">
+          <div class="lc-step-num">1</div>
           <div>Recevez votre carte LeadWase sous 48h avec votre document d'identifiants</div>
         </div>
-        <div class="login-cta-step">
-          <div class="login-cta-step-num">2</div>
+        <div class="lc-step">
+          <div class="lc-step-num">2</div>
           <div>Rendez-vous sur <strong>leadwase.com</strong> et cliquez sur <strong>Connexion</strong></div>
         </div>
-        <div class="login-cta-step">
-          <div class="login-cta-step-num">3</div>
+        <div class="lc-step">
+          <div class="lc-step-num">3</div>
           <div>Entrez votre identifiant <strong>${loginEmail || 'LW-XXXXX'}</strong> et votre mot de passe</div>
         </div>
-        <div class="login-cta-step">
-          <div class="login-cta-step-num">4</div>
+        <div class="lc-step">
+          <div class="lc-step-num">4</div>
           <div>Personnalisez votre profil et commencez à partager votre carte !</div>
         </div>
       </div>
-      <a href="connexion.html" class="action-btn-primary" style="display:inline-block;padding:14px 32px">
+      <a href="connexion.html" class="btn-primary" style="display:inline-block;padding:14px 32px">
         🔑 Se connecter maintenant
       </a>
     </div>
 
-    <div class="next-steps">
+    <!-- Prochaines étapes -->
+    <div class="next-steps box-anim-4">
       <div class="ns-title">📋 Prochaines étapes</div>
-      <div class="ns-steps">
+      <div class="ns-list">
+
         <div class="ns-step">
-          <div class="ns-dot-wrap"><div class="ns-dot done">✓</div><div class="ns-line"></div></div>
+          <div class="ns-dot-col">
+            <div class="ns-dot done">✓</div>
+            <div class="ns-line"></div>
+          </div>
           <div class="ns-content">
-            <div class="ns-step-title">Commande enregistrée</div>
-            <div class="ns-step-desc">Votre commande a bien été reçue et le paiement confirmé.</div>
-            <span class="ns-step-time">Fait — ${formatDate(order.createdAt)}</span>
+            <div class="ns-step-title">Achat enregistré</div>
+            <div class="ns-step-desc">Votre achat a bien été reçu et le paiement confirmé.</div>
+            <span class="ns-badge">Fait — ${formatDate(order.createdAt)}</span>
           </div>
         </div>
+
         <div class="ns-step">
-          <div class="ns-dot-wrap"><div class="ns-dot waiting">2</div><div class="ns-line"></div></div>
+          <div class="ns-dot-col">
+            <div class="ns-dot current">2</div>
+            <div class="ns-line"></div>
+          </div>
           <div class="ns-content">
             <div class="ns-step-title">Préparation de votre carte</div>
             <div class="ns-step-desc">Notre équipe prépare votre carte LeadWase personnalisée avec votre QR code unique.</div>
-            <span class="ns-step-time">En cours — sous 24h</span>
+            <span class="ns-badge">En cours — sous 24h</span>
           </div>
         </div>
+
         <div class="ns-step">
-          <div class="ns-dot-wrap"><div class="ns-dot pending">3</div><div class="ns-line"></div></div>
+          <div class="ns-dot-col">
+            <div class="ns-dot pending">3</div>
+            <div class="ns-line"></div>
+          </div>
           <div class="ns-content">
             <div class="ns-step-title">Expédition & Livraison</div>
             <div class="ns-step-desc">Votre carte est expédiée avec votre document d'identifiants de connexion.</div>
-            <span class="ns-step-time">Prévu — sous 48h</span>
+            <span class="ns-badge">Prévu — sous 48h</span>
           </div>
         </div>
+
         <div class="ns-step">
-          <div class="ns-dot-wrap"><div class="ns-dot pending">4</div></div>
+          <div class="ns-dot-col">
+            <div class="ns-dot pending">4</div>
+          </div>
           <div class="ns-content">
             <div class="ns-step-title">Activation de votre profil</div>
             <div class="ns-step-desc">Connectez-vous sur leadwase.com avec vos identifiants et personnalisez votre profil digital.</div>
-            <span class="ns-step-time">À votre réception</span>
+            <span class="ns-badge">À votre réception</span>
           </div>
         </div>
+
       </div>
     </div>
 
-    <div class="delivery-box">
-      <span class="del-icon">📦</span>
-      <div class="del-text">
-        <div class="del-title">Livraison estimée : 48h après validation</div>
-        <div class="del-sub">Votre carte sera livrée à l'adresse indiquée. Vous serez contacté par SMS ou appel avant la livraison.</div>
+    <!-- Livraison -->
+    <div class="info-bar box-anim-5">
+      <span class="info-bar-icon">📦</span>
+      <div>
+        <div class="info-bar-title">Livraison estimée : 48h après validation</div>
+        <div class="info-bar-sub">Votre carte sera livrée à l'adresse indiquée. Vous serez contacté par SMS ou appel avant la livraison.</div>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="actions-row">
-      <button class="action-btn-primary" onclick="window.print()">🖨 Imprimer la confirmation</button>
-      <a href="connexion.html" class="action-btn-secondary">🔑 Se connecter</a>
+      <button class="btn-primary"   onclick="window.print()">🖨 Imprimer la confirmation</button>
+      <a href="connexion.html" class="btn-secondary">🔑 Se connecter</a>
     </div>
   `;
 
   setTimeout(makeConfetti, 600);
-  sessionStorage.removeItem('last_order_id');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AFFICHAGE — COMMANDE CARTE (utilisateur CONNECTÉ — cas rare)
-// ═══════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
+// RENDU — CARTE PHYSIQUE · utilisateur CONNECTÉ
+// Déclenché uniquement quand orderId est présent dans l'URL ou sessionStorage
+// N'affiche RIEN lié à un abonnement
+// ════════════════════════════════════════════════════════════════════════════
 function renderOrderConnected(order, orderId) {
-  const container = document.getElementById('main-container');
+  document.getElementById('header-label-text').textContent = 'Carte confirmée';
+  sessionStorage.removeItem('last_order_id');
+
   const orderRef  = 'CMD-' + orderId.slice(-6).toUpperCase();
   const amountFmt = order.amount ? formatNum(order.amount) + ' FCFA' : 'Sur devis';
+  const fullName  = `${order.firstName || ''} ${order.lastName || ''}`.trim();
 
-  container.innerHTML = `
-    ${successIconHtml()}
+  document.getElementById('main-container').innerHTML = `
+    ${successIcon()}
 
+    <!-- Titre -->
     <div class="title-block">
-      <div class="confirm-eyebrow">Commande enregistrée</div>
-      <h1 class="confirm-title">Merci pour<br>votre <em>commande !</em></h1>
-      <p class="confirm-sub">Votre carte LeadWase est en préparation. Vous pouvez dès maintenant compléter votre profil.</p>
+      <div class="eyebrow">Carte enregistrée</div>
+      <h1 class="main-title">Merci pour<br>votre <em>achat !</em></h1>
+      <p class="main-sub">Votre carte LeadWase est en préparation. Vous pouvez dès maintenant compléter votre profil.</p>
     </div>
 
-    <div class="order-box">
-      <div class="order-box-header">
-        <span class="obh-left">Récapitulatif de commande</span>
-        <span class="obh-num">#${orderRef}</span>
+    <!-- Récapitulatif achat carte -->
+    <div class="box box-anim-1">
+      <div class="box-header">
+        <span class="bh-left">Récapitulatif — Carte LeadWase</span>
+        <span class="bh-ref">#${orderRef}</span>
       </div>
-      <div class="order-box-body">
-        <div class="order-detail-row">
-          <span class="odl">Produit</span>
-          <span class="odv">Carte Classique LeadWase</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Nom</span>
-          <span class="odv">${(order.firstName||'')} ${(order.lastName||'')}</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Montant payé</span>
-          <span class="odv green">${amountFmt} ✓</span>
-        </div>
-        <div class="order-detail-row">
-          <span class="odl">Date de commande</span>
-          <span class="odv">${formatDate(order.createdAt)}</span>
-        </div>
+      <div class="box-body">
+        <div class="detail-row"><span class="dl">Produit</span><span class="dv">Carte LeadWase Classique</span></div>
+        <div class="detail-row"><span class="dl">Nom</span><span class="dv">${fullName || '—'}</span></div>
+        <div class="detail-row"><span class="dl">Montant réglé</span><span class="dv green">${amountFmt} ✓</span></div>
+        <div class="detail-row"><span class="dl">Date d'achat</span><span class="dv">${formatDate(order.createdAt)}</span></div>
+        <div class="detail-row"><span class="dl">Statut</span><span class="dv green">En préparation ✓</span></div>
       </div>
     </div>
 
-    <div class="delivery-box">
-      <span class="del-icon">📦</span>
-      <div class="del-text">
-        <div class="del-title">Livraison estimée : 48h après validation</div>
-        <div class="del-sub">Vous êtes déjà connecté. Votre carte sera livrée sous 48h à l'adresse indiquée.</div>
+    <!-- Livraison -->
+    <div class="info-bar box-anim-2">
+      <span class="info-bar-icon">📦</span>
+      <div>
+        <div class="info-bar-title">Livraison estimée : 48h après validation</div>
+        <div class="info-bar-sub">Vous êtes déjà connecté. Votre carte sera livrée sous 48h à l'adresse indiquée. Profitez-en pour compléter votre profil dès maintenant.</div>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="actions-row">
-      <a href="dashboard.html" class="action-btn-primary">📱 Aller à mon profil</a>
-      <button class="action-btn-secondary" onclick="window.print()">🖨 Imprimer</button>
+      <a href="dashboard.html" class="btn-primary">📱 Aller à mon profil</a>
+      <button class="btn-secondary" onclick="window.print()">🖨 Imprimer</button>
     </div>
   `;
 
   setTimeout(makeConfetti, 600);
-  sessionStorage.removeItem('last_order_id');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AFFICHAGE — ERREUR / AUCUNE DONNÉE
-// ═══════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
+// RENDU — FALLBACK (aucun paramètre reconnu)
+// ════════════════════════════════════════════════════════════════════════════
 function renderFallback() {
-  const container = document.getElementById('main-container');
-  container.innerHTML = `
+  document.getElementById('header-label-text').textContent = 'Confirmation';
+  document.getElementById('main-container').innerHTML = `
     <div class="title-block">
-      <div class="confirm-eyebrow">Confirmation</div>
-      <h1 class="confirm-title">Paiement <em>reçu</em></h1>
-      <p class="confirm-sub">Votre paiement a bien été enregistré. Votre commande est en cours de traitement.</p>
+      <div class="eyebrow">Paiement reçu</div>
+      <h1 class="main-title">Paiement <em>confirmé</em></h1>
+      <p class="main-sub">Votre paiement a bien été enregistré et est en cours de traitement.</p>
     </div>
-    <div class="error-box">
-      <div class="error-icon">📋</div>
-      <div class="error-title">Détails non disponibles</div>
-      <div class="error-sub">Les détails de votre commande ne sont pas disponibles pour le moment. Si vous avez des questions, contactez notre support.</div>
+    <div class="fallback-box">
+      <div class="fallback-icon">📋</div>
+      <div class="fallback-title">Détails non disponibles</div>
+      <div class="fallback-sub">Les détails de votre transaction ne sont pas disponibles pour le moment. Si vous avez des questions, contactez notre support.</div>
     </div>
     <div class="actions-row">
-      <a href="connexion.html" class="action-btn-primary">🔑 Se connecter</a>
-      <a href="mailto:supportleadwase@gmail.com" class="action-btn-secondary">💬 Contacter le support</a>
+      <a href="connexion.html"              class="btn-primary">🔑 Se connecter</a>
+      <a href="mailto:supportleadwase@gmail.com" class="btn-secondary">💬 Contacter le support</a>
     </div>
   `;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// LOGIQUE PRINCIPALE
-// ═══════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
+// POINT D'ENTRÉE — lecture des paramètres URL et routage strict
+//
+// Règle absolue :
+//   • subscriptionId présent  →  flux ABONNEMENT  →  renderSubscription()
+//   • orderId présent          →  flux CARTE        →  renderOrder*()
+//   • aucun des deux           →  renderFallback()
+//
+// Le paramètre "type" sert uniquement de signal de secours si les IDs
+// manquent mais qu'une sessionStorage a été posée par la page précédente.
+// ════════════════════════════════════════════════════════════════════════════
 async function loadConfirmation(user) {
-  const params         = new URLSearchParams(window.location.search);
-  let orderId          = params.get('orderId')        || sessionStorage.getItem('last_order_id');
-  let subscriptionId   = params.get('subscriptionId') || sessionStorage.getItem('last_subscription_id');
-  const type           = params.get('type'); // 'order' | 'subscription'
+  const params = new URLSearchParams(window.location.search);
 
-  // ── CAS : Abonnement ──────────────────────────────────────────────────────
-  if (subscriptionId || type === 'subscription') {
-    if (!subscriptionId) { renderFallback(); return; }
+  // ── Lire les IDs depuis l'URL en priorité, puis sessionStorage ──
+  const subscriptionId = params.get('subscriptionId') || sessionStorage.getItem('last_subscription_id') || null;
+  const orderId        = params.get('orderId')        || sessionStorage.getItem('last_order_id')        || null;
+
+  // ── CAS 1 : ABONNEMENT ───────────────────────────────────────────────────
+  // Condition stricte : subscriptionId doit être présent.
+  // Si orderId est aussi présent (ne devrait pas arriver), subscriptionId prend priorité.
+  if (subscriptionId) {
     try {
-      const subDoc = await getDoc(doc(db, 'subscriptions', subscriptionId));
-      if (subDoc.exists()) {
-        // Peu importe si connecté ou non, on affiche le message abonnement
-        // Si connecté → redirection auto ; si non connecté → boutons connexion
-        renderSubscriptionConnected(subDoc.data(), subscriptionId);
-        if (!user) {
-          // Pas connecté : on ne redirige pas automatiquement, on affiche juste
-          // On empêche le redirect auto déclenché dans renderSubscriptionConnected
-          // en ne rappelant rien (le countdown est déjà lancé mais on override)
-          // => On retire le redirect bar et on met un bouton
-          // Note: le redirect a déjà été lancé; on le laisse car si abonnement
-          //       l'utilisateur DOIT être connecté normalement. Si pas connecté,
-          //       la redirection vers dashboard le renvoie vers connexion.html.
-        }
+      const snap = await getDoc(doc(db, 'subscriptions', subscriptionId));
+      if (snap.exists()) {
+        renderSubscription(snap.data(), subscriptionId);
         return;
       }
-    } catch(e) { console.error('Erreur abonnement:', e); }
+    } catch (e) {
+      console.error('Erreur lecture abonnement:', e);
+    }
+    // subscriptionId invalide → fallback
     renderFallback();
     return;
   }
 
-  // ── CAS : Commande carte ──────────────────────────────────────────────────
-  if (orderId || type === 'order') {
-    if (!orderId) { renderFallback(); return; }
+  // ── CAS 2 : CARTE PHYSIQUE ───────────────────────────────────────────────
+  // On entre ici SEULEMENT si subscriptionId est absent.
+  if (orderId) {
     try {
-      const orderDoc = await getDoc(doc(db, 'orders', orderId));
-      if (orderDoc.exists()) {
-        const order = orderDoc.data();
+      const snap = await getDoc(doc(db, 'orders', orderId));
+      if (snap.exists()) {
+        const order = snap.data();
 
         if (user) {
-          // Connecté → message simplifié, accès direct au dashboard
+          // Utilisateur connecté → vue simplifiée, accès direct au profil
           renderOrderConnected(order, orderId);
         } else {
-          // Non connecté → afficher identifiants + CTA connexion
+          // Utilisateur non connecté → afficher identifiants + étapes
           let cred = null;
           if (order.leadwaseId) {
             try {
-              const credDoc = await getDoc(doc(db, 'credentials', order.leadwaseId));
-              if (credDoc.exists()) cred = credDoc.data();
-            } catch(e) { console.warn('Credentials non trouvés:', e); }
+              const credSnap = await getDoc(doc(db, 'credentials', order.leadwaseId));
+              if (credSnap.exists()) cred = credSnap.data();
+            } catch (e) {
+              console.warn('Credentials non trouvés:', e);
+            }
           }
           renderOrderNotConnected(order, orderId, cred);
         }
         return;
       }
-    } catch(e) { console.error('Erreur commande:', e); }
+    } catch (e) {
+      console.error('Erreur lecture carte:', e);
+    }
+    // orderId invalide → fallback
     renderFallback();
     return;
   }
 
-  // ── Aucun paramètre ───────────────────────────────────────────────────────
+  // ── CAS 3 : Aucun ID reconnu ─────────────────────────────────────────────
   renderFallback();
 }
 
-// ── Auth listener → point d'entrée ──────────────────────────────────────────
+// Auth listener → unique point d'entrée
 onAuthStateChanged(auth, user => {
   loadConfirmation(user);
 });
