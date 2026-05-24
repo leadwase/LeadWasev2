@@ -6,11 +6,19 @@
 <meta name="description" content="Commandez votre carte LeadWase NFC, activez votre profil digital et développez votre réseau professionnel.">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .sec-h2, .sec-eyebrow, .sec-sub{
-        text-align: center!important;
-    align-items: center!important;
-    justify-content: center!important;
+  .sec-eyebrow, .sec-eyebrow::before, .sec-eyebrow::after {
     display: block!important;
+    content: none!important;
+    text-align: center!important;
+    width: 100%!important;
+  }
+  .sec-eyebrow::before, .sec-eyebrow::after {
+    display: none!important;
+  }
+  .sec-h2, .sec-sub {
+    text-align: center!important;
+    display: block!important;
+    width: 100%!important;
   }
 .hero{display:grid;grid-template-columns:1fr 1fr;/*min-height:calc(100vh - 64px);*/overflow:hidden}
 .hero-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
@@ -111,7 +119,8 @@
 .faq-item.open .faq-ico{transform:rotate(45deg)}
 
 /* sec-eyebrow sans tirets */
-.sec-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block;text-align:center}
+.sec-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block!important;text-align:center!important;gap:0!important}
+.sec-eyebrow::before,.sec-eyebrow::after{display:none!important;content:none!important}
 
 @media(max-width:900px){
   .hero{grid-template-columns:1fr}.hero-right{display:none}.hero-left{padding:60px 24px}
