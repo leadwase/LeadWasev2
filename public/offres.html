@@ -378,6 +378,8 @@ const [profilesSnap, hasCarte] = await Promise.all([
   checkCarte(user),
 ]);
 
+userHasCarte = hasCarte; // ← cette ligne manque !
+
 const userPlan = !profilesSnap.empty ? (profilesSnap.docs[0].data()?.plan || 'free') : 'free';
 
   if (!hasCarte) {
