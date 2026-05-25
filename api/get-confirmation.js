@@ -77,10 +77,10 @@ export default async function handler(req, res) {
           const credSnap = await db.collection('credentials').doc(order.leadwaseId).get();
           if (credSnap.exists) {
             const c = credSnap.data();
-            credentials = {
-              loginEmail:   c.loginEmail   || null,
-              passwordHash: c.passwordHash || null,
-            };
+          credentials = {
+            leadwaseId:   c.leadwaseId   || c.loginEmail || null,  // ← renommer
+            passwordHash: c.passwordHash || null,
+          };
           }
         } catch (e) {
           console.warn('[get-confirmation] credentials introuvables:', e);
