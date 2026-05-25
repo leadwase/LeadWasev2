@@ -342,11 +342,11 @@ function markCurrentPlan(plan) {
 async function checkCarte(user) {
   try {
     const token = await getIdToken(user);
-    const r = await fetch('/api/get-confirmation', {
+    const r = await fetch('/api/get-confirmation?checkCarte=1', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     const d = await r.json();
-    console.log('[checkCarte] résultat API:', d);
+    console.log('[checkCarte]', d);
     return d.hasCarte === true;
   } catch (e) {
     console.warn('[checkCarte] error:', e);
