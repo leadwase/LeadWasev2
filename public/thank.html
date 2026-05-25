@@ -368,7 +368,7 @@ function renderOrderNotConnected(data, cred, orderId) {
   const orderRef   = 'CMD-' + orderId.slice(-6).toUpperCase();
   const amountFmt  = data.amount ? formatNum(data.amount) + ' FCFA' : 'Sur devis';
   const fullName   = (data.firstName + ' ' + data.lastName).trim() || '—';
-  const loginEmail = cred?.loginEmail   || null;
+  const leadwaseId = cred?.leadwaseId || null;  // ← était loginEmail
   const pwd        = cred?.passwordHash || null;
   const dateAchat  = formatDate(data.createdAt);
 
@@ -397,14 +397,14 @@ function renderOrderNotConnected(data, cred, orderId) {
       </div>
     </div>
 
-    ${loginEmail && pwd ? `
+    ${leadwaseId && pwd ? `
     <div class="cred-box a2">
       <div class="cred-title">🔑 Vos identifiants de connexion</div>
       <p class="cred-sub">Ces identifiants seront joints à votre carte physique. Conservez-les précieusement — ils donnent accès à votre profil digital LeadWase.</p>
       <div class="cred-grid">
         <div class="cred-item">
           <div class="cred-label">Identifiant unique</div>
-          <div class="cred-value">${loginEmail}</div>
+          <div class="cred-value">${leadwaseId}</div>
         </div>
         <div class="cred-item">
           <div class="cred-label">Mot de passe</div>
@@ -425,7 +425,7 @@ function renderOrderNotConnected(data, cred, orderId) {
       <div class="lc-steps">
         <div class="lc-step"><div class="lc-num">1</div><div>Recevez votre carte LeadWase sous 48h avec votre document d'identifiants</div></div>
         <div class="lc-step"><div class="lc-num">2</div><div>Rendez-vous sur <strong>leadwase.com</strong> et cliquez sur <strong>Connexion</strong></div></div>
-        <div class="lc-step"><div class="lc-num">3</div><div>Entrez votre identifiant <strong>${loginEmail || 'LW-XXXXX'}</strong> et votre mot de passe</div></div>
+        <div>Entrez votre identifiant <strong>${leadwaseId || 'LW-XXXXX'}</strong> et votre mot de passe</div>
         <div class="lc-step"><div class="lc-num">4</div><div>Personnalisez votre profil et commencez à partager votre carte !</div></div>
       </div>
       <a href="connexion.html" class="btn-primary" style="display:inline-block;padding:14px 32px">🔑 Se connecter maintenant</a>
