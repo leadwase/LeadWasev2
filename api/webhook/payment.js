@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp }       from 'firebase-admin/firestore';
 import { getAuth }                        from 'firebase-admin/auth';
+import PDFDocument                        from 'pdfkit';
 import {
   notifyAdminNewOrder,
   notifyClientPaymentSuccess,
@@ -22,6 +23,104 @@ function genId() { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
 function genPwd(n = 24) {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   return Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join('');
+}
+
+/**
+ * Génère une facture PDF en mémoire et retourne un Buffer base64.
+ * @param {object} params
+ * @returns {Promise<string>} base64 du PDF
+ */
+function generateInvoice({ invoiceNumber, date, firstName, lastName, email, phone, amount, plan, leadwaseId }) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const chunks = [];
+
+    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks).toString('base64')));
+    doc.on('error', reject);
+
+    const pageWidth = doc.page.width - 100; // marges de 50 de chaque côté
+    const dateStr = new Date(date).toLocaleDateString('fr-FR', {
+      day: '2-digit', month: 'long', year: 'numeric',
+    });
+
+    // ── En-tête ──────────────────────────────────────────────────────────────
+    doc.fontSize(22).fillColor('#1a1a2e').font('Helvetica-Bold').text('LEADWASE', 50, 50);
+    doc.fontSize(9).fillColor('#666').font('Helvetica').text('leadwase.com', 50, 76);
+
+    doc.fontSize(22).fillColor('#1a1a2e').font('Helvetica-Bold')
+       .text('FACTURE', 0, 50, { align: 'right' });
+    doc.fontSize(9).fillColor('#666').font('Helvetica')
+       .text(`N° ${invoiceNumber}`, 0, 76, { align: 'right' });
+    doc.text(`Date : ${dateStr}`, 0, 90, { align: 'right' });
+
+    // ── Ligne de séparation ──────────────────────────────────────────────────
+    doc.moveTo(50, 115).lineTo(545, 115).strokeColor('#e0e0e0').lineWidth(1).stroke();
+
+    // ── Bloc client ──────────────────────────────────────────────────────────
+    doc.fontSize(9).fillColor('#999').font('Helvetica').text('FACTURÉ À', 50, 130);
+    doc.fontSize(11).fillColor('#1a1a2e').font('Helvetica-Bold')
+       .text(`${firstName} ${lastName}`, 50, 144);
+    doc.fontSize(10).fillColor('#444').font('Helvetica').text(email, 50, 159);
+    if (phone) doc.text(phone, 50, 173);
+    if (leadwaseId) {
+      doc.fontSize(9).fillColor('#999').text(`ID : ${leadwaseId}`, 50, phone ? 188 : 173);
+    }
+
+    // ── Tableau ──────────────────────────────────────────────────────────────
+    const tableTop = 240;
+    const colDesc  = 50;
+    const colQty   = 350;
+    const colPrix  = 420;
+    const colTotal = 490;
+
+    // En-tête tableau
+    doc.rect(50, tableTop, pageWidth, 24).fill('#1a1a2e');
+    doc.fontSize(9).fillColor('#fff').font('Helvetica-Bold');
+    doc.text('DESCRIPTION',  colDesc  + 4, tableTop + 8);
+    doc.text('QTÉ',          colQty,        tableTop + 8, { width: 60, align: 'center' });
+    doc.text('P.U.',         colPrix,        tableTop + 8, { width: 60, align: 'right' });
+    doc.text('TOTAL',        colTotal,       tableTop + 8, { width: 55, align: 'right' });
+
+    // Ligne produit
+    const rowY = tableTop + 24;
+    doc.rect(50, rowY, pageWidth, 30).fill('#f7f7fb');
+    doc.fontSize(10).fillColor('#1a1a2e').font('Helvetica-Bold')
+       .text(plan, colDesc + 4, rowY + 9);
+    doc.fontSize(9).fillColor('#555').font('Helvetica')
+       .text('1', colQty, rowY + 11, { width: 60, align: 'center' });
+    const amountStr = `${Number(amount).toLocaleString('fr-FR')} FCFA`;
+    doc.text(amountStr, colPrix, rowY + 11, { width: 60, align: 'right' });
+    doc.text(amountStr, colTotal, rowY + 11, { width: 55, align: 'right' });
+
+    // ── Totaux ───────────────────────────────────────────────────────────────
+    const totY = rowY + 50;
+    doc.fontSize(9).fillColor('#999').font('Helvetica')
+       .text('Sous-total :', 350, totY, { width: 130, align: 'right' });
+    doc.text(amountStr, 490, totY, { width: 55, align: 'right' });
+
+    doc.fontSize(9).fillColor('#999')
+       .text('TVA (0%) :', 350, totY + 16, { width: 130, align: 'right' });
+    doc.text('0 FCFA', 490, totY + 16, { width: 55, align: 'right' });
+
+    doc.moveTo(350, totY + 36).lineTo(545, totY + 36).strokeColor('#ccc').lineWidth(0.5).stroke();
+
+    doc.rect(350, totY + 42, 195, 26).fill('#1a1a2e');
+    doc.fontSize(11).fillColor('#fff').font('Helvetica-Bold')
+       .text('TOTAL', 354, totY + 50, { width: 125, align: 'right' });
+    doc.text(amountStr, 490, totY + 50, { width: 55, align: 'right' });
+
+    // ── Note de paiement ─────────────────────────────────────────────────────
+    doc.fontSize(9).fillColor('#27ae60').font('Helvetica-Bold')
+       .text('✓ Paiement reçu — Merci pour votre confiance !', 50, totY + 90, { align: 'center', width: pageWidth });
+
+    // ── Pied de page ─────────────────────────────────────────────────────────
+    doc.moveTo(50, 760).lineTo(545, 760).strokeColor('#e0e0e0').lineWidth(1).stroke();
+    doc.fontSize(8).fillColor('#aaa').font('Helvetica')
+       .text('Leadwase — leadwase.com', 50, 768, { align: 'center', width: pageWidth });
+
+    doc.end();
+  });
 }
 
 export default async function handler(req, res) {
@@ -122,6 +221,25 @@ export default async function handler(req, res) {
         createdAt:    new Date(),
       });
 
+      // Génération de la facture PDF
+      let invoicePdfBase64 = null;
+      try {
+        invoicePdfBase64 = await generateInvoice({
+          invoiceNumber: pay.orderId,
+          date:          new Date(),
+          firstName:     oData.firstName,
+          lastName:      oData.lastName,
+          email:         oData.email,
+          phone:         oData.phone,
+          amount:        pay.amount,
+          plan:          'Carte Classique Leadwase',
+          leadwaseId:    lwId,
+        });
+        console.log(`✅ Facture PDF générée pour ${lwId}`);
+      } catch (pdfError) {
+        console.error('❌ Erreur génération facture PDF:', pdfError);
+      }
+
       await Promise.allSettled([
         notifyAdminNewOrder({
           orderId:   pay.orderId,
@@ -133,12 +251,13 @@ export default async function handler(req, res) {
           plan:      'Carte Classique',
         }),
         notifyClientPaymentSuccess({
-          firstName: oData.firstName,
-          email:     oData.email,
-          amount:    pay.amount,
-          loginEmail: loginEmail,
-          password: pwd,
-          leadwaseId: lwId,
+          firstName:        oData.firstName,
+          email:            oData.email,
+          amount:           pay.amount,
+          loginEmail:       loginEmail,
+          password:         pwd,
+          leadwaseId:       lwId,
+          invoicePdfBase64: invoicePdfBase64, // <-- facture jointe
         }),
       ]);
     }
@@ -202,6 +321,40 @@ export default async function handler(req, res) {
             updatedAt: new Date(),
           });
           console.log(`✅ Plan mis à jour: ${oldPlan} → ${sData.plan} pour le profil ${profileDoc.id}`);
+
+          // Génération de la facture PDF pour abonnement
+          let invoicePdfBase64 = null;
+          try {
+            const pData = profileDoc.data();
+            invoicePdfBase64 = await generateInvoice({
+              invoiceNumber: pay.subscriptionId,
+              date:          new Date(),
+              firstName:     pData.firstName,
+              lastName:      pData.lastName,
+              email:         pData.email,
+              phone:         pData.phone,
+              amount:        sData.amount || pay.amount,
+              plan:          `Abonnement Leadwase ${sData.plan?.toUpperCase() || ''}`,
+              leadwaseId:    profileDoc.id,
+            });
+            console.log(`✅ Facture PDF abonnement générée pour ${profileDoc.id}`);
+          } catch (pdfError) {
+            console.error('❌ Erreur génération facture PDF abonnement:', pdfError);
+          }
+
+          // Notifier le client (à adapter selon ta fonction brevo)
+          await Promise.allSettled([
+            notifyClientPaymentSuccess({
+              firstName:        profileDoc.data().firstName,
+              email:            profileDoc.data().email,
+              amount:           sData.amount || pay.amount,
+              loginEmail:       profileDoc.data().loginEmail,
+              password:         null, // pas de nouveau mot de passe pour un abonnement
+              leadwaseId:       profileDoc.id,
+              invoicePdfBase64: invoicePdfBase64, // <-- facture jointe
+            }),
+          ]);
+
         } else {
           console.log(`❌ Aucun profil trouvé avec firebaseUid: ${firebaseUid}`);
           
