@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "firebase-admin": "^11.0.0"
+    "firebase-admin": "^11.0.0",
+    "pdfkit": "^0.15.2"
   }
 }
