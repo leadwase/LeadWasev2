@@ -372,13 +372,13 @@ onAuthStateChanged(auth, async user => {
   navAuth.href        = 'dashboard.html';
 
   // Récupérer plan + vérifier carte en parallèle
-  const [userSnap, hasCarte] = await Promise.all([
-    getDoc(doc(db, 'users', user.uid)),
-    checkCarte(user),
-  ]);
+// ✅ Nouveau — lit le plan dans 'profiles' via firebaseUid
+const [profilesSnap, hasCarte] = await Promise.all([
+  getDocs(query(collection(db, 'profiles'), where('firebaseUid', '==', user.uid), limit(1))),
+  checkCarte(user),
+]);
 
-  userHasCarte = hasCarte;
-  const userPlan = userSnap.exists() ? (userSnap.data()?.plan || 'free') : 'free';
+const userPlan = !profilesSnap.empty ? (profilesSnap.docs[0].data()?.plan || 'free') : 'free';
 
   if (!hasCarte) {
     // Connecté mais pas de carte → griser + bannière carte
