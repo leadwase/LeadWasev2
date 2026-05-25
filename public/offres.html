@@ -341,37 +341,13 @@ function markCurrentPlan(plan) {
 // ── Vérifie si l'utilisateur a une carte (commande paid) ─────────────────────
 async function checkCarte(user) {
   try {
-    // 1. Récupérer le leadwaseId depuis le profil
-    const profileSnap = await getDocs(
-      query(
-        collection(db, 'profiles'),
-        where('firebaseUid', '==', user.uid),
-        limit(1)
-      )
-    );
-
-    if (profileSnap.empty) {
-      console.log('[checkCarte] aucun profil trouvé pour uid:', user.uid);
-      return false;
-    }
-
-    const leadwaseId = profileSnap.docs[0].id; // ex: "lw-68518"
-    const leadwaseIdUpper = leadwaseId.toUpperCase(); // "LW-68518"
-    console.log('[checkCarte] leadwaseId:', leadwaseId);
-
-    // 2. Chercher une commande paid avec ce leadwaseId
-    const ordersSnap = await getDocs(
-      query(
-        collection(db, 'orders'),
-        where('leadwaseId', '==', leadwaseIdUpper),
-        where('status',    '==', 'paid'),
-        limit(1)
-      )
-    );
-
-    console.log('[checkCarte] commande trouvée:', !ordersSnap.empty);
-    return !ordersSnap.empty;
-
+    const token = await getIdToken(user);
+    const r = await fetch('/api/get-confirmation', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const d = await r.json();
+    console.log('[checkCarte] résultat API:', d);
+    return d.hasCarte === true;
   } catch (e) {
     console.warn('[checkCarte] error:', e);
     return false;
