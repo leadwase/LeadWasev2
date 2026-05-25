@@ -1,9 +1,12 @@
 // api/get-confirmation.js
-// Lit orders / subscriptions / credentials via l'admin SDK.
-// Les Firestore Rules côté client ne s'appliquent pas ici.
+// Gère deux routes :
+//   GET /api/get-confirmation?orderId=...        → détails commande
+//   GET /api/get-confirmation?subscriptionId=... → détails abonnement
+//   GET /api/get-confirmation?checkCarte=1       → vérifie si l'utilisateur a une carte (Bearer token requis)
 
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore }                  from 'firebase-admin/firestore';
+import { getAuth }                       from 'firebase-admin/auth';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -28,14 +31,53 @@ export default async function handler(req, res) {
   const origin = process.env.SITE_URL || 'https://leadwase.com';
   res.setHeader('Access-Control-Allow-Origin',  origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET')    return res.status(405).end();
 
-  const { orderId, subscriptionId } = req.query;
+  const { orderId, subscriptionId, checkCarte } = req.query;
+
+  // ── CAS CHECK-CARTE ──────────────────────────────────────────────────────
+  // GET /api/get-confirmation?checkCarte=1
+  // Header : Authorization: Bearer <idToken>
+  if (checkCarte) {
+    try {
+      const token = (req.headers.authorization || '').split('Bearer ')[1];
+      if (!token) return res.status(401).json({ hasCarte: false, error: 'Non autorisé' });
+
+      // Vérifier le token Firebase
+      const decoded = await getAuth().verifyIdToken(token);
+
+      // Trouver le profil via firebaseUid
+      const profilesSnap = await db.collection('profiles')
+        .where('firebaseUid', '==', decoded.uid)
+        .limit(1)
+        .get();
+
+      if (profilesSnap.empty) {
+        return res.json({ hasCarte: false });
+      }
+
+      // L'ID du document profil est le leadwaseId (ex: "lw-68518")
+      const leadwaseId = profilesSnap.docs[0].id.toUpperCase(); // → "LW-68518"
+
+      // Chercher une commande paid avec ce leadwaseId
+      const ordersSnap = await db.collection('orders')
+        .where('leadwaseId', '==', leadwaseId)
+        .where('status',    '==', 'paid')
+        .limit(1)
+        .get();
+
+      return res.json({ hasCarte: !ordersSnap.empty });
+
+    } catch (e) {
+      console.error('[get-confirmation] checkCarte:', e);
+      return res.json({ hasCarte: false });
+    }
+  }
 
   if (!orderId && !subscriptionId) {
-    return res.status(400).json({ error: 'orderId ou subscriptionId requis' });
+    return res.status(400).json({ error: 'orderId, subscriptionId ou checkCarte requis' });
   }
 
   // ── CAS ABONNEMENT ───────────────────────────────────────────────────────
@@ -77,10 +119,10 @@ export default async function handler(req, res) {
           const credSnap = await db.collection('credentials').doc(order.leadwaseId).get();
           if (credSnap.exists) {
             const c = credSnap.data();
-          credentials = {
-            leadwaseId:   c.leadwaseId   || c.loginEmail || null,  // ← renommer
-            passwordHash: c.passwordHash || null,
-          };
+            credentials = {
+              leadwaseId:   c.leadwaseId   || c.loginEmail || null,
+              passwordHash: c.passwordHash || null,
+            };
           }
         } catch (e) {
           console.warn('[get-confirmation] credentials introuvables:', e);
