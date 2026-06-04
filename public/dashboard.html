@@ -954,7 +954,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null;
 let currentPlan = 'free';
@@ -1197,16 +1197,15 @@ window.changePassword = async () => {
     await updatePassword(currentUser, newPwd);
 
     // Mise à jour du hash dans Firestore (collection credentials)
-    try {
-      const credRef = doc(db, 'credentials', lwId);
-      await updateDoc(credRef, {
-        passwordHash: newPwd, // Remplacer par un vrai hash si vous hashez côté client
-        updatedAt: new Date()
-      });
-    } catch(firestoreErr) {
-      // Non bloquant si credentials n'existe pas encore
-      console.warn('Firestore credentials update skipped:', firestoreErr);
-    }
+      try {
+        const credRef = doc(db, 'credentials', lwId);
+        await setDoc(credRef, {
+          passwordHash: newPwd,
+          updatedAt: new Date()
+        }, { merge: true }); // ← crée si n'existe pas, met à jour sinon
+      } catch(firestoreErr) {
+        console.warn('Firestore credentials update skipped:', firestoreErr);
+      }
 
     toast('✅ Mot de passe modifié avec succès !', 'success');
 
