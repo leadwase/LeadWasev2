@@ -15,25 +15,75 @@
 .login-right{background:var(--white);padding:80px 64px;display:flex;flex-direction:column;justify-content:center}
 .login-title{font-size:28px;font-weight:bold;color:var(--black);margin-bottom:8px}
 .login-sub{font-size:14px;color:var(--gray2);font-style:italic;margin-bottom:28px;line-height:1.7}
+
+/* ── Panneaux (login / reset) ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── Boîtes info ── */
 .hint-box{background:var(--green-pale);border-left:3px solid var(--green);padding:14px 18px;margin-bottom:24px}
 .hint-box p{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic}
 .hint-box strong{color:var(--green);font-style:normal}
-/* Message contextuel quand redirigé depuis dashboard */
 .info-box{background:#fff8e1;border-left:3px solid #f0a500;padding:14px 18px;margin-bottom:24px;display:none}
 .info-box p{font-size:13px;color:#7a5500;line-height:1.7}
 .info-box strong{color:#f0a500}
+
+/* ── Champs ── */
 .l-group{margin-bottom:16px}
 .l-label{display:block;font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--black);margin-bottom:7px}
 .l-input{width:100%;padding:13px 17px;border:1px solid var(--gray5);background:var(--off);font-family:var(--serif);font-size:15px;color:var(--black);outline:none;transition:border-color .2s;border-radius:2px}
 .l-input:focus{border-color:var(--green);background:var(--white)}
 .l-input::placeholder{color:var(--gray4);font-style:italic}
+.l-input-wrap{position:relative}
+.l-input-wrap .l-input{padding-right:44px}
+.pwd-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--gray3);padding:2px;transition:color .15s}
+.pwd-eye:hover{color:var(--black)}
+
+/* ── Bouton principal ── */
 .l-btn{width:100%;margin-top:6px;padding:15px;background:var(--green);color:var(--white);border:none;font-family:var(--serif);font-size:15px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
 .l-btn:hover{background:var(--green2)}
 .l-btn:disabled{opacity:.6;cursor:not-allowed}
+.l-btn-ghost{width:100%;margin-top:8px;padding:12px;background:transparent;color:var(--gray2);border:1px solid var(--gray5);font-family:var(--serif);font-size:13px;cursor:pointer;transition:all .2s;border-radius:2px}
+.l-btn-ghost:hover{border-color:var(--black);color:var(--black)}
+
+/* ── Erreur / succès ── */
 .err-msg{background:rgba(192,57,43,.08);border-left:3px solid var(--red);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;border-radius:2px}
+.ok-msg{background:rgba(26,122,60,.07);border-left:3px solid var(--green);padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:14px;display:none;border-radius:2px}
+
+/* ── Séparateur ── */
 .l-divider{height:1px;background:var(--gray5);margin:24px 0;position:relative}
 .l-divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);padding:0 12px;font-size:11px;color:var(--gray3);font-style:italic}
+
+/* ── Indicateur de force du mot de passe ── */
+.pwd-strength{margin-top:6px;margin-bottom:4px}
+.pwd-strength-bar{height:3px;background:var(--gray5);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.pwd-strength-fill{height:100%;border-radius:2px;transition:width .3s ease,background .3s ease;width:0%}
+.pwd-strength-label{font-size:10px;color:var(--gray3);font-style:italic}
+.pwd-rules{margin-top:8px;padding:10px 12px;background:var(--gray6,#f5f5f7);border:1px solid var(--gray5);border-radius:2px}
+.pwd-rule{font-size:11px;color:var(--gray4);margin-bottom:4px;display:flex;align-items:center;gap:6px;transition:color .2s}
+.pwd-rule:last-child{margin-bottom:0}
+.pwd-rule.ok{color:var(--green)}
+.rule-icon{font-size:10px}
+.pwd-match-hint{font-size:11px;font-style:italic;margin-top:4px;min-height:16px}
+
+/* ── Stepper reset (3 étapes) ── */
+.step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:24px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--gray5);transition:background .3s}
+.step-dot.done{background:var(--green)}
+.step-dot.current{background:var(--green3);box-shadow:0 0 0 3px rgba(76,175,117,.2)}
+.step-label{font-size:11px;color:var(--gray3);font-style:italic;margin-left:4px}
+
+/* ── Lien retour ── */
+.back-link{font-size:13px;color:var(--green);cursor:pointer;font-style:italic;display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;background:none;border:none;font-family:var(--serif);padding:0}
+.back-link:hover{text-decoration:underline}
+
+/* ── Loader inline ── */
+.loader-inline{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Responsive ── */
 @media(max-width:900px){.login-wrap{grid-template-columns:1fr}.login-left{display:none}.login-right{padding:60px 24px}}
+@media(max-width:480px){.login-right{padding:40px 18px}}
 </style>
 </head>
 <body>
@@ -43,32 +93,162 @@
     <h2 class="login-h">Bienvenue<br>sur votre<br>espace.</h2>
     <p class="login-p">Connectez-vous avec les identifiants reçus lors de la livraison de votre carte pour accéder à votre profil digital.</p>
   </div>
+
   <div class="login-right">
-    <div class="login-title">Accéder à mon profil</div>
-    <p class="login-sub">Saisissez vos identifiants de connexion remis avec votre carte LeadWase.</p>
 
-    <!-- Message affiché si redirection depuis dashboard (compte sans profil lié) -->
-    <div class="info-box" id="info-box">
-      <p>
-        <strong>🔑 Connectez-vous avec vos identifiants de carte.</strong><br>
-        Votre compte email ne correspond à aucun profil LeadWase. Utilisez l'identifiant <strong>LW-XXXXX</strong> et le mot de passe fournis avec votre carte physique.
+    <!-- ══════════════════════════════════
+         PANNEAU 1 — CONNEXION
+    ══════════════════════════════════ -->
+    <div class="panel active" id="panel-login">
+      <div class="login-title">Accéder à mon profil</div>
+      <p class="login-sub">Saisissez vos identifiants de connexion remis avec votre carte LeadWase.</p>
+
+      <div class="info-box" id="info-box">
+        <p>
+          <strong>🔑 Connectez-vous avec vos identifiants de carte.</strong><br>
+          Votre compte email ne correspond à aucun profil LeadWase. Utilisez l'identifiant <strong>LW-XXXXX</strong> et le mot de passe fournis avec votre carte physique.
+        </p>
+      </div>
+
+      <div class="hint-box">
+        <p><strong>Où trouver mes identifiants ?</strong><br>Ils sont indiqués sur le document livré avec votre carte physique. Format : <strong>LW-XXXXX</strong></p>
+      </div>
+
+      <div class="err-msg" id="err-login"></div>
+
+      <div class="l-group">
+        <label class="l-label">Identifiant unique</label>
+        <input class="f-input l-input" id="lwid" placeholder="Ex : LW-48291" autocomplete="username">
+      </div>
+      <div class="l-group">
+        <label class="l-label">Mot de passe</label>
+        <div class="l-input-wrap">
+          <input class="f-input l-input" id="pwd" type="password" placeholder="••••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          <button type="button" class="pwd-eye" onclick="toggleEye('pwd',this)" aria-label="Afficher">👁️</button>
+        </div>
+      </div>
+
+      <button class="l-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
+
+      <p style="text-align:center;margin-top:14px;font-size:13px;font-style:italic">
+        <button type="button" onclick="showPanel('panel-reset')" style="background:none;border:none;color:var(--green);font-family:var(--serif);font-size:13px;cursor:pointer;font-style:italic;padding:0">
+          Mot de passe oublié / Changer mon mot de passe →
+        </button>
       </p>
-    </div>
 
-    <div class="hint-box"><p><strong>Où trouver mes identifiants ?</strong><br>Ils sont indiqués sur le document livré avec votre carte physique. Format : <strong>LW-XXXXX</strong></p></div>
-    <div class="err-msg" id="err"></div>
-    <div class="l-group"><label class="l-label">Identifiant unique</label><input class="f-input l-input" id="lwid" placeholder="Ex : LW-48291"></div>
-    <div class="l-group"><label class="l-label">Mot de passe</label><input class="f-input l-input" id="pwd" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <button class="l-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
-    <p style="text-align:center;margin-top:14px;font-size:13px;font-style:italic"><a href="mailto:supportleadwase@gmail.com" style="color:var(--green)">Mot de passe oublié ? Contacter le support</a></p>
-    <div class="l-divider"><span>Pas encore de carte ?</span></div>
-    <p style="font-size:12px;color:var(--gray3);font-style:italic;text-align:center;line-height:1.6">Commandez votre carte LeadWase et recevez vos accès sous 48h.<br><a href="commander.html" style="color:var(--green);text-decoration:underline">Commander maintenant →</a></p>
-  </div>
-</div>
+      <div class="l-divider"><span>Pas encore de carte ?</span></div>
+      <p style="font-size:12px;color:var(--gray3);font-style:italic;text-align:center;line-height:1.6">
+        Commandez votre carte LeadWase et recevez vos accès sous 48h.<br>
+        <a href="commander.html" style="color:var(--green);text-decoration:underline">Commander maintenant →</a>
+      </p>
+    </div><!-- /panel-login -->
+
+
+    <!-- ══════════════════════════════════
+         PANNEAU 2 — CHANGEMENT MOT DE PASSE
+         Étape 1 : Saisir identifiant + mot de passe actuel
+         Étape 2 : Saisir + confirmer nouveau mot de passe
+         Étape 3 : Confirmation succès
+    ══════════════════════════════════ -->
+    <div class="panel" id="panel-reset">
+
+      <button type="button" class="back-link" onclick="showPanel('panel-login')">← Retour à la connexion</button>
+
+      <div class="login-title" style="font-size:22px;margin-bottom:6px">Modifier mon mot de passe</div>
+      <p class="login-sub" id="reset-sub">Vérifiez d'abord votre identité avec vos identifiants actuels.</p>
+
+      <!-- Indicateur d'étapes -->
+      <div class="step-indicator">
+        <div class="step-dot current" id="step-dot-1"></div>
+        <div class="step-dot" id="step-dot-2"></div>
+        <div class="step-dot" id="step-dot-3"></div>
+        <span class="step-label" id="step-label">Étape 1 / 3 — Vérification de l'identité</span>
+      </div>
+
+      <!-- ÉTAPE 1 — Vérification identité -->
+      <div id="reset-step-1">
+        <div class="err-msg" id="err-reset-1"></div>
+
+        <div class="l-group">
+          <label class="l-label">Identifiant unique</label>
+          <input class="f-input l-input" id="r-lwid" placeholder="Ex : LW-48291" autocomplete="username">
+        </div>
+        <div class="l-group">
+          <label class="l-label">Mot de passe actuel</label>
+          <div class="l-input-wrap">
+            <input class="f-input l-input" id="r-current" type="password" placeholder="Votre mot de passe actuel" autocomplete="current-password" onkeydown="if(event.key==='Enter')verifyIdentity()">
+            <button type="button" class="pwd-eye" onclick="toggleEye('r-current',this)" aria-label="Afficher">👁️</button>
+          </div>
+        </div>
+
+        <button class="l-btn" id="verify-btn" onclick="verifyIdentity()">Vérifier mon identité →</button>
+      </div>
+
+      <!-- ÉTAPE 2 — Nouveau mot de passe -->
+      <div id="reset-step-2" style="display:none">
+        <div class="err-msg" id="err-reset-2"></div>
+
+        <div class="l-group">
+          <label class="l-label">Nouveau mot de passe</label>
+          <div class="l-input-wrap">
+            <input class="f-input l-input" id="r-new" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password" oninput="onNewPwdInput(this.value)">
+            <button type="button" class="pwd-eye" onclick="toggleEye('r-new',this)" aria-label="Afficher">👁️</button>
+          </div>
+          <div class="pwd-strength">
+            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="r-strength-fill"></div></div>
+            <div class="pwd-strength-label" id="r-strength-label">Saisissez un mot de passe</div>
+          </div>
+          <div class="pwd-rules">
+            <div class="pwd-rule" id="r-rule-length"><span class="rule-icon">○</span> Au moins 8 caractères</div>
+            <div class="pwd-rule" id="r-rule-upper"><span class="rule-icon">○</span> Une majuscule</div>
+            <div class="pwd-rule" id="r-rule-number"><span class="rule-icon">○</span> Un chiffre</div>
+            <div class="pwd-rule" id="r-rule-special"><span class="rule-icon">○</span> Un caractère spécial (!@#$%...)</div>
+          </div>
+        </div>
+
+        <div class="l-group">
+          <label class="l-label">Confirmer le nouveau mot de passe</label>
+          <div class="l-input-wrap">
+            <input class="f-input l-input" id="r-confirm" type="password" placeholder="Répétez le nouveau mot de passe" autocomplete="new-password" oninput="onConfirmInput()" onkeydown="if(event.key==='Enter')doChangePassword()">
+            <button type="button" class="pwd-eye" onclick="toggleEye('r-confirm',this)" aria-label="Afficher">👁️</button>
+          </div>
+          <div class="pwd-match-hint" id="r-match-hint"></div>
+        </div>
+
+        <button class="l-btn" id="change-btn" onclick="doChangePassword()">Changer le mot de passe →</button>
+        <button type="button" class="l-btn-ghost" onclick="backToStep1()">← Recommencer</button>
+      </div>
+
+      <!-- ÉTAPE 3 — Succès -->
+      <div id="reset-step-3" style="display:none;text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:16px">✅</div>
+        <div style="font-size:18px;font-weight:bold;color:var(--black);margin-bottom:10px">Mot de passe modifié !</div>
+        <p style="font-size:13px;color:var(--gray2);font-style:italic;line-height:1.7;margin-bottom:24px">
+          Votre nouveau mot de passe est actif. Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
+        </p>
+        <button class="l-btn" onclick="goToLogin()">Se connecter →</button>
+      </div>
+
+    </div><!-- /panel-reset -->
+
+  </div><!-- /login-right -->
+</div><!-- /login-wrap -->
+
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// ── État partagé pour le flow de reset ──────────────────────────────────────
+let _resetUser   = null;   // objet Firebase User après ré-auth réussie
+let _resetLwId   = null;   // identifiant LW-XXXXX normalisé
+let _resetEmail  = null;   // email interne leadwase.internal
 
 // ── Afficher le message contextuel si redirigé depuis dashboard ──────────────
 const params = new URLSearchParams(window.location.search);
@@ -76,36 +256,247 @@ if (params.get('msg') === 'identifiants') {
   document.getElementById('info-box').style.display = 'block';
 }
 
+// ── Navigation entre panneaux ─────────────────────────────────────────────────
+window.showPanel = (id) => {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+};
+
+// ── Afficher/masquer mot de passe ─────────────────────────────────────────────
+window.toggleEye = (inputId, btn) => {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else                           { input.type = 'password'; btn.textContent = '👁️'; }
+};
+
+// ── Connexion ─────────────────────────────────────────────────────────────────
 window.doLogin = async () => {
   const btn = document.getElementById('login-btn');
-  const err = document.getElementById('err');
+  const err = document.getElementById('err-login');
   const id  = document.getElementById('lwid').value.trim().toUpperCase();
   const pwd = document.getElementById('pwd').value;
-  if (!id || !pwd) { err.textContent = 'Veuillez remplir tous les champs.'; err.style.display = 'block'; return; }
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Connexion...'; err.style.display = 'none';
+
+  if (!id || !pwd) { showErr(err, 'Veuillez remplir tous les champs.'); return; }
+  setLoading(btn, true, 'Connexion...');
+  err.style.display = 'none';
+
   const email = id.toLowerCase() + '@leadwase.internal';
+
   try {
     await signInWithEmailAndPassword(auth, email, pwd);
     redirect();
   } catch {
+    // Fallback Firestore
     try {
       const cDoc = await getDoc(doc(db, 'credentials', id));
-      if (!cDoc.exists()) throw new Error('Identifiant introuvable');
-      if (cDoc.data().passwordHash !== pwd) throw new Error('Mot de passe incorrect');
+      if (!cDoc.exists())                      throw new Error('Identifiant introuvable.');
+      if (cDoc.data().passwordHash !== pwd)    throw new Error('Mot de passe incorrect.');
+      // Création du compte Auth si inexistant
       try {
         const nc = await createUserWithEmailAndPassword(auth, email, pwd);
-        await setDoc(doc(db, 'users', nc.user.uid), { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() }, { merge: true });
-      } catch(_) {}
+        await setDoc(doc(db, 'users', nc.user.uid),
+          { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() },
+          { merge: true });
+      } catch(_) { /* déjà existant */ }
       await signInWithEmailAndPassword(auth, email, pwd);
       redirect();
-    } catch(e2) {
-      err.textContent = e2.message || 'Identifiant ou mot de passe incorrect.';
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Se connecter →';
+    } catch (e2) {
+      showErr(err, e2.message || 'Identifiant ou mot de passe incorrect.');
+      setLoading(btn, false, 'Se connecter →');
     }
   }
 };
+
+// ── ÉTAPE 1 — Vérification identité ──────────────────────────────────────────
+window.verifyIdentity = async () => {
+  const btn  = document.getElementById('verify-btn');
+  const err  = document.getElementById('err-reset-1');
+  const id   = document.getElementById('r-lwid').value.trim().toUpperCase();
+  const curr = document.getElementById('r-current').value;
+
+  if (!id || !curr) { showErr(err, 'Veuillez remplir les deux champs.'); return; }
+  setLoading(btn, true, 'Vérification...');
+  err.style.display = 'none';
+
+  const email = id.toLowerCase() + '@leadwase.internal';
+  let firebaseUser = null;
+
+  try {
+    // Tentative de connexion Firebase pour obtenir le User
+    const uc = await signInWithEmailAndPassword(auth, email, curr);
+    firebaseUser = uc.user;
+  } catch {
+    // Fallback Firestore : vérifier le passwordHash
+    try {
+      const cDoc = await getDoc(doc(db, 'credentials', id));
+      if (!cDoc.exists())                   throw new Error('Identifiant introuvable.');
+      if (cDoc.data().passwordHash !== curr) throw new Error('Mot de passe actuel incorrect.');
+      // Créer le compte Auth si nécessaire pour pouvoir appeler updatePassword ensuite
+      try {
+        const nc = await createUserWithEmailAndPassword(auth, email, curr);
+        await setDoc(doc(db, 'users', nc.user.uid),
+          { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() },
+          { merge: true });
+        firebaseUser = nc.user;
+      } catch (_) {
+        // Compte Auth existant mais connexion échouée plus tôt — ré-essayer
+        const uc2 = await signInWithEmailAndPassword(auth, email, curr);
+        firebaseUser = uc2.user;
+      }
+    } catch (e2) {
+      showErr(err, e2.message || 'Identifiant ou mot de passe incorrect.');
+      setLoading(btn, false, 'Vérifier mon identité →');
+      return;
+    }
+  }
+
+  // Ré-authentification explicite pour pouvoir appeler updatePassword
+  try {
+    const credential = EmailAuthProvider.credential(email, curr);
+    await reauthenticateWithCredential(firebaseUser, credential);
+  } catch (_) { /* déjà fraîchement connecté, pas bloquant */ }
+
+  _resetUser  = firebaseUser;
+  _resetLwId  = id;
+  _resetEmail = email;
+
+  setLoading(btn, false, 'Vérifier mon identité →');
+  goToStep(2);
+};
+
+// ── Indicateur de force ───────────────────────────────────────────────────────
+window.onNewPwdInput = (val) => {
+  const fill  = document.getElementById('r-strength-fill');
+  const label = document.getElementById('r-strength-label');
+  const rules = {
+    length:  val.length >= 8,
+    upper:   /[A-Z]/.test(val),
+    number:  /[0-9]/.test(val),
+    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val),
+  };
+  const map = { length:'r-rule-length', upper:'r-rule-upper', number:'r-rule-number', special:'r-rule-special' };
+  Object.entries(rules).forEach(([k, ok]) => {
+    const el = document.getElementById(map[k]);
+    if (!el) return;
+    el.className = 'pwd-rule' + (ok ? ' ok' : '');
+    el.querySelector('.rule-icon').textContent = ok ? '✓' : '○';
+  });
+  const score = Object.values(rules).filter(Boolean).length;
+  const pct    = [0,25,50,75,100][score];
+  const colors = ['#e5e5ea','#e74c3c','#f39c12','#2ecc71','#1a7a3c'];
+  const labels = ['','Très faible','Faible','Moyen','Fort'];
+  fill.style.width      = pct + '%';
+  fill.style.background = colors[score];
+  label.textContent     = val.length === 0 ? 'Saisissez un mot de passe' : labels[score];
+  label.style.color     = colors[score];
+  onConfirmInput();
+};
+
+window.onConfirmInput = () => {
+  const nv   = document.getElementById('r-new').value;
+  const cv   = document.getElementById('r-confirm').value;
+  const hint = document.getElementById('r-match-hint');
+  if (!cv) { hint.textContent = ''; return; }
+  if (nv === cv) { hint.textContent = '✓ Les mots de passe correspondent'; hint.style.color = 'var(--green)'; }
+  else           { hint.textContent = '✗ Les mots de passe ne correspondent pas'; hint.style.color = '#c0392b'; }
+};
+
+// ── ÉTAPE 2 — Changement de mot de passe ─────────────────────────────────────
+window.doChangePassword = async () => {
+  const btn     = document.getElementById('change-btn');
+  const err     = document.getElementById('err-reset-2');
+  const newPwd  = document.getElementById('r-new').value;
+  const confirm = document.getElementById('r-confirm').value;
+
+  if (!newPwd || !confirm) { showErr(err, 'Veuillez remplir les deux champs.'); return; }
+  if (newPwd.length < 8)   { showErr(err, 'Le mot de passe doit contenir au moins 8 caractères.'); return; }
+  if (newPwd !== confirm)  { showErr(err, 'Les mots de passe ne correspondent pas.'); return; }
+  if (!_resetUser)         { showErr(err, 'Session expirée. Veuillez recommencer.'); backToStep1(); return; }
+
+  setLoading(btn, true, 'Mise à jour...');
+  err.style.display = 'none';
+
+  try {
+    // Mise à jour Firebase Auth
+    await updatePassword(_resetUser, newPwd);
+
+    // Mise à jour Firestore credentials (passwordHash)
+    try {
+      await setDoc(doc(db, 'credentials', _resetLwId),
+        { passwordHash: newPwd, updatedAt: new Date() },
+        { merge: true });
+    } catch (fe) {
+      console.warn('Firestore credentials non mis à jour :', fe);
+    }
+
+    goToStep(3);
+  } catch (e) {
+    if (e.code === 'auth/requires-recent-login') {
+      showErr(err, 'Session expirée. Cliquez sur "Recommencer" pour vous ré-identifier.');
+    } else if (e.code === 'auth/weak-password') {
+      showErr(err, 'Le mot de passe est trop faible.');
+    } else {
+      showErr(err, e.message || 'Une erreur est survenue.');
+    }
+    setLoading(btn, false, 'Changer le mot de passe →');
+  }
+};
+
+// ── Navigation interne du stepper ─────────────────────────────────────────────
+function goToStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('reset-step-' + i).style.display = (i === n) ? 'block' : 'none';
+    const dot = document.getElementById('step-dot-' + i);
+    dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' current' : '');
+  });
+  const labels = ['','Étape 1 / 3 — Vérification de l\'identité','Étape 2 / 3 — Nouveau mot de passe','Terminé'];
+  document.getElementById('step-label').textContent = labels[n];
+  const subs = ['','Vérifiez d\'abord votre identité avec vos identifiants actuels.','Choisissez un nouveau mot de passe sécurisé.',''];
+  document.getElementById('reset-sub').textContent = subs[n];
+}
+
+window.backToStep1 = () => {
+  _resetUser = null; _resetLwId = null; _resetEmail = null;
+  document.getElementById('r-current').value = '';
+  document.getElementById('r-new').value = '';
+  document.getElementById('r-confirm').value = '';
+  document.getElementById('err-reset-1').style.display = 'none';
+  document.getElementById('err-reset-2').style.display = 'none';
+  document.getElementById('r-match-hint').textContent = '';
+  document.getElementById('r-strength-fill').style.width = '0%';
+  document.getElementById('r-strength-label').textContent = 'Saisissez un mot de passe';
+  document.querySelectorAll('.pwd-rule').forEach(r => {
+    r.className = 'pwd-rule';
+    r.querySelector('.rule-icon').textContent = '○';
+  });
+  goToStep(1);
+};
+
+window.goToLogin = () => {
+  // Pré-remplir l'identifiant sur la page de connexion si on l'a
+  if (_resetLwId) document.getElementById('lwid').value = _resetLwId;
+  window.showPanel('panel-login');
+  // Reset état interne
+  _resetUser = null; _resetLwId = null; _resetEmail = null;
+  goToStep(1);
+  document.getElementById('reset-step-1').style.display = 'block';
+  document.getElementById('reset-step-2').style.display = 'none';
+  document.getElementById('reset-step-3').style.display = 'none';
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function setLoading(btn, loading, label) {
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="loader-inline"></span>' + label
+    : label;
+}
 
 function redirect() {
   const r = new URLSearchParams(window.location.search).get('redirect');
