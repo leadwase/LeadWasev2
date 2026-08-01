@@ -49,10 +49,10 @@
   </aside>
 
   <main class="app-content" style="padding:0">
-    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh;background:#0d0d0d">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
       <div style="text-align:center">
         <div class="loader" style="margin:0 auto"></div>
-        <p style="margin-top:14px;color:#999;font-style:italic">Chargement...</p>
+        <p style="margin-top:14px;color:var(--gray4);font-style:italic">Chargement...</p>
       </div>
     </div>
 
@@ -71,22 +71,22 @@
         </div>
 
         <div class="pros-stats">
-          <div class="pros-stat">
+          <div class="pros-stat c-green">
             <div class="pros-stat-top"><span class="pros-stat-label">Total prospects</span><span class="pros-stat-icon">🤝</span></div>
             <div class="pros-stat-val" id="stat-total">–</div>
             <div class="pros-stat-sub">↑ Mis à jour en temps réel</div>
           </div>
-          <div class="pros-stat">
+          <div class="pros-stat c-blue">
             <div class="pros-stat-top"><span class="pros-stat-label">Cette semaine</span><span class="pros-stat-icon">📅</span></div>
             <div class="pros-stat-val" id="stat-week">–</div>
             <div class="pros-stat-sub">↑ Via NFC</div>
           </div>
-          <div class="pros-stat">
+          <div class="pros-stat c-orange">
             <div class="pros-stat-top"><span class="pros-stat-label">Aujourd'hui</span><span class="pros-stat-icon">⚡</span></div>
             <div class="pros-stat-val" id="stat-today">–</div>
             <div class="pros-stat-sub orange" id="stat-today-sub">↑ Nouveaux</div>
           </div>
-          <div class="pros-stat">
+          <div class="pros-stat c-purple">
             <div class="pros-stat-top"><span class="pros-stat-label">Taux de complétion</span><span class="pros-stat-icon">📊</span></div>
             <div class="pros-stat-val" id="stat-completion">–</div>
             <div class="pros-stat-sub muted">Champs remplis</div>
@@ -226,7 +226,7 @@ function renderTable() {
       <td>${p.phone || '—'}</td>
       <td style="max-width:260px">${p.object || '—'}</td>
       <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC Card</span>' : '<span class="pros-badge lien">🔗 Lien direct</span>'}</td>
-      <td style="color:#999;font-size:12px">${fmtDate(p.createdAt)}</td>
+      <td style="color:var(--gray4);font-size:12px">${fmtDate(p.createdAt)}</td>
       <td>
         <div class="pros-act">
           ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
