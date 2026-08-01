@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -9,6 +10,76 @@ if (!getApps().length) {
   })});
 }
 const db = getFirestore();
+
+// ── Prospects ("Mes Prospects" / bouton "Échanger" du profil public) ─────────
+// Regroupées ici (plutôt que dans un fichier api/ séparé) pour rester sous la
+// limite de 12 fonctions serverless du plan Vercel Hobby.
+
+// Vérifie que le token envoyé correspond bien au propriétaire du profil `leadwaseId`.
+async function verifyOwner(req, leadwaseId) {
+  const token = (req.headers.authorization || '').split('Bearer ')[1];
+  if (!token) throw new Error('Non autorisé');
+  const decoded = await getAuth().verifyIdToken(token);
+  const uDoc = await db.collection('users').doc(decoded.uid).get();
+  if (uDoc.data()?.leadwaseId !== leadwaseId) throw new Error('Accès refusé');
+  return decoded;
+}
+
+// POST /api/profile/[id]?action=capture-lead — public, appelé depuis le bouton
+// "Échanger" de la page profil publique. N'importe quel visiteur peut soumettre
+// ses coordonnées ; aucune authentification requise (comme un formulaire de contact).
+async function captureLead(req, res, leadwaseId) {
+  const { name, phone, email, object, source } = req.body || {};
+  if (!name || (!phone && !email)) {
+    return res.status(400).json({ success: false, error: 'Nom et (téléphone ou email) requis' });
+  }
+  await db.collection('prospects').add({
+    ownerId:   leadwaseId,
+    name:      String(name).trim().slice(0, 120),
+    phone:     phone  ? String(phone).trim().slice(0, 40)  : '',
+    email:     email  ? String(email).trim().slice(0, 120) : '',
+    object:    object ? String(object).trim().slice(0, 300) : '',
+    source:    source === 'nfc' ? 'nfc' : 'lien_direct',
+    createdAt: new Date(),
+  });
+  res.json({ success: true });
+}
+
+// GET /api/profile/[id]?action=prospects — authentifié (propriétaire uniquement).
+async function listProspects(req, res, leadwaseId) {
+  await verifyOwner(req, leadwaseId);
+  const snap = await db.collection('prospects')
+    .where('ownerId', '==', leadwaseId)
+    .orderBy('createdAt', 'desc')
+    .limit(500)
+    .get();
+  const prospects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  res.json({ success: true, prospects });
+}
+
+// DELETE /api/profile/[id]?action=prospects&prospectId=xxx — authentifié.
+async function deleteProspect(req, res, leadwaseId) {
+  await verifyOwner(req, leadwaseId);
+  const { prospectId } = req.query;
+  if (!prospectId) return res.status(400).json({ success: false, error: 'prospectId requis' });
+  const ref = db.collection('prospects').doc(prospectId);
+  const doc = await ref.get();
+  if (!doc.exists || doc.data().ownerId !== leadwaseId) {
+    return res.status(404).json({ success: false, error: 'Prospect introuvable' });
+  }
+  await ref.delete();
+  res.json({ success: true });
+}
+
+// POST /api/profile/[id]?action=clear-prospects — authentifié, vide tout l'annuaire.
+async function clearProspects(req, res, leadwaseId) {
+  await verifyOwner(req, leadwaseId);
+  const snap = await db.collection('prospects').where('ownerId', '==', leadwaseId).get();
+  const batch = db.batch();
+  snap.docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+  res.json({ success: true, deleted: snap.size });
+}
 
 // Fonction pour transformer l'ID réel en code public
 function getPublicCode(lwId) {
@@ -36,6 +107,26 @@ export default async function handler(req, res) {
     }
     
     const leadwaseId = id.toString().toUpperCase();
+
+    // ── Routage des actions "prospects" (CRM) ───────────────────────────────
+    const action = req.query.action;
+    if (action === 'capture-lead' && req.method === 'POST') {
+      return captureLead(req, res, leadwaseId).catch(e =>
+        res.status(500).json({ success: false, error: e.message }));
+    }
+    if (action === 'prospects' && req.method === 'GET') {
+      return listProspects(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'prospects' && req.method === 'DELETE') {
+      return deleteProspect(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'clear-prospects' && req.method === 'POST') {
+      return clearProspects(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+
     console.log(`🔍 Recherche du profil: ${leadwaseId}`);
     
     // 1. Chercher le profil par son ID de document

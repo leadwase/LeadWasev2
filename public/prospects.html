@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Prospects — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app-dashboard.css">
+<link rel="stylesheet" href="css/prospects.css">
+</head>
+<body>
+
+<!-- MOBILE TOPBAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-brand">Lead<em>Wase</em></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout" id="app-layout" style="display:none">
+
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-av">?</div>
+      <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">FREE</div></div>
+    </div>
+    <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item" href="identifiants.html"><span class="s-icon">🔑</span>Identifiants</a>
+      <a class="sidebar-item active" href="prospects.html"><span class="s-icon">📇</span>Mes Prospects</a>
+      <div id="analytics-nav-item"></div>
+      <a class="sidebar-item" href="offres.html" target="_blank" rel="noopener"><span class="s-icon">⭐</span>Offres</a>
+      <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
+      <a class="sidebar-item" href="commander.html" target="_blank" rel="noopener"><span class="s-icon">🛒</span>Commander une carte</a>
+      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Légal</div>
+      <a class="sidebar-item" href="cgu.html" target="_blank" rel="noopener"><span class="s-icon">📄</span>CGU</a>
+      <a class="sidebar-item" href="confidentialite.html" target="_blank" rel="noopener"><span class="s-icon">🔒</span>Confidentialité</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+
+  <main class="app-content" style="padding:0">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh;background:#0d0d0d">
+      <div style="text-align:center">
+        <div class="loader" style="margin:0 auto"></div>
+        <p style="margin-top:14px;color:#999;font-style:italic">Chargement...</p>
+      </div>
+    </div>
+
+    <div id="content" style="display:none">
+      <div class="pros-wrap">
+
+        <div class="pros-head">
+          <div>
+            <div class="pros-h1">Mes Prospects</div>
+            <div class="pros-sub">Annuaire des contacts collectés via votre carte NFC</div>
+          </div>
+          <div class="pros-actions">
+            <button class="pros-btn" id="export-csv-btn">📤 Exporter CSV</button>
+            <a class="pros-btn primary" id="view-profile-btn" href="#" target="_blank" rel="noopener">🪪 Voir mon profil</a>
+          </div>
+        </div>
+
+        <div class="pros-stats">
+          <div class="pros-stat">
+            <div class="pros-stat-top"><span class="pros-stat-label">Total prospects</span><span class="pros-stat-icon">🤝</span></div>
+            <div class="pros-stat-val" id="stat-total">–</div>
+            <div class="pros-stat-sub">↑ Mis à jour en temps réel</div>
+          </div>
+          <div class="pros-stat">
+            <div class="pros-stat-top"><span class="pros-stat-label">Cette semaine</span><span class="pros-stat-icon">📅</span></div>
+            <div class="pros-stat-val" id="stat-week">–</div>
+            <div class="pros-stat-sub">↑ Via NFC</div>
+          </div>
+          <div class="pros-stat">
+            <div class="pros-stat-top"><span class="pros-stat-label">Aujourd'hui</span><span class="pros-stat-icon">⚡</span></div>
+            <div class="pros-stat-val" id="stat-today">–</div>
+            <div class="pros-stat-sub orange" id="stat-today-sub">↑ Nouveaux</div>
+          </div>
+          <div class="pros-stat">
+            <div class="pros-stat-top"><span class="pros-stat-label">Taux de complétion</span><span class="pros-stat-icon">📊</span></div>
+            <div class="pros-stat-val" id="stat-completion">–</div>
+            <div class="pros-stat-sub muted">Champs remplis</div>
+          </div>
+        </div>
+
+        <div class="pros-infobar">
+          <div><strong id="info-count">0 prospect(s)</strong> dans votre CRM · Dernière mise à jour : <span id="info-updated">–</span></div>
+          <div class="pros-actions">
+            <button class="pros-btn" id="export-csv-btn-2">📤 CSV</button>
+            <button class="pros-btn danger" id="clear-btn">🗑 Vider</button>
+          </div>
+        </div>
+
+        <div class="pros-card">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">Annuaire des prospects</div>
+              <div class="pros-card-sub">Contacts collectés via le bouton "Échanger" de votre profil NFC</div>
+            </div>
+            <div class="pros-search-row">
+              <div class="pros-search"><input id="search-input" type="text" placeholder="Rechercher..."></div>
+              <button class="pros-filter-btn active" id="filter-all" data-filter="all">Tous</button>
+              <button class="pros-filter-btn" id="filter-today" data-filter="today">Aujourd'hui</button>
+            </div>
+          </div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Source</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="pros-tbody">
+              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { initDashboardAuth, toast } from './js/dashboard-shared.js';
+import { auth } from './js/dashboard-shared.js';
+
+let lwId = null, allProspects = [], currentFilter = 'all';
+const AVATAR_COLORS = ['#2f7bff','#e05a5a','#5fbf6d','#e8a13a','#9b59d0','#1f9e4e'];
+
+function colorFor(name) {
+  let h = 0;
+  for (let i = 0; i < (name || '').length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function initials(name) {
+  const parts = (name || '?').trim().split(/\s+/);
+  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?';
+}
+function fmtDate(v) {
+  if (!v) return '–';
+  const d = v._seconds ? new Date(v._seconds * 1000) : new Date(v);
+  const now = new Date();
+  const diffH = Math.floor((now - d) / 36e5);
+  if (diffH < 1) return "À l'instant";
+  if (diffH < 24) return `Il y a ${diffH}h`;
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function isThisWeek(v) {
+  if (!v) return false;
+  const d = v._seconds ? new Date(v._seconds * 1000) : new Date(v);
+  const now = new Date();
+  const start = new Date(now); start.setDate(now.getDate() - now.getDay() + 1); start.setHours(0,0,0,0);
+  return d >= start;
+}
+function isToday(v) {
+  if (!v) return false;
+  const d = v._seconds ? new Date(v._seconds * 1000) : new Date(v);
+  const now = new Date();
+  return d.toDateString() === now.toDateString();
+}
+
+async function api(action, opts = {}) {
+  const token = await auth.currentUser.getIdToken();
+  const url = `/api/profile/${lwId}?action=${action}` + (opts.qs || '');
+  const res = await fetch(url, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: opts.body,
+  });
+  return res.json();
+}
+
+function renderStats() {
+  const total = allProspects.length;
+  const week  = allProspects.filter(p => isThisWeek(p.createdAt)).length;
+  const today = allProspects.filter(p => isToday(p.createdAt)).length;
+  const completed = allProspects.filter(p => p.name && p.phone && p.email).length;
+  const rate = total ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById('stat-total').textContent      = total;
+  document.getElementById('stat-week').textContent        = week;
+  document.getElementById('stat-today').textContent       = today;
+  document.getElementById('stat-completion').textContent  = rate + '%';
+  document.getElementById('info-count').textContent       = `${total} prospect${total > 1 ? 's' : ''}`;
+  document.getElementById('info-updated').textContent     = allProspects[0] ? fmtDate(allProspects[0].createdAt) : '–';
+}
+
+function renderTable() {
+  const tbody  = document.getElementById('pros-tbody');
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+
+  let rows = allProspects;
+  if (currentFilter === 'today') rows = rows.filter(p => isToday(p.createdAt));
+  if (search) {
+    rows = rows.filter(p =>
+      (p.name || '').toLowerCase().includes(search) ||
+      (p.email || '').toLowerCase().includes(search) ||
+      (p.phone || '').toLowerCase().includes(search) ||
+      (p.object || '').toLowerCase().includes(search));
+  }
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td>
+        <div class="pros-name-cell">
+          <span class="pros-avatar" style="background:${colorFor(p.name)}">${initials(p.name)}</span>
+          <div>
+            <div class="pros-name">${p.name || '—'}</div>
+            <div class="pros-email">${p.email || '—'}</div>
+          </div>
+        </div>
+      </td>
+      <td>${p.phone || '—'}</td>
+      <td style="max-width:260px">${p.object || '—'}</td>
+      <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC Card</span>' : '<span class="pros-badge lien">🔗 Lien direct</span>'}</td>
+      <td style="color:#999;font-size:12px">${fmtDate(p.createdAt)}</td>
+      <td>
+        <div class="pros-act">
+          ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
+          ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
+          <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.deleteProspect = async (id) => {
+  if (!confirm('Supprimer ce prospect de votre annuaire ?')) return;
+  try {
+    const d = await api('prospects', { method: 'DELETE', qs: '&prospectId=' + id });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allProspects = allProspects.filter(p => p.id !== id);
+    renderStats(); renderTable();
+    toast('Prospect supprimé', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+document.getElementById('clear-btn').onclick = async () => {
+  if (!allProspects.length) return;
+  if (!confirm(`Supprimer définitivement les ${allProspects.length} prospect(s) de votre annuaire ? Cette action est irréversible.`)) return;
+  try {
+    const d = await api('clear-prospects', { method: 'POST', body: '{}' });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allProspects = [];
+    renderStats(); renderTable();
+    toast('Annuaire vidé', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+function exportCsv() {
+  if (!allProspects.length) { toast('Aucun prospect à exporter', 'error'); return; }
+  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Source', 'Date'];
+  const lines  = allProspects.map(p => [
+    p.name || '', p.phone || '', p.email || '', (p.object || '').replace(/\n/g, ' '),
+    p.source === 'nfc' ? 'NFC Card' : 'Lien direct', fmtDate(p.createdAt),
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+  const csv  = [header.join(','), ...lines].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `prospects-leadwase-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+document.getElementById('export-csv-btn').onclick   = exportCsv;
+document.getElementById('export-csv-btn-2').onclick = exportCsv;
+
+document.getElementById('search-input').addEventListener('input', renderTable);
+document.getElementById('filter-all').onclick = () => {
+  currentFilter = 'all';
+  document.getElementById('filter-all').classList.add('active');
+  document.getElementById('filter-today').classList.remove('active');
+  renderTable();
+};
+document.getElementById('filter-today').onclick = () => {
+  currentFilter = 'today';
+  document.getElementById('filter-today').classList.add('active');
+  document.getElementById('filter-all').classList.remove('active');
+  renderTable();
+};
+
+initDashboardAuth(async ({ lwId: id }) => {
+  lwId = id;
+  document.getElementById('view-profile-btn').href = 'profil.html?id=' + lwId;
+  try {
+    const d = await api('prospects');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allProspects = d.prospects || [];
+  } catch (e) {
+    console.error(e);
+    toast('Erreur de chargement des prospects : ' + e.message, 'error');
+    allProspects = [];
+  }
+  renderStats();
+  renderTable();
+});
+
+document.querySelectorAll('.sidebar-item').forEach(a =>
+  a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));
+
+</script>
+</body>
+</html>

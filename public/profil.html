@@ -668,6 +668,36 @@ svg.icon-lg { width: 22px; height: 22px; }
   .pf-name { font-size: 20px; }
   .pf-identity { margin-top: -28px; }
 }
+
+/* ─── Modal "Échanger" ─────────────────── */
+.xchg-btn { background: var(--green); }
+.xchg-btn:hover { background: var(--green-mid); }
+.xchg-overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(3px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.xchg-overlay.open { display: flex; }
+.xchg-modal {
+  background: var(--white); border-radius: var(--radius-sm);
+  max-width: 380px; width: 100%; padding: 28px 24px; position: relative;
+  max-height: 90vh; overflow-y: auto;
+}
+.xchg-close {
+  position: absolute; top: 14px; right: 14px; width: 28px; height: 28px;
+  border: none; background: #f0f0f0; border-radius: 50%; font-size: 18px;
+  cursor: pointer; color: #666; line-height: 1;
+}
+.xchg-title { font-size: 17px; font-weight: 700; margin: 0 0 6px; color: var(--black); }
+.xchg-sub { font-size: 12.5px; color: #666; margin: 0 0 18px; line-height: 1.5; }
+.xchg-field { margin-bottom: 12px; }
+.xchg-field label { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #888; margin-bottom: 5px; }
+.xchg-field input, .xchg-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;
+  font-family: var(--sans); font-size: 13px; color: var(--black); resize: vertical;
+}
+.xchg-field input:focus, .xchg-field textarea:focus { outline: none; border-color: var(--green-bright); }
+.xchg-err { color: #c0392b; font-size: 12px; margin-bottom: 10px; min-height: 14px; }
 </style>
 </head>
 <body>
@@ -734,12 +764,18 @@ svg.icon-lg { width: 22px; height: 22px; }
   <div class="pf-divider"></div>
 
   <!-- vCard CTA -->
-  <div class="a3">
-    <button class="vcf-btn" id="vcf-btn">
+  <div class="a3" style="display:flex;gap:10px">
+    <button class="vcf-btn" id="vcf-btn" style="margin-bottom:0">
       <span class="icon-wrap">
         <svg class="icon"><use href="#icon-download"/></svg>
       </span>
-      Enregistrer le contact
+      Enregistrer
+    </button>
+    <button class="vcf-btn xchg-btn" id="xchg-btn" style="margin-bottom:0">
+      <span class="icon-wrap">
+        <svg class="icon"><use href="#icon-arrow-right"/></svg>
+      </span>
+      Échanger
     </button>
   </div>
 
@@ -830,6 +866,28 @@ svg.icon-lg { width: 22px; height: 22px; }
   <div class="pf-footer a6">
     <p>Profil créé avec</p>
     <a href="/">Lead<em>Wase</em> — Créez le vôtre</a>
+  </div>
+</div>
+
+<!-- ── Modal "Échanger" (capture des coordonnées du visiteur) ─────── -->
+<div class="xchg-overlay" id="xchg-overlay">
+  <div class="xchg-modal">
+    <button class="xchg-close" id="xchg-close" aria-label="Fermer">&times;</button>
+    <div id="xchg-form-state">
+      <h3 class="xchg-title">Échanger nos coordonnées</h3>
+      <p class="xchg-sub">Laissez vos coordonnées, <span id="xchg-owner-name">ce contact</span> pourra vous recontacter.</p>
+      <div class="xchg-field"><label>Nom complet *</label><input id="xchg-name" type="text" placeholder="Votre nom"></div>
+      <div class="xchg-field"><label>Téléphone</label><input id="xchg-phone" type="tel" placeholder="+225 07 00 00 00 00"></div>
+      <div class="xchg-field"><label>Email</label><input id="xchg-email" type="email" placeholder="vous@email.com"></div>
+      <div class="xchg-field"><label>Objet / message</label><textarea id="xchg-object" rows="2" placeholder="Ex : Intéressé par une collaboration"></textarea></div>
+      <div class="xchg-err" id="xchg-err"></div>
+      <button class="vcf-btn" id="xchg-submit" style="margin:0">Envoyer mes coordonnées</button>
+    </div>
+    <div id="xchg-success-state" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:40px;margin-bottom:12px">✅</div>
+      <h3 class="xchg-title">Coordonnées envoyées !</h3>
+      <p class="xchg-sub">Merci, vos informations ont bien été transmises.</p>
+    </div>
   </div>
 </div>
 
@@ -1031,6 +1089,54 @@ async function load(leadwaseId) {
       a.download = `${p.firstName||'contact'}_${p.lastName||''}.vcf`;
       a.click();
       URL.revokeObjectURL(url);
+    };
+
+    // Échanger (capture des coordonnées du visiteur)
+    document.getElementById('xchg-owner-name').textContent = (p.firstName || 'ce contact');
+    document.getElementById('xchg-btn').onclick = () => {
+      document.getElementById('xchg-form-state').style.display    = 'block';
+      document.getElementById('xchg-success-state').style.display = 'none';
+      document.getElementById('xchg-err').textContent = '';
+      document.getElementById('xchg-overlay').classList.add('open');
+      recordAnalytics('click_xchg', leadwaseId);
+    };
+    const closeXchg = () => document.getElementById('xchg-overlay').classList.remove('open');
+    document.getElementById('xchg-close').onclick = closeXchg;
+    document.getElementById('xchg-overlay').addEventListener('click', e => { if (e.target.id === 'xchg-overlay') closeXchg(); });
+
+    document.getElementById('xchg-submit').onclick = async () => {
+      const name   = document.getElementById('xchg-name').value.trim();
+      const phone  = document.getElementById('xchg-phone').value.trim();
+      const email  = document.getElementById('xchg-email').value.trim();
+      const object = document.getElementById('xchg-object').value.trim();
+      const err    = document.getElementById('xchg-err');
+      const btn    = document.getElementById('xchg-submit');
+
+      if (!name || (!phone && !email)) {
+        err.textContent = 'Merci de renseigner votre nom, et un téléphone ou un email.';
+        return;
+      }
+      err.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Envoi...';
+      try {
+        const source = new URLSearchParams(window.location.search).get('src') === 'nfc' ? 'nfc' : 'lien_direct';
+        const res = await fetch(`/api/profile/${leadwaseId}?action=capture-lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, object, source }),
+        });
+        const d = await res.json();
+        if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+        document.getElementById('xchg-form-state').style.display    = 'none';
+        document.getElementById('xchg-success-state').style.display = 'block';
+        setTimeout(closeXchg, 2200);
+      } catch (e) {
+        err.textContent = 'Erreur : ' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer mes coordonnées';
+      }
     };
 
     await recordAnalytics('profile_view', leadwaseId);
