@@ -1120,7 +1120,11 @@ async function load(leadwaseId) {
       btn.disabled = true;
       btn.textContent = 'Envoi...';
       try {
-        const source = new URLSearchParams(window.location.search).get('src') === 'nfc' ? 'nfc' : 'lien_direct';
+        // Détection automatique de la source, sans rien à configurer sur la carte NFC :
+        // un tap NFC ouvre l'URL directement dans le navigateur (aucun "referrer"),
+        // alors qu'un lien partagé/cliqué (SMS, WhatsApp, email, réseau social) laisse
+        // presque toujours une trace de provenance.
+        const source = document.referrer ? 'lien_direct' : 'nfc';
         const res = await fetch(`/api/profile/${leadwaseId}?action=capture-lead`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
