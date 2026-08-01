@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Notifications — Admin LeadWase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Lead<em>Wase</em></div>
+    <div class="login-badge">Administration</div>
+    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com"></div>
+    <div class="fl"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="••••••••••"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ APP ══ -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-text">Lead<em>Wase</em></div>
+        <div class="sb-logo-sub">Administration</div>
+      </div>
+      <div class="sb-section">Principal</div>
+      <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
+      <a class="sb-item" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
+      <a class="sb-item" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
+      <a class="sb-item" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
+      <div class="sb-section">Finances</div>
+      <a class="sb-item" href="paiements.html" id="nav-paiements"><span class="ico">💳</span> Paiements</a>
+      <a class="sb-item" href="abonnements.html" id="nav-abonnements"><span class="ico">🔄</span> Abonnements</a>
+      <div class="sb-section">Système</div>
+      <a class="sb-item" href="parametres.html" id="nav-parametres"><span class="ico">⚙️</span> Paramètres</a>
+      <a class="sb-item active" href="notifications.html" id="nav-notifications"><span class="ico">🔔</span> Notifications</a>
+      <div class="sb-bottom">
+        <div class="sb-user" id="sb-user-email">—</div>
+        <button class="sb-logout" onclick="doLogout()">Déconnexion</button>
+      </div>
+    </aside>
+    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+    <div class="main-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <span class="page-title" id="page-title">Notifications</span>
+        </div>
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+
+      <div class="content">
+
+          <div class="card"><div class="card-head"><span class="card-title">Notifications</span></div><div style="padding:40px;text-align:center;color:var(--gray4)">Section en cours de développement.</div></div>
+        
+      </div><!-- /content -->
+    </div><!-- /main-wrap -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Détail commande</div>
+    <div id="modal-body"></div>
+    <button class="modal-close-btn" onclick="closeModal()">Fermer</button>
+  </div>
+</div>
+
+<script type="module">
+import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
+
+initAuth(() => {});
+
+</script>
+</body>
+</html>

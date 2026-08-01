@@ -1,6 +1,6 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { notifyAdminNewOrder, notifyAdminB2BRequest, notifyClientPaymentSuccess } from '../brevo.js';
+import { notifyAdminNewOrder, notifyAdminB2BRequest, notifyClientPaymentSuccess } from '../../lib/brevo.js';
 import { getPrices } from '../../lib/getPrices.js';
 
 if (!getApps().length) {

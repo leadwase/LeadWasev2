@@ -7,7 +7,7 @@ import {
   notifyClientPaymentSuccess,
   notifyClientPaymentFailed,
   notifyAdminPaymentFailed,
-} from '../brevo.js';
+} from '../../lib/brevo.js';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({

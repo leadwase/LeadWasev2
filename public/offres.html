@@ -1,152 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Offres — LeadWase</title>
 <link rel="stylesheet" href="css/style.css">
-<style>
-.offers-hero{background:var(--black);padding:72px 56px;text-align:center;border-bottom:2px solid var(--green);position:relative;overflow:hidden}
-.offers-hero::before{content:'PRO · BUSINESS · FREE · PRO · BUSINESS · FREE · PRO · BUSINESS ·';position:absolute;top:20px;left:0;white-space:nowrap;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.04);animation:ticker 25s linear infinite}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.offers-h1{font-size:clamp(30px,5vw,52px);font-weight:bold;color:var(--white);margin-bottom:10px;letter-spacing:-1px}
-.offers-h1 em{color:var(--green3);font-style:italic}
-.offers-sub{font-size:14px;color:var(--gray3);font-style:italic;max-width:480px;margin:0 auto;line-height:1.8}
-.plans-intro{text-align:center;padding:44px 40px 0}
-.plans-intro h2{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:8px}
-.plans-intro p{font-size:13px;color:var(--gray2);font-style:italic;max-width:500px;margin:0 auto}
-.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1100px;margin:32px auto 0;padding:0 32px 72px;gap:0}
-.plan-col{background:var(--white);border:1px solid var(--gray5);border-right:none;padding:36px 26px;position:relative}
-.plan-col:last-child{border-right:1px solid var(--gray5)}
-.plan-col.featured{background:var(--black);border:2px solid var(--green);z-index:2;transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.rec-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--white);font-size:9px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:4px 16px;white-space:nowrap}
-.plan-name{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray3);margin-bottom:8px;font-weight:bold}
-.featured .plan-name{color:var(--green3)}
-.plan-price{font-size:38px;font-weight:bold;color:var(--black);line-height:1;margin-bottom:4px}
-.featured .plan-price{color:var(--white)}
-.plan-price small{font-size:14px;font-weight:normal;color:var(--gray3)}
-.featured .plan-price small{color:rgba(255,255,255,.5)}
-.plan-period{font-size:12px;color:var(--gray3);margin-bottom:8px}
-.featured .plan-period{color:rgba(255,255,255,.5)}
-.plan-desc{font-size:13px;color:var(--gray2);font-style:italic;margin-bottom:20px;line-height:1.6}
-.featured .plan-desc{color:rgba(255,255,255,.6)}
-.plan-features{list-style:none;margin-bottom:24px;border-top:1px solid var(--gray5);padding-top:14px}
-.featured .plan-features{border-top-color:rgba(255,255,255,.1)}
-.plan-features li{font-size:13px;color:var(--gray2);padding:7px 0;border-bottom:1px dotted var(--gray5);display:flex;align-items:center;gap:8px;line-height:1.4}
-.plan-features li:last-child{border-bottom:none}
-.featured .plan-features li{color:rgba(255,255,255,.75);border-bottom-color:rgba(255,255,255,.06)}
-.ck{color:var(--green2);font-weight:bold;flex-shrink:0;font-size:14px}
-.plan-btn{width:100%;padding:13px;border-radius:2px;font-family:var(--serif);font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;border:none;display:block;text-align:center;text-decoration:none}
-.plan-btn.outline{background:transparent;border:1px solid var(--gray5);color:var(--gray2)}
-.plan-btn.outline:hover{border-color:var(--black);color:var(--black)}
-.plan-btn.filled{background:var(--green);color:var(--white)}
-.plan-btn.filled:hover{background:var(--green2)}
-.plan-btn:disabled{opacity:.5;cursor:not-allowed !important;pointer-events:none}
-.compare-wrap{background:var(--white);padding:64px 40px;border-top:1px solid var(--gray5)}
-.compare-title{font-size:24px;font-weight:bold;color:var(--black);margin-bottom:24px;text-align:center}
-.compare-table{width:100%;max-width:860px;margin:0 auto;border-collapse:collapse}
-.compare-table th{font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:14px 16px;border-bottom:2px solid var(--black);text-align:center}
-.compare-table th:first-child{text-align:left}
-.compare-table th.th-pro{color:var(--green)}
-.compare-table td{padding:11px 16px;border-bottom:1px solid var(--gray5);font-size:13px;color:var(--gray2);text-align:center}
-.compare-table td:first-child{text-align:left;font-style:italic}
-.compare-table tr:hover td{background:var(--green-pale)}
-.t-ck{color:var(--green2);font-size:16px;font-weight:bold}
-
-/* ── Bannière carte requise ── */
-.carte-banner{
-  display:none;
-  background:#FFFBEA;
-  border:1px solid #F0C040;
-  border-left:4px solid #E6A800;
-  padding:20px 28px;
-  max-width:760px;
-  margin:28px auto 0;
-  gap:16px;
-  align-items:flex-start;
-  font-size:14px;
-  color:#555;
-}
-.carte-banner.visible{display:flex}
-.carte-banner-icon{font-size:26px;flex-shrink:0;margin-top:2px}
-.carte-banner-title{font-size:15px;font-weight:bold;color:#0A0A0A;margin-bottom:5px}
-.carte-banner-sub{font-size:13px;color:#666;font-style:italic;line-height:1.7;margin-bottom:12px}
-.carte-banner-cta{
-  display:inline-block;
-  padding:9px 22px;
-  background:#1A7A3C;
-  color:#fff;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  text-decoration:none;
-  border-radius:2px;
-  transition:background .2s;
-}
-.carte-banner-cta:hover{background:#22A050}
-
-/* ── Bannière connexion requise ── */
-.login-banner{
-  display:none;
-  background:#F0F4FF;
-  border:1px solid #B0C4F8;
-  border-left:4px solid #3B6FE8;
-  padding:20px 28px;
-  max-width:760px;
-  margin:0 auto 0;
-  gap:16px;
-  align-items:flex-start;
-  font-size:14px;
-  color:#555;
-}
-.login-banner.visible{display:flex}
-.login-banner-icon{font-size:26px;flex-shrink:0;margin-top:2px}
-.login-banner-title{font-size:15px;font-weight:bold;color:#0A0A0A;margin-bottom:5px}
-.login-banner-sub{font-size:13px;color:#666;font-style:italic;line-height:1.7;margin-bottom:12px}
-.login-banner-btns{display:flex;gap:10px;flex-wrap:wrap}
-.login-banner-cta{
-  display:inline-block;
-  padding:9px 22px;
-  background:#3B6FE8;
-  color:#fff;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  text-decoration:none;
-  border-radius:2px;
-  transition:background .2s;
-}
-.login-banner-cta:hover{background:#2a5dd0}
-.login-banner-cta.secondary{background:transparent;border:1px solid #3B6FE8;color:#3B6FE8}
-.login-banner-cta.secondary:hover{background:#3B6FE8;color:#fff}
-
-/* ── Loader inline ── */
-.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-radius:50%;border-top-color:#fff;animation:spin 0.6s linear infinite;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── Skeleton loader pour les plans ── */
-.plans-loading{text-align:center;padding:48px 20px;color:var(--gray3);font-style:italic;font-size:13px}
-
-@media(max-width:900px){
-  .plans-grid{grid-template-columns:1fr;padding:20px;gap:20px}
-  .plan-col{border-right:1px solid var(--gray5)}
-  .plan-col.featured{transform:none}
-  .offers-hero,.plans-intro,.compare-wrap{padding-left:20px;padding-right:20px}
-  .carte-banner,.login-banner{margin-left:16px;margin-right:16px}
-}
-</style>
+<link rel="stylesheet" href="css/plans.css">
 </head>
 <body>
-<nav class="main-nav">
-  <a class="nav-logo" href="/">Lead<em>Wase</em></a>
-  <div class="nav-items">
-    <a class="nav-item" href="/">Accueil</a>
-    <a class="nav-item" href="commander.html">Commander</a>
-    <a class="nav-item" href="connexion.html" id="nav-auth">Connexion</a>
-    <a class="nav-cta" href="commander.html">Commander ma carte</a>
-  </div>
-</nav>
+<div id="site-header"></div>
 
 <div style="background:var(--off)">
   <div class="offers-hero">
@@ -265,18 +128,7 @@
   </div>
 </div>
 
-<footer class="footer">
-  <div class="footer-grid">
-    <div><div class="footer-brand">Lead<em>Wase</em></div><p class="footer-tagline">Votre identité digitale professionnelle.</p></div>
-    <div><div class="footer-col-title">Produit</div><ul class="footer-links"><li><a href="commander.html">Commander une carte</a></li><li><a href="offres.html">Offres</a></li></ul></div>
-    <div><div class="footer-col-title">Compte</div><ul class="footer-links"><li><a href="connexion.html">Connexion</a></li><li><a href="dashboard.html">Mon profil</a></li></ul></div>
-    <div><div class="footer-col-title">Légal</div><ul class="footer-links"><li><a href="cgu.html">CGU</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="mailto:supportleadwase@gmail.com">Contact</a></li></ul></div>
-  </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">© 2026 LeadWase</span>
-    <div class="footer-legal"><a href="cgu.html">CGU</a><a href="confidentialite.html">Confidentialité</a><a href="mailto:supportleadwase@gmail.com">Contact</a></div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
@@ -293,7 +145,8 @@ const btnBiz       = document.getElementById('btn-biz');
 const btnFree      = document.getElementById('btn-free');
 const loginBanner  = document.getElementById('login-banner');
 const carteBanner  = document.getElementById('carte-banner');
-const navAuth      = document.getElementById('nav-auth');
+// Le lien "Connexion" ⇄ "Mon profil" du header est géré par js/include-layout.js
+// (le header est injecté de façon asynchrone, donc on ne le référence pas ici).
 
 // ── Grise les boutons payants et affiche la bonne bannière ───────────────────
 function lockPlans(reason) {
@@ -360,16 +213,12 @@ onAuthStateChanged(auth, async user => {
     // ── Non connecté ──────────────────────────────────────────────────────
     currentUser  = null;
     userHasCarte = false;
-    navAuth.textContent = 'Connexion';
-    navAuth.href        = 'connexion.html';
     lockPlans('not_logged');
     return;
   }
 
   // ── Connecté ──────────────────────────────────────────────────────────────
   currentUser = user;
-  navAuth.textContent = 'Mon profil';
-  navAuth.href        = 'dashboard.html';
 
   // Récupérer plan + vérifier carte en parallèle
 // ✅ Nouveau — lit le plan dans 'profiles' via firebaseUid
@@ -450,5 +299,6 @@ window.subscribe = async plan => {
   }
 };
 </script>
+<script type="module" src="js/include-layout.js"></script>
 </body>
 </html>

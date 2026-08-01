@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>LeadWase — Cartes de visite connectées NFC</title>
 <meta name="description" content="Commandez votre carte LeadWase NFC, activez votre profil digital et développez votre réseau professionnel.">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/plans.css">
 <style>
   .sec-eyebrow, .sec-eyebrow::before, .sec-eyebrow::after {
     display: block!important;
@@ -140,16 +143,7 @@
 </style>
 </head>
 <body>
-<nav class="main-nav">
-  <a class="nav-logo" href="/">Lead<em>Wase</em></a>
-  <div class="nav-items">
-    <a class="nav-item" href="#nos-cartes">Nos Cartes</a>
-    <a class="nav-item" href="#comment-ca-marche">Comment ça marche</a>
-    <a class="nav-item" href="offres.html">Tarifs</a>
-    <a class="nav-item" href="connexion.html" id="nav-auth">Connexion</a>
-    <a class="nav-cta" href="commander.html">Commander ma carte</a>
-  </div>
-</nav>
+<div id="site-header"></div>
 
 <div class="hero">
   <div class="hero-left">
@@ -236,6 +230,27 @@
   </div>
 </section>
 
+<section class="sec sec-off">
+  <div class="split-row">
+    <div class="split-media">
+      <!-- TODO: remplacer par une vraie photo (ex: public/images/feature-profil.jpg) -->
+      <img src="/images/feature-profil.jpg" alt="Profil digital LeadWase" loading="lazy"
+        onerror="this.parentElement.innerHTML='<div style=\'aspect-ratio:4/3;background:var(--black);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--gray4);font-size:12px;letter-spacing:1px\'>Image à ajouter — /images/feature-profil.jpg</div>'">
+    </div>
+    <div class="split-text">
+      <div class="sec-eyebrow">Votre profil, partout</div>
+      <h2>Un profil digital qui vous ressemble</h2>
+      <p>Personnalisez votre profil LeadWase avec vos informations, vos réseaux sociaux et votre photo. Partagez-le en un instant via NFC ou QR code, sans jamais ressortir de carte papier.</p>
+      <ul class="split-list">
+        <li>Modifiable à tout moment depuis votre dashboard</li>
+        <li>Partage instantané par NFC ou QR code</li>
+        <li>Visible sur leadwase.com/profil/LW-XXXXX</li>
+      </ul>
+      <a class="btn-green" href="commander.html">Commander ma carte</a>
+    </div>
+  </div>
+</section>
+
 <section id="comment-ca-marche" class="sec sec-black">
   <div style="text-align:center;margin-bottom:52px">
     <div class="sec-eyebrow" style="color:var(--green3)">Simple &amp; Rapide</div>
@@ -248,6 +263,25 @@
   </div>
 </section>
 
+<section class="sec sec-white">
+  <div class="split-row reverse">
+    <div class="split-text">
+      <div class="sec-eyebrow">Voir LeadWase en action</div>
+      <h2>Découvrez la carte en 60 secondes</h2>
+      <p>Un simple contact NFC ou un scan de QR code suffit pour partager votre profil professionnel. Regardez comment vos futurs contacts découvrent votre carte LeadWase.</p>
+      <a class="btn-outline" href="commander.html">Commander maintenant</a>
+    </div>
+    <div class="split-media">
+      <!-- TODO: remplacer par une vraie vidéo (ex: public/videos/demo-leadwase.mp4) -->
+      <div class="video-frame">
+        <video controls preload="none" poster="/images/video-poster.jpg">
+          <source src="/videos/demo-leadwase.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="sec sec-off">
   <div class="sec-eyebrow">Ils nous font confiance</div>
   <h2 class="sec-h2">Ce que disent nos clients</h2>
@@ -256,6 +290,90 @@
     <div class="testi-card"><div class="testi-quote">« LeadWase a transformé ma manière de réseauter. Mon profil digital est devenu mon meilleur outil commercial. »</div><div class="testi-author">Ama Serwaa</div><div class="testi-role">Consultante en stratégie, Accra</div></div>
     <div class="testi-card"><div class="testi-quote">« La livraison en 48h et l'activation immédiate m'ont vraiment impressionné. Très professionnel. »</div><div class="testi-author">Boubacar Diallo</div><div class="testi-role">Directeur Général, Dakar</div></div>
     <div class="testi-card"><div class="testi-quote">« Depuis l'offre Business, le CRM intégré m'a permis de conclure plus de deals. »</div><div class="testi-author">Fatou Camara</div><div class="testi-role">Entrepreneur, Abidjan</div></div>
+  </div>
+</section>
+
+<section id="offres" class="sec sec-off" style="padding-top:72px">
+  <div style="text-align:center;margin-bottom:8px">
+    <div class="sec-eyebrow">Nos offres</div>
+    <h2 class="sec-h2">Choisissez votre offre</h2>
+    <p class="sec-sub" style="text-align:center">Débloquez instantanément les fonctionnalités dès confirmation du paiement. Sans engagement.</p>
+  </div>
+
+  <div class="plans-grid" style="background:transparent">
+    <div class="plan-col">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">0 <small>XOF</small></div>
+      <div class="plan-period">Pour toujours gratuit</div>
+      <p class="plan-desc">Inclus avec votre carte LeadWase.</p>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✗</span>Réseaux sociaux</li>
+        <li><span class="ck">✗</span>Photo de Profil</li>
+        <li><span class="ck">✗</span>Analytics</li>
+        <li><span class="ck">✗</span>Lien de votre site</li>
+        <li><span class="ck">✗</span>Localisation</li>
+      </ul>
+      <span class="plan-btn outline" style="cursor:default">Inclus avec la carte</span>
+    </div>
+    <div class="plan-col featured">
+      <div class="rec-badge">⭐ Recommandé</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">2 999 <small>XOF</small></div>
+      <div class="plan-period">par mois · résiliable à tout moment</div>
+      <p class="plan-desc">Pour les professionnels qui veulent plus de visibilité.</p>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✗</span>Localisation</li>
+      </ul>
+      <a class="plan-btn filled" href="offres.html" style="text-align:center;display:block">Passer au Pro →</a>
+    </div>
+    <div class="plan-col">
+      <div class="plan-name">Business</div>
+      <div class="plan-price">4 566 <small>XOF</small></div>
+      <div class="plan-period">par mois · facturation annuelle</div>
+      <p class="plan-desc">Pour les équipes et entreprises qui veulent tout maîtriser.</p>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Formulaire de contact</li>
+        <li><span class="ck">✓</span>Prise de rendez-vous</li>
+        <li><span class="ck">✓</span>Avis Google</li>
+        <li><span class="ck">✓</span>Localisation</li>
+      </ul>
+      <a class="plan-btn outline" href="offres.html" style="text-align:center;display:block">Choisir Business →</a>
+    </div>
+  </div>
+
+  <div class="compare-wrap" style="background:transparent;border-top:none;max-width:1100px;margin:0 auto">
+    <div class="compare-title">Comparaison détaillée</div>
+    <table class="compare-table">
+      <thead>
+        <tr><th style="width:40%">Fonctionnalité</th><th>Free</th><th class="th-pro">Pro</th><th>Business</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Profil</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Personnalisation et Modification</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Réseaux sociaux</td><td class="t-ck">✓</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Photo de profil</td><td class="t-ck">✗</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Analytics</td><td class="t-ck">✗</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Lien de votre site</td><td class="t-ck">✗</td><td class="t-ck">✓</td><td class="t-ck">✓</td></tr>
+        <tr><td>Localisation</td><td class="t-ck">✗</td><td class="t-ck">✗</td><td class="t-ck">✓</td></tr>
+        <tr><td>Formulaire de contact</td><td class="t-ck">✗</td><td class="t-ck">✗</td><td class="t-ck">✓</td></tr>
+        <tr><td>Prise de rendez-vous</td><td class="t-ck">✗</td><td class="t-ck">✗</td><td class="t-ck">✓</td></tr>
+        <tr><td>Avis Google</td><td class="t-ck">✗</td><td class="t-ck">✗</td><td class="t-ck">✓</td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
@@ -273,27 +391,11 @@
   </div>
 </section>
 
-<footer class="footer">
-  <div class="footer-grid">
-    <div><div class="footer-brand">Lead<em>Wase</em></div><p class="footer-tagline">Votre identité digitale professionnelle. Commandez votre carte, activez votre profil, développez votre réseau.</p></div>
-    <div><div class="footer-col-title">Produit</div><ul class="footer-links"><li><a href="commander.html">Carte Classique</a></li><li><a href="commander.html?type=b2b">Carte B2B</a></li><li><a href="offres.html">Offre Pro</a></li><li><a href="offres.html">Offre Business</a></li></ul></div>
-    <div><div class="footer-col-title">Informations</div><ul class="footer-links"><li><a href="/#comment-ca-marche">Comment ça marche</a></li><li><a href="connexion.html">Connexion</a></li><li><a href="offres.html">Tarifs</a></li><li><a href="mailto:supportleadwase@gmail.com">Contact</a></li></ul></div>
-    <div><div class="footer-col-title">Légal &amp; Support</div><ul class="footer-links"><li><a href="cgu.html">CGU</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="mailto:supportleadwase@gmail.com">Support</a></li><li><a href="https://wa.me/leadwase" target="_blank">WhatsApp</a></li></ul></div>
-  </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">© 2026 LeadWase. Tous droits réservés.</span>
-    <div class="footer-legal"><a href="cgu.html">CGU</a><a href="confidentialite.html">Confidentialité</a><a href="mailto:supportleadwase@gmail.com">Contact</a></div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
+<script type="module" src="js/include-layout.js"></script>
 <script type="module">
-import { auth } from './js/firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 document.querySelectorAll('.faq-item').forEach(el => el.addEventListener('click', () => el.classList.toggle('open')));
-onAuthStateChanged(auth, user => {
-  const el = document.getElementById('nav-auth');
-  if (user) { el.textContent = 'Mon profil'; el.href = 'dashboard.html'; }
-});
 </script>
 </body>
 </html>

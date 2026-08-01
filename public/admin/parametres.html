@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Paramètres — Admin LeadWase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Lead<em>Wase</em></div>
+    <div class="login-badge">Administration</div>
+    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com"></div>
+    <div class="fl"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="••••••••••"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ APP ══ -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-text">Lead<em>Wase</em></div>
+        <div class="sb-logo-sub">Administration</div>
+      </div>
+      <div class="sb-section">Principal</div>
+      <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
+      <a class="sb-item" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
+      <a class="sb-item" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
+      <a class="sb-item" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
+      <div class="sb-section">Finances</div>
+      <a class="sb-item" href="paiements.html" id="nav-paiements"><span class="ico">💳</span> Paiements</a>
+      <a class="sb-item" href="abonnements.html" id="nav-abonnements"><span class="ico">🔄</span> Abonnements</a>
+      <div class="sb-section">Système</div>
+      <a class="sb-item active" href="parametres.html" id="nav-parametres"><span class="ico">⚙️</span> Paramètres</a>
+      <a class="sb-item" href="notifications.html" id="nav-notifications"><span class="ico">🔔</span> Notifications</a>
+      <div class="sb-bottom">
+        <div class="sb-user" id="sb-user-email">—</div>
+        <button class="sb-logout" onclick="doLogout()">Déconnexion</button>
+      </div>
+    </aside>
+    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+    <div class="main-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <span class="page-title" id="page-title">Paramètres</span>
+        </div>
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+
+      <div class="content">
+
+          <div class="settings-grid">
+            <!-- Tarifs Cartes -->
+            <div class="settings-card">
+              <div class="settings-card-head">
+                <h3>💳 Tarifs — Commandes Cartes</h3>
+              </div>
+              <div class="settings-body">
+                <div class="settings-info-box">
+                  <strong>💡 Comment ça fonctionne</strong>
+                  Ces prix sont sauvegardés dans Firebase (collection <code>settings</code>, document <code>prices</code>) et lus dynamiquement par les APIs de commande et d'abonnement.
+                </div>
+                <div class="price-row">
+                  <div class="price-info">
+                    <div class="price-name">Carte Classique</div>
+                    <div class="price-desc">Commande standard (endpoint /api/order)</div>
+                  </div>
+                  <div class="price-input-wrap">
+                    <input type="number" id="price-classic" class="price-input" placeholder="25000" min="0" step="100">
+                    <span class="price-currency">FCFA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarifs Abonnements -->
+            <div class="settings-card">
+              <div class="settings-card-head">
+                <h3>🔄 Tarifs — Abonnements</h3>
+              </div>
+              <div class="settings-body">
+                <div class="settings-info-box">
+                  <strong>💡 Impact immédiat</strong>
+                  Les nouveaux abonnements utilisent ces prix. Les abonnements existants ne sont pas modifiés.
+                </div>
+                <div class="price-row">
+                  <div class="price-info">
+                    <div class="price-name">Plan Pro</div>
+                    <div class="price-desc">Abonnement mensuel Pro (endpoint /api/subscribe)</div>
+                  </div>
+                  <div class="price-input-wrap">
+                    <input type="number" id="price-pro" class="price-input" placeholder="3500" min="0" step="100">
+                    <span class="price-currency">FCFA</span>
+                  </div>
+                </div>
+                <div class="price-row">
+                  <div class="price-info">
+                    <div class="price-name">Plan Business</div>
+                    <div class="price-desc">Abonnement mensuel Business (endpoint /api/subscribe)</div>
+                  </div>
+                  <div class="price-input-wrap">
+                    <input type="number" id="price-business" class="price-input" placeholder="9900" min="0" step="100">
+                    <span class="price-currency">FCFA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton global de sauvegarde -->
+          <div class="settings-card" style="max-width:500px">
+            <div class="settings-card-head"><h3>⚡ Sauvegarder les prix</h3></div>
+            <div class="settings-body">
+              <div class="price-row" style="border:none;padding-top:0">
+                <div class="price-info">
+                  <div class="price-name">Aperçu actuel</div>
+                  <div class="price-desc" id="prices-preview">Chargement des prix actuels...</div>
+                </div>
+              </div>
+              <button class="save-prices-btn" id="save-prices-btn" onclick="savePrices()">💾 Enregistrer les nouveaux prix</button>
+              <div class="save-msg" id="save-msg"></div>
+            </div>
+          </div>
+        
+      </div><!-- /content -->
+    </div><!-- /main-wrap -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Détail commande</div>
+    <div id="modal-body"></div>
+    <button class="modal-close-btn" onclick="closeModal()">Fermer</button>
+  </div>
+</div>
+
+<script type="module">
+import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
+
+async function loadPrices() {
+  try {
+    const d = await api('settings-prices');
+    const prices = d.prices || {};
+    document.getElementById('price-classic').value  = prices.classic  || 25000;
+    document.getElementById('price-pro').value      = prices.pro      || 3500;
+    document.getElementById('price-business').value = prices.business || 9900;
+    updatePricesPreview(prices);
+  } catch(e) {
+    console.error('Erreur chargement prix:', e);
+    document.getElementById('price-classic').value  = 25000;
+    document.getElementById('price-pro').value      = 3500;
+    document.getElementById('price-business').value = 9900;
+    updatePricesPreview({ classic:25000, pro:3500, business:9900 });
+  }
+}
+
+function updatePricesPreview(prices) {
+  const p = document.getElementById('prices-preview');
+  const c = prices.classic  ? fmtNum(prices.classic)  : '25 000';
+  const r = prices.pro      ? fmtNum(prices.pro)       : '3 500';
+  const b = prices.business ? fmtNum(prices.business)  : '9 900';
+  p.innerHTML = `Classique : <strong>${c} FCFA</strong> &nbsp;|&nbsp; Pro : <strong>${r} FCFA/mois</strong> &nbsp;|&nbsp; Business : <strong>${b} FCFA/mois</strong>`;
+  // Ces labels vivent sur la page Tableau de bord : on les met à jour seulement s'ils sont présents.
+  const proLabel = document.getElementById('sub-pro-price-label');
+  const bizLabel = document.getElementById('sub-business-price-label');
+  if (proLabel) proLabel.textContent = `${r} FCFA/mois`;
+  if (bizLabel) bizLabel.textContent = `${b} FCFA/mois`;
+}
+
+window.savePrices = async () => {
+  const btn = document.getElementById('save-prices-btn');
+  const msg = document.getElementById('save-msg');
+  const classic  = parseInt(document.getElementById('price-classic').value)  || 0;
+  const pro      = parseInt(document.getElementById('price-pro').value)      || 0;
+  const business = parseInt(document.getElementById('price-business').value) || 0;
+
+  if (classic <= 0 || pro <= 0 || business <= 0) {
+    msg.textContent = '⚠️ Tous les prix doivent être supérieurs à 0.';
+    msg.className   = 'save-msg err';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Enregistrement...';
+  msg.textContent = '';
+  msg.className   = 'save-msg';
+
+  try {
+    const d = await api('settings-prices', {
+      method: 'POST',
+      body: JSON.stringify({ prices: { classic, pro, business } }),
+    });
+    if (d.success) {
+      msg.textContent = '✅ Prix mis à jour avec succès !';
+      msg.className   = 'save-msg ok';
+      updatePricesPreview({ classic, pro, business });
+    } else {
+      throw new Error(d.error || 'Erreur inconnue');
+    }
+  } catch(e) {
+    msg.textContent = `❌ Erreur : ${e.message}`;
+    msg.className   = 'save-msg err';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '💾 Enregistrer les nouveaux prix';
+    setTimeout(() => { msg.textContent = ''; msg.className = 'save-msg'; }, 5000);
+  }
+};
+
+initAuth(() => loadPrices());
+
+</script>
+</body>
+</html>
