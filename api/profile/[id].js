@@ -16,12 +16,22 @@ const db = getFirestore();
 // limite de 12 fonctions serverless du plan Vercel Hobby.
 
 // Vérifie que le token envoyé correspond bien au propriétaire du profil `leadwaseId`.
+// Même logique que les règles Firestore (profiles/credentials) : match par
+// firebaseUid stocké sur le profil, avec repli sur l'email interne LW-XXXX@leadwase.internal.
 async function verifyOwner(req, leadwaseId) {
   const token = (req.headers.authorization || '').split('Bearer ')[1];
   if (!token) throw new Error('Non autorisé');
   const decoded = await getAuth().verifyIdToken(token);
-  const uDoc = await db.collection('users').doc(decoded.uid).get();
-  if (uDoc.data()?.leadwaseId !== leadwaseId) throw new Error('Accès refusé');
+
+  const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+  if (!profileDoc.exists) throw new Error('Accès refusé');
+  const pd = profileDoc.data();
+
+  const ownsByUid   = pd.firebaseUid && pd.firebaseUid === decoded.uid;
+  const ownsByEmail = decoded.email &&
+    decoded.email.toLowerCase() === `${leadwaseId.toLowerCase()}@leadwase.internal`;
+
+  if (!ownsByUid && !ownsByEmail) throw new Error('Accès refusé');
   return decoded;
 }
 
