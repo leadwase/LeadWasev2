@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identifiants — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app-dashboard.css">
+</head>
+<body>
+
+<!-- MOBILE TOPBAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-brand">Lead<em>Wase</em></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout" id="app-layout" style="display:none">
+
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-av">?</div>
+      <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">FREE</div></div>
+    </div>
+    <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item active" href="identifiants.html"><span class="s-icon">🔑</span>Identifiants</a>
+      <div id="analytics-nav-item"></div>
+      <a class="sidebar-item" href="offres.html" target="_blank" rel="noopener"><span class="s-icon">⭐</span>Offres</a>
+      <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
+      <a class="sidebar-item" href="commander.html" target="_blank" rel="noopener"><span class="s-icon">🛒</span>Commander une carte</a>
+      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Légal</div>
+      <a class="sidebar-item" href="cgu.html" target="_blank" rel="noopener"><span class="s-icon">📄</span>CGU</a>
+      <a class="sidebar-item" href="confidentialite.html" target="_blank" rel="noopener"><span class="s-icon">🔒</span>Confidentialité</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+
+  <main class="app-content">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div style="text-align:center">
+        <div class="loader" style="margin:0 auto"></div>
+        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+      </div>
+    </div>
+
+    <div class="dash" id="content" style="display:none">
+      <div class="dash-header">
+        <div class="dash-h1">🔑 Identifiants</div>
+      </div>
+
+
+
+        <!-- Infos de connexion -->
+        <div class="credentials-card">
+          <h2>🔑 Mes identifiants de connexion</h2>
+          <p class="section-desc">Consultez vos informations de connexion et modifiez votre mot de passe. Ces identifiants vous permettent d'accéder à votre espace LeadWase.</p>
+
+          <div class="login-info-box">
+            <div class="lib-label">Identifiant LeadWase</div>
+            <div class="lib-value" id="cred-lwid">–</div>
+          </div>
+          <!-- Section changement de mot de passe -->
+          <div class="pwd-section">
+            <h3>🔒 Modifier mon mot de passe</h3>
+            <p class="pwd-desc">Choisissez un mot de passe sécurisé d'au moins 8 caractères. Il sera utilisé lors de votre prochaine connexion.</p>
+
+            <div class="pwd-grid">
+              <!-- Mot de passe actuel -->
+              <div class="f-group">
+                <label class="f-label">Mot de passe actuel</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-current" placeholder="Votre mot de passe actuel" autocomplete="current-password">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-current', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+              </div>
+
+              <!-- Nouveau mot de passe -->
+              <div class="f-group">
+                <label class="f-label">Nouveau mot de passe</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-new" placeholder="Nouveau mot de passe" autocomplete="new-password" oninput="checkPwdStrength(this.value)">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-new', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+                <div class="pwd-strength">
+                  <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="pwd-strength-fill"></div></div>
+                  <div class="pwd-strength-label" id="pwd-strength-label">Saisissez un mot de passe</div>
+                </div>
+                <div class="pwd-rules" id="pwd-rules">
+                  <div class="pwd-rule" id="rule-length"><span class="rule-icon">○</span> Au moins 8 caractères</div>
+                  <div class="pwd-rule" id="rule-upper"><span class="rule-icon">○</span> Une majuscule</div>
+                  <div class="pwd-rule" id="rule-number"><span class="rule-icon">○</span> Un chiffre</div>
+                  <div class="pwd-rule" id="rule-special"><span class="rule-icon">○</span> Un caractère spécial (!@#$%...)</div>
+                </div>
+              </div>
+
+              <!-- Confirmer le nouveau mot de passe -->
+              <div class="f-group">
+                <label class="f-label">Confirmer le nouveau mot de passe</label>
+                <div class="pwd-input-wrap">
+                  <input class="f-input" type="password" id="pwd-confirm" placeholder="Répétez le nouveau mot de passe" autocomplete="new-password" oninput="checkPwdMatch()">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwd('pwd-confirm', this)" aria-label="Afficher/masquer">👁️</button>
+                </div>
+                <div class="f-hint" id="pwd-match-hint"></div>
+              </div>
+            </div>
+
+            <button class="save-btn" id="pwd-save-btn" onclick="changePassword()" style="margin-top:18px">Changer le mot de passe</button>
+          </div>
+        </div>
+
+      
+
+    </div><!-- /dash -->
+  </main>
+</div>
+
+<script type="module">
+import { initDashboardAuth, toast } from './js/dashboard-shared.js';
+import { auth, db } from './js/dashboard-shared.js';
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail }
+  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+let lwId = null, currentUser = null, currentLoginEmail = null;
+
+// ── Afficher/masquer mot de passe ─────────────────────────────────────────────
+window.togglePwd = (inputId, btn) => {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
+};
+
+// ── Force du mot de passe ─────────────────────────────────────────────────────
+window.checkPwdStrength = (val) => {
+  const fill  = document.getElementById('pwd-strength-fill');
+  const label = document.getElementById('pwd-strength-label');
+  const rules = {
+    length:  val.length >= 8,
+    upper:   /[A-Z]/.test(val),
+    number:  /[0-9]/.test(val),
+    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val),
+  };
+  const ruleMap = { length: 'rule-length', upper: 'rule-upper', number: 'rule-number', special: 'rule-special' };
+  Object.entries(rules).forEach(([key, ok]) => {
+    const el = document.getElementById(ruleMap[key]);
+    if (!el) return;
+    el.className = 'pwd-rule ' + (ok ? 'ok' : 'fail');
+    el.querySelector('.rule-icon').textContent = ok ? '✓' : '○';
+  });
+  const score  = Object.values(rules).filter(Boolean).length;
+  const pct    = [0, 25, 50, 75, 100][score];
+  const colors = ['#e5e5ea', '#e74c3c', '#f39c12', '#2ecc71', '#1a7a3c'];
+  const labels = ['', 'Très faible', 'Faible', 'Moyen', 'Fort'];
+  fill.style.width = pct + '%';
+  fill.style.background = colors[score];
+  label.textContent = val.length === 0 ? 'Saisissez un mot de passe' : labels[score];
+  label.style.color = colors[score];
+  checkPwdMatch();
+};
+
+// ── Correspondance des mots de passe ─────────────────────────────────────────
+window.checkPwdMatch = () => {
+  const newVal     = document.getElementById('pwd-new').value;
+  const confirmVal = document.getElementById('pwd-confirm').value;
+  const hint = document.getElementById('pwd-match-hint');
+  if (!confirmVal) { hint.textContent = ''; return; }
+  if (newVal === confirmVal) { hint.textContent = '✓ Les mots de passe correspondent'; hint.style.color = 'var(--green)'; }
+  else { hint.textContent = '✗ Les mots de passe ne correspondent pas'; hint.style.color = '#c0392b'; }
+};
+
+// ── Changement de mot de passe ────────────────────────────────────────────────
+window.changePassword = async () => {
+  const current = document.getElementById('pwd-current').value;
+  const newPwd  = document.getElementById('pwd-new').value;
+  const confirm = document.getElementById('pwd-confirm').value;
+  const btn     = document.getElementById('pwd-save-btn');
+
+  if (!current || !newPwd || !confirm) { toast('Veuillez remplir tous les champs', 'error'); return; }
+  if (newPwd.length < 8) { toast('Le nouveau mot de passe doit contenir au moins 8 caractères', 'error'); return; }
+  if (newPwd !== confirm) { toast('Les mots de passe ne correspondent pas', 'error'); return; }
+  if (newPwd === current) { toast('Le nouveau mot de passe doit être différent de l\'ancien', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Mise à jour...';
+
+  try {
+    if (!currentUser || !currentLoginEmail) throw new Error('Utilisateur non connecté');
+    const credential = EmailAuthProvider.credential(currentLoginEmail, current);
+    await reauthenticateWithCredential(currentUser, credential);
+    await updatePassword(currentUser, newPwd);
+    try {
+      await setDoc(doc(db, 'credentials', lwId), { passwordHash: newPwd, updatedAt: new Date() }, { merge: true });
+    } catch (firestoreErr) {
+      console.warn('Firestore credentials update skipped:', firestoreErr);
+    }
+    toast('✅ Mot de passe modifié avec succès !', 'success');
+    document.getElementById('pwd-current').value = '';
+    document.getElementById('pwd-new').value = '';
+    document.getElementById('pwd-confirm').value = '';
+    document.getElementById('pwd-strength-fill').style.width = '0%';
+    document.getElementById('pwd-strength-label').textContent = 'Saisissez un mot de passe';
+    document.getElementById('pwd-match-hint').textContent = '';
+    document.querySelectorAll('.pwd-rule').forEach(r => { r.className = 'pwd-rule'; r.querySelector('.rule-icon').textContent = '○'; });
+  } catch (err) {
+    console.error('Erreur changement mdp:', err);
+    if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') toast('Mot de passe actuel incorrect', 'error');
+    else if (err.code === 'auth/weak-password') toast('Le nouveau mot de passe est trop faible', 'error');
+    else if (err.code === 'auth/requires-recent-login') toast('Session expirée. Veuillez vous reconnecter puis réessayer.', 'error');
+    else toast('Erreur : ' + (err.message || 'inconnue'), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Changer le mot de passe';
+  }
+};
+
+// ── Réinitialisation par email ────────────────────────────────────────────────
+window.sendResetEmail = async () => {
+  if (!currentLoginEmail) { toast('Email de connexion introuvable', 'error'); return; }
+  try {
+    await sendPasswordResetEmail(auth, currentLoginEmail);
+    toast('📧 Lien de réinitialisation envoyé à ' + currentLoginEmail, 'success');
+  } catch (err) {
+    console.error(err);
+    toast('Erreur lors de l\'envoi : ' + err.message, 'error');
+  }
+};
+
+initDashboardAuth(({ user, lwId: id, currentLoginEmail: email }) => {
+  lwId = id; currentUser = user; currentLoginEmail = email;
+  document.getElementById('cred-lwid').textContent = lwId || '–';
+});
+
+document.querySelectorAll('.sidebar-item').forEach(a =>
+  a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));
+
+</script>
+</body>
+</html>
