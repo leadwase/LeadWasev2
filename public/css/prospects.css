@@ -1,5 +1,8 @@
 /* public/css/prospects.css — thème clair, cohérent avec dashboard/identifiants/analytics */
-.pros-wrap { width: 100%; max-width: 1120px; padding: 28px; }
+/* Remplace le centrage étroit hérité de app-dashboard.css (comme le fait analytics.html) */
+.app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
+
+.pros-wrap { width: 100%; padding: 0; }
 .pros-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
 .pros-h1 { font-size: 22px; font-weight: bold; color: var(--black); }
 .pros-sub { font-size: 12.5px; color: var(--gray3); margin-top: 4px; }
