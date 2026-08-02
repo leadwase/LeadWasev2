@@ -53,10 +53,10 @@ export function orderRow(o, showId) {
     ? (showId ? `<button class="act-btn btn-view" onclick="showDetail('${o.id}')">Voir profil</button>` : `<button class="act-btn btn-done" disabled>✓ Livré</button>`)
     : o.status === 'paid'
       ? `<button class="act-btn btn-gen" onclick="generateAccess('${o.id}')">Générer accès</button>`
-      : `<span style="color:var(--gray4);font-size:11px">—</span>`;
-  const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:11px">${o.leadwaseId || '—'}</td>` : '';
+      : `<span style="color:var(--gray4);font-size:13px">—</span>`;
+  const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:13px">${o.leadwaseId || '—'}</td>` : '';
   return `<tr>
-    <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">${shortId_}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">${shortId_}</td>
     <td style="font-weight:600">${o.firstName || ''} ${o.lastName || ''}</td>
     <td>${o.cardType === 'b2b' ? 'B2B' : 'Classique'}</td>
     <td style="font-weight:600;color:var(--green)">${o.amount ? fmtNum(o.amount) + ' FCFA' : 'Sur devis'}</td>

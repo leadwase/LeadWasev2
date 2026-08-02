@@ -4,11 +4,11 @@
 
 .pros-wrap { width: 100%; padding: 0; }
 .pros-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
-.pros-h1 { font-size: 22px; font-weight: bold; color: var(--black); }
-.pros-sub { font-size: 12.5px; color: var(--gray3); margin-top: 4px; }
+.pros-h1 { font-size:25px; font-weight: bold; color: var(--black); }
+.pros-sub { font-size:14px; color: var(--gray3); margin-top: 4px; }
 .pros-actions { display: flex; gap: 10px; }
 .pros-btn {
-  padding: 10px 16px; border-radius: 3px; font-size: 12px; font-weight: 600;
+  padding: 10px 16px; border-radius: 3px; font-size:14px; font-weight: 600;
   border: 1px solid var(--gray5); background: var(--white); color: var(--gray1, var(--black)); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
   transition: background .15s, border-color .15s; font-family: var(--serif);
@@ -26,54 +26,54 @@
 .pros-stat.c-orange::after { background: #d97706; }
 .pros-stat.c-purple::after { background: #7c3aed; }
 .pros-stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-.pros-stat-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray4); }
-.pros-stat-icon { font-size: 15px; opacity: .85; }
-.pros-stat-val { font-size: 32px; font-weight: 700; color: var(--black); font-family: 'Space Mono', monospace; line-height: 1; }
-.pros-stat-sub { font-size: 11px; color: var(--gray4); margin-top: 6px; }
+.pros-stat-label { font-size:12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray4); }
+.pros-stat-icon { font-size:17px; opacity: .85; }
+.pros-stat-val { font-size:37px; font-weight: 700; color: var(--black); font-family: 'Space Mono', monospace; line-height: 1; }
+.pros-stat-sub { font-size:13px; color: var(--gray4); margin-top: 6px; }
 .pros-stat-sub.up { color: var(--green); }
 .pros-stat-sub.orange { color: #d97706; }
 
 .pros-infobar {
   background: var(--white); border: 1px solid var(--gray5);
   padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 12px; margin-bottom: 20px; font-size: 12.5px; color: var(--gray3);
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px; font-size:14px; color: var(--gray3);
 }
 .pros-infobar strong { color: var(--black); }
 
 .pros-card { background: var(--white); border: 1px solid var(--gray5); }
 .pros-card-head { padding: 16px 24px; border-bottom: 1px solid var(--gray5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
-.pros-card-title { font-size: 14px; font-weight: 700; color: var(--black); }
-.pros-card-sub { font-size: 11.5px; color: var(--gray4); margin-top: 3px; }
+.pros-card-title { font-size:16px; font-weight: 700; color: var(--black); }
+.pros-card-sub { font-size:13px; color: var(--gray4); margin-top: 3px; }
 .pros-search-row { display: flex; gap: 10px; align-items: center; }
 .pros-search { position: relative; }
 .pros-search input {
   background: var(--white); border: 1px solid var(--gray5); border-radius: 3px;
-  padding: 8px 12px 8px 30px; font-size: 12.5px; color: var(--black); width: 190px; font-family: var(--serif);
+  padding: 8px 12px 8px 30px; font-size:14px; color: var(--black); width: 190px; font-family: var(--serif);
 }
 .pros-search input::placeholder { color: var(--gray4); }
-.pros-search::before { content: '🔍'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; opacity: .6; }
-.pros-filter-btn { padding: 8px 14px; border-radius: 3px; font-size: 12px; font-weight: 600; border: 1px solid var(--gray5); background: var(--white); color: var(--gray3); cursor: pointer; font-family: var(--serif); }
+.pros-search::before { content: '🔍'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size:13px; opacity: .6; }
+.pros-filter-btn { padding: 8px 14px; border-radius: 3px; font-size:14px; font-weight: 600; border: 1px solid var(--gray5); background: var(--white); color: var(--gray3); cursor: pointer; font-family: var(--serif); }
 .pros-filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
 
 .pros-table { width: 100%; border-collapse: collapse; }
 .pros-table thead th {
-  text-align: left; padding: 10px 24px; font-size: 10px; letter-spacing: .8px; text-transform: uppercase;
+  text-align: left; padding: 10px 24px; font-size:12px; letter-spacing: .8px; text-transform: uppercase;
   color: var(--gray4); border-bottom: 1px solid var(--gray5); font-weight: 700; background: var(--gray6);
 }
-.pros-table tbody td { padding: 14px 24px; border-bottom: 1px solid var(--gray5); font-size: 13px; color: var(--gray1, var(--black)); vertical-align: middle; }
+.pros-table tbody td { padding: 14px 24px; border-bottom: 1px solid var(--gray5); font-size:15px; color: var(--gray1, var(--black)); vertical-align: middle; }
 .pros-table tbody tr:last-child td { border-bottom: none; }
 .pros-table tbody tr:hover { background: var(--gray6); }
 .pros-empty td { text-align: center; padding: 40px 20px; color: var(--gray4); }
 
 .pros-avatar {
   width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff; margin-right: 10px; flex-shrink: 0;
+  font-size:14px; font-weight: 700; color: #fff; margin-right: 10px; flex-shrink: 0;
 }
 .pros-name-cell { display: flex; align-items: center; }
-.pros-name { font-weight: 600; color: var(--black); font-size: 13px; }
-.pros-email { font-size: 11.5px; color: var(--gray4); margin-top: 1px; }
+.pros-name { font-weight: 600; color: var(--black); font-size:15px; }
+.pros-email { font-size:13px; color: var(--gray4); margin-top: 1px; }
 
-.pros-badge { padding: 3px 9px; border-radius: 3px; font-size: 10.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.pros-badge { padding: 3px 9px; border-radius: 3px; font-size:12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 .pros-badge.nfc { background: #e8f0fe; color: #1a56c4; }
 .pros-badge.lien { background: var(--gray6); color: var(--gray3); }
 
@@ -81,7 +81,7 @@
 .pros-act-btn {
   width: 30px; height: 30px; border-radius: 3px; border: 1px solid var(--gray5); background: var(--white);
   color: var(--gray3); display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; text-decoration: none; font-size: 13px;
+  cursor: pointer; text-decoration: none; font-size:15px;
 }
 .pros-act-btn:hover { background: var(--gray6); }
 .pros-act-btn.del:hover { background: #fdecec; border-color: #e8a3a3; color: #c0392b; }

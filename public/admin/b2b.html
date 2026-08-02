@@ -103,13 +103,13 @@ window.loadB2B = async () => {
     document.getElementById('sb-b2b-count').textContent = count;
     if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
     tbody.innerHTML = orders.map(o => `<tr>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
       <td style="font-weight:600">${o.company||'—'}</td>
       <td>${o.firstName||'—'}</td>
       <td style="color:var(--gray4)">${o.email||'—'}</td>
       <td style="color:var(--gray4)">${o.phone||'—'}</td>
       <td style="color:var(--gray4)">${o.quantity||'—'}</td>
-      <td style="color:var(--gray4);font-size:11px">${fmtDate(o.createdAt)}</td>
+      <td style="color:var(--gray4);font-size:13px">${fmtDate(o.createdAt)}</td>
       <td>${badge(o.status)}</td>
       <td><a href="mailto:${o.email}" class="act-btn btn-gen" style="text-decoration:none">Répondre</a></td>
     </tr>`).join('');

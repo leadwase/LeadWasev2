@@ -146,7 +146,7 @@
               <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
             </div>
             <div style="margin-top:10px">
-              <span style="font-size:11px;color:var(--gray3)">Aperçu bouton :</span><br>
+              <span style="font-size:13px;color:var(--gray3)">Aperçu bouton :</span><br>
               <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
             </div>
           </div>
@@ -161,9 +161,9 @@
               <span>Voir nos avis sur Google →</span>
             </div>
             <div class="ai-box" id="ai-review-box" style="display:none">
-              <strong style="font-size:11px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
+              <strong style="font-size:13px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
               <p>Activez la réponse IA automatique à vos nouveaux avis Google.</p>
-              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+              <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
                 <input type="checkbox" id="ai-review-toggle" style="accent-color:var(--green);width:13px;height:13px">
                 Activer les réponses automatiques
               </label>
@@ -176,7 +176,7 @@
               <div class="f-group"><label class="f-label">Lien du formulaire</label><input class="f-input" id="e-contact-link" placeholder="https://form.typeform.com/... ou https://exemple.com/contact"></div>
               <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
             </div>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:10px;cursor:pointer;color:var(--gray2)">
+            <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-top:10px;cursor:pointer;color:var(--gray2)">
               <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
               Afficher le formulaire sur mon profil public
             </label>
@@ -434,7 +434,7 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      photoPreview.innerHTML = `<img src="${ev.target.result}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px"> <span style="font-size:11px">Nouvelle photo</span>`;
+      photoPreview.innerHTML = `<img src="${ev.target.result}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px"> <span style="font-size:13px">Nouvelle photo</span>`;
     };
     reader.readAsDataURL(file);
     await uploadProfileImage(file);

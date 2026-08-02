@@ -69,12 +69,12 @@
             <div class="card-head">
               <span class="card-title">Abonnements actifs</span>
               <div style="display:flex;gap:10px;align-items:center">
-                <select id="sub-filter-plan" class="f-input" style="font-size:12px;padding:6px 10px;width:auto" onchange="loadSubs()">
+                <select id="sub-filter-plan" class="f-input" style="font-size:14px;padding:6px 10px;width:auto" onchange="loadSubs()">
                   <option value="">Tous les plans</option>
                   <option value="pro">Pro</option>
                   <option value="business">Business</option>
                 </select>
-                <select id="sub-filter-status" class="f-input" style="font-size:12px;padding:6px 10px;width:auto" onchange="loadSubs()">
+                <select id="sub-filter-status" class="f-input" style="font-size:14px;padding:6px 10px;width:auto" onchange="loadSubs()">
                   <option value="">Tous les statuts</option>
                   <option value="active">Actif</option>
                   <option value="pending">En attente</option>
@@ -104,17 +104,17 @@
             <!-- Stats abonnements -->
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--gray5)">
               <div style="padding:16px 24px;text-align:center;border-right:1px solid var(--gray5)">
-                <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Total abonnements</div>
-                <div style="font-size:24px;font-weight:700;font-family:'Space Mono',monospace;color:var(--gray1)" id="subs-total-count">—</div>
+                <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Total abonnements</div>
+                <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--gray1)" id="subs-total-count">—</div>
               </div>
               <div style="padding:16px 24px;text-align:center;border-right:1px solid var(--gray5)">
-                <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Abonnements actifs</div>
-                <div style="font-size:24px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green)" id="subs-active-count">—</div>
+                <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Abonnements actifs</div>
+                <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green)" id="subs-active-count">—</div>
               </div>
               <div style="padding:16px 24px;text-align:center">
-                <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Revenus abonnements</div>
-                <div style="font-size:24px;font-weight:700;font-family:'Space Mono',monospace;color:var(--orange)" id="subs-revenue">—</div>
-                <div style="font-size:11px;color:var(--gray4);margin-top:3px">FCFA</div>
+                <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray4);margin-bottom:6px">Revenus abonnements</div>
+                <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--orange)" id="subs-revenue">—</div>
+                <div style="font-size:13px;color:var(--gray4);margin-top:3px">FCFA</div>
               </div>
             </div>
           </div>
@@ -162,15 +162,15 @@ window.loadSubs = async () => {
         : s.plan === 'business'
         ? '<span class="badge b-paid">BUSINESS</span>'
         : `<span class="badge b-pending">${(s.plan||'—').toUpperCase()}</span>`;
-      const uid = s.uid ? `<span style="font-size:10px;font-family:'Space Mono',monospace;color:var(--gray4)">${s.uid.slice(0,12)}…</span>` : '—';
+      const uid = s.uid ? `<span style="font-size:12px;font-family:'Space Mono',monospace;color:var(--gray4)">${s.uid.slice(0,12)}…</span>` : '—';
       return `<tr>
-        <td style="font-size:12px;color:var(--gray4)">${fmtDateTime(s.createdAt)}</td>
-        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray3)">${shortId(s.id)}</td>
+        <td style="font-size:14px;color:var(--gray4)">${fmtDateTime(s.createdAt)}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${shortId(s.id)}</td>
         <td>${uid}</td>
         <td>${planLabel}</td>
         <td style="font-weight:700;font-family:'Space Mono',monospace;color:var(--gray1)">${s.amount ? fmtNum(s.amount)+' FCFA' : '—'}</td>
         <td>${badge(s.status)}</td>
-        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray4)">${s.pid||'—'}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">${s.pid||'—'}</td>
       </tr>`;
     }).join('');
 

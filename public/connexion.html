@@ -9,55 +9,55 @@
 <style>
 .login-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
 .login-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.login-left::before{content:'"Votre identité,\A votre réseau."';white-space:pre;position:absolute;font-size:60px;font-weight:bold;color:rgba(255,255,255,.025);line-height:1.1;bottom:40px;left:40px;right:40px;font-family:var(--serif)}
-.login-logo{font-size:24px;font-weight:bold;color:var(--white);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:40px;display:block}
+.login-left::before{content:'"Votre identité,\A votre réseau."';white-space:pre;position:absolute;font-size:69px;font-weight:bold;color:rgba(255,255,255,.025);line-height:1.1;bottom:40px;left:40px;right:40px;font-family:var(--serif)}
+.login-logo{font-size:28px;font-weight:bold;color:var(--white);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:40px;display:block}
 .login-logo em{color:var(--green3);font-style:normal}
-.login-h{font-size:44px;font-weight:bold;color:var(--white);line-height:1.1;margin-bottom:18px}
-.login-p{font-size:15px;color:var(--gray3);line-height:1.8;font-style:italic}
+.login-h{font-size:51px;font-weight:bold;color:var(--white);line-height:1.1;margin-bottom:18px}
+.login-p{font-size:17px;color:var(--gray3);line-height:1.8;font-style:italic}
 .login-right{background:var(--white);padding:80px 64px;display:flex;flex-direction:column;justify-content:center}
-.login-title{font-size:28px;font-weight:bold;color:var(--black);margin-bottom:8px}
-.login-sub{font-size:14px;color:var(--gray2);font-style:italic;margin-bottom:28px;line-height:1.7}
+.login-title{font-size:32px;font-weight:bold;color:var(--black);margin-bottom:8px}
+.login-sub{font-size:16px;color:var(--gray2);font-style:italic;margin-bottom:28px;line-height:1.7}
 .panel{display:none}
 .panel.active{display:block}
 .hint-box{background:var(--green-pale);border-left:3px solid var(--green);padding:14px 18px;margin-bottom:24px}
-.hint-box p{font-size:13px;color:var(--gray2);line-height:1.7;font-style:italic}
+.hint-box p{font-size:15px;color:var(--gray2);line-height:1.7;font-style:italic}
 .hint-box strong{color:var(--green);font-style:normal}
 .info-box{background:#fff8e1;border-left:3px solid #f0a500;padding:14px 18px;margin-bottom:24px;display:none}
-.info-box p{font-size:13px;color:#7a5500;line-height:1.7}
+.info-box p{font-size:15px;color:#7a5500;line-height:1.7}
 .info-box strong{color:#f0a500}
 .l-group{margin-bottom:16px}
-.l-label{display:block;font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--black);margin-bottom:7px}
-.l-input{width:100%;padding:13px 17px;border:1px solid var(--gray5);background:var(--off);font-family:var(--serif);font-size:15px;color:var(--black);outline:none;transition:border-color .2s;border-radius:2px}
+.l-label{display:block;font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--black);margin-bottom:7px}
+.l-input{width:100%;padding:13px 17px;border:1px solid var(--gray5);background:var(--off);font-family:var(--serif);font-size:17px;color:var(--black);outline:none;transition:border-color .2s;border-radius:2px}
 .l-input:focus{border-color:var(--green);background:var(--white)}
 .l-input::placeholder{color:var(--gray4);font-style:italic}
 .l-input-wrap{position:relative}
 .l-input-wrap .l-input{padding-right:44px}
-.pwd-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--gray3);padding:2px;transition:color .15s}
+.pwd-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;color:var(--gray3);padding:2px;transition:color .15s}
 .pwd-eye:hover{color:var(--black)}
-.l-btn{width:100%;margin-top:6px;padding:15px;background:var(--green);color:var(--white);border:none;font-family:var(--serif);font-size:15px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
+.l-btn{width:100%;margin-top:6px;padding:15px;background:var(--green);color:var(--white);border:none;font-family:var(--serif);font-size:17px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;border-radius:2px}
 .l-btn:hover{background:var(--green2)}
 .l-btn:disabled{opacity:.6;cursor:not-allowed}
-.l-btn-ghost{width:100%;margin-top:8px;padding:12px;background:transparent;color:var(--gray2);border:1px solid var(--gray5);font-family:var(--serif);font-size:13px;cursor:pointer;transition:all .2s;border-radius:2px}
+.l-btn-ghost{width:100%;margin-top:8px;padding:12px;background:transparent;color:var(--gray2);border:1px solid var(--gray5);font-family:var(--serif);font-size:15px;cursor:pointer;transition:all .2s;border-radius:2px}
 .l-btn-ghost:hover{border-color:var(--black);color:var(--black)}
-.err-msg{background:rgba(192,57,43,.08);border-left:3px solid var(--red);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;border-radius:2px}
+.err-msg{background:rgba(192,57,43,.08);border-left:3px solid var(--red);padding:12px 16px;font-size:15px;color:var(--red);margin-bottom:14px;display:none;border-radius:2px}
 .l-divider{height:1px;background:var(--gray5);margin:24px 0;position:relative}
-.l-divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);padding:0 12px;font-size:11px;color:var(--gray3);font-style:italic}
+.l-divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);padding:0 12px;font-size:13px;color:var(--gray3);font-style:italic}
 .pwd-strength{margin-top:6px;margin-bottom:4px}
 .pwd-strength-bar{height:3px;background:var(--gray5);border-radius:2px;overflow:hidden;margin-bottom:4px}
 .pwd-strength-fill{height:100%;border-radius:2px;transition:width .3s ease,background .3s ease;width:0%}
-.pwd-strength-label{font-size:10px;color:var(--gray3);font-style:italic}
+.pwd-strength-label{font-size:12px;color:var(--gray3);font-style:italic}
 .pwd-rules{margin-top:8px;padding:10px 12px;background:#f5f5f7;border:1px solid var(--gray5);border-radius:2px}
-.pwd-rule{font-size:11px;color:var(--gray4);margin-bottom:4px;display:flex;align-items:center;gap:6px;transition:color .2s}
+.pwd-rule{font-size:13px;color:var(--gray4);margin-bottom:4px;display:flex;align-items:center;gap:6px;transition:color .2s}
 .pwd-rule:last-child{margin-bottom:0}
 .pwd-rule.ok{color:var(--green)}
-.rule-icon{font-size:10px}
-.pwd-match-hint{font-size:11px;font-style:italic;margin-top:4px;min-height:16px}
+.rule-icon{font-size:12px}
+.pwd-match-hint{font-size:13px;font-style:italic;margin-top:4px;min-height:16px}
 .step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:24px}
 .step-dot{width:8px;height:8px;border-radius:50%;background:var(--gray5);transition:background .3s}
 .step-dot.done{background:var(--green)}
 .step-dot.current{background:var(--green3);box-shadow:0 0 0 3px rgba(76,175,117,.2)}
-.step-label{font-size:11px;color:var(--gray3);font-style:italic;margin-left:4px}
-.back-link{font-size:13px;color:var(--green);cursor:pointer;font-style:italic;display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;background:none;border:none;font-family:var(--serif);padding:0}
+.step-label{font-size:13px;color:var(--gray3);font-style:italic;margin-left:4px}
+.back-link{font-size:15px;color:var(--green);cursor:pointer;font-style:italic;display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;background:none;border:none;font-family:var(--serif);padding:0}
 .back-link:hover{text-decoration:underline}
 .loader-inline{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -109,14 +109,14 @@
 
       <button class="l-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
 
-      <p style="text-align:center;margin-top:14px;font-size:13px;font-style:italic">
-        <button type="button" onclick="showPanel('panel-reset')" style="background:none;border:none;color:var(--green);font-family:var(--serif);font-size:13px;cursor:pointer;font-style:italic;padding:0">
+      <p style="text-align:center;margin-top:14px;font-size:15px;font-style:italic">
+        <button type="button" onclick="showPanel('panel-reset')" style="background:none;border:none;color:var(--green);font-family:var(--serif);font-size:15px;cursor:pointer;font-style:italic;padding:0">
           Mot de passe oublié / Changer mon mot de passe →
         </button>
       </p>
 
       <div class="l-divider"><span>Pas encore de carte ?</span></div>
-      <p style="font-size:12px;color:var(--gray3);font-style:italic;text-align:center;line-height:1.6">
+      <p style="font-size:14px;color:var(--gray3);font-style:italic;text-align:center;line-height:1.6">
         Commandez votre carte LeadWase et recevez vos accès sous 48h.<br>
         <a href="commander.html" style="color:var(--green);text-decoration:underline">Commander maintenant →</a>
       </p>
@@ -129,7 +129,7 @@
 
       <button type="button" class="back-link" onclick="showPanel('panel-login')">← Retour à la connexion</button>
 
-      <div class="login-title" style="font-size:22px;margin-bottom:6px">Modifier mon mot de passe</div>
+      <div class="login-title" style="font-size:25px;margin-bottom:6px">Modifier mon mot de passe</div>
       <p class="login-sub" id="reset-sub">Vérifiez d'abord votre identité avec vos identifiants actuels.</p>
 
       <div class="step-indicator">
@@ -190,9 +190,9 @@
 
       <!-- ÉTAPE 3 -->
       <div id="reset-step-3" style="display:none;text-align:center;padding:20px 0">
-        <div style="font-size:48px;margin-bottom:16px">✅</div>
-        <div style="font-size:18px;font-weight:bold;color:var(--black);margin-bottom:10px">Mot de passe modifié !</div>
-        <p style="font-size:13px;color:var(--gray2);font-style:italic;line-height:1.7;margin-bottom:24px">
+        <div style="font-size:55px;margin-bottom:16px">✅</div>
+        <div style="font-size:21px;font-weight:bold;color:var(--black);margin-bottom:10px">Mot de passe modifié !</div>
+        <p style="font-size:15px;color:var(--gray2);font-style:italic;line-height:1.7;margin-bottom:24px">
           Votre nouveau mot de passe est actif. Vous pouvez maintenant vous connecter.
         </p>
         <button class="l-btn" onclick="goToLogin()">Se connecter →</button>
