@@ -16,22 +16,46 @@ const db = getFirestore();
 // limite de 12 fonctions serverless du plan Vercel Hobby.
 
 // Vérifie que le token envoyé correspond bien au propriétaire du profil `leadwaseId`.
-// Même logique que les règles Firestore (profiles/credentials) : match par
-// firebaseUid stocké sur le profil, avec repli sur l'email interne LW-XXXX@leadwase.internal.
+// Plusieurs signaux sont acceptés (l'écriture de firebaseUid au premier login peut
+// échouer silencieusement selon connexion.html) : firebaseUid, uid, email interne,
+// et en dernier recours users/{uid}.leadwaseId.
 async function verifyOwner(req, leadwaseId) {
   const token = (req.headers.authorization || '').split('Bearer ')[1];
   if (!token) throw new Error('Non autorisé');
-  const decoded = await getAuth().verifyIdToken(token);
+
+  let decoded;
+  try {
+    decoded = await getAuth().verifyIdToken(token);
+  } catch (e) {
+    console.error('[verifyOwner] verifyIdToken a échoué:', e.message);
+    throw new Error('Session invalide, merci de vous reconnecter');
+  }
 
   const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
   if (!profileDoc.exists) throw new Error('Accès refusé');
   const pd = profileDoc.data();
 
-  const ownsByUid   = pd.firebaseUid && pd.firebaseUid === decoded.uid;
-  const ownsByEmail = decoded.email &&
+  const ownsByFirebaseUid = pd.firebaseUid && pd.firebaseUid === decoded.uid;
+  const ownsByUid         = pd.uid && pd.uid === decoded.uid;
+  const ownsByEmail       = decoded.email &&
     decoded.email.toLowerCase() === `${leadwaseId.toLowerCase()}@leadwase.internal`;
 
-  if (!ownsByUid && !ownsByEmail) throw new Error('Accès refusé');
+  let ownsByUsersDoc = false;
+  if (!ownsByFirebaseUid && !ownsByUid && !ownsByEmail) {
+    const uDoc = await db.collection('users').doc(decoded.uid).get();
+    ownsByUsersDoc = uDoc.exists && uDoc.data()?.leadwaseId === leadwaseId;
+  }
+
+  if (!ownsByFirebaseUid && !ownsByUid && !ownsByEmail && !ownsByUsersDoc) {
+    console.error(`[verifyOwner] Accès refusé pour uid=${decoded.uid} sur profil ${leadwaseId}`);
+    throw new Error('Accès refusé');
+  }
+
+  // Répare le profil au passage si firebaseUid manquait (évite de retomber sur ce bug).
+  if (!pd.firebaseUid) {
+    await profileDoc.ref.set({ firebaseUid: decoded.uid }, { merge: true }).catch(() => {});
+  }
+
   return decoded;
 }
 
