@@ -60,7 +60,7 @@
   text-align: left; padding: 10px 24px; font-size:12px; letter-spacing: .8px; text-transform: uppercase;
   color: var(--gray4); border-bottom: 1px solid var(--gray5); font-weight: 700; background: var(--gray6);
 }
-.pros-table tbody td { padding: 14px 24px; border-bottom: 1px solid var(--gray5); font-size:15px; color: var(--gray1, var(--black)); vertical-align: middle; }
+.pros-table tbody td { padding: 14px 24px; border-bottom: 1px solid var(--gray5); font-size:20px; color: var(--gray1, var(--black)); vertical-align: middle; }
 .pros-table tbody tr:last-child td { border-bottom: none; }
 .pros-table tbody tr:hover { background: var(--gray6); }
 .pros-empty td { text-align: center; padding: 40px 20px; color: var(--gray4); }
@@ -70,7 +70,7 @@
   font-size:14px; font-weight: 700; color: #fff; margin-right: 10px; flex-shrink: 0;
 }
 .pros-name-cell { display: flex; align-items: center; }
-.pros-name { font-weight: 600; color: var(--black); font-size:15px; }
+.pros-name { font-weight: 600; color: var(--black); font-size:20px; }
 .pros-email { font-size:13px; color: var(--gray4); margin-top: 1px; }
 
 .pros-badge { padding: 3px 9px; border-radius: 3px; font-size:12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }

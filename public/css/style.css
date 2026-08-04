@@ -58,11 +58,11 @@ a{text-decoration:none;color:inherit}
 .sidebar-logo .sub{font-size:10px;color:var(--gray2);letter-spacing:2px;margin-top:2px;text-transform:uppercase}
 .sidebar-user{padding:14px 20px;border-bottom:1px solid var(--gray1);display:flex;align-items:center;gap:12px}
 .sidebar-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;color:var(--white);flex-shrink:0}
-.sidebar-user-name{font-size:15px;font-weight:bold;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-name{font-size:20px;font-weight:bold;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-user-plan{font-size:12px;color:var(--green3);letter-spacing:1px;text-transform:uppercase}
 .sidebar-nav{flex:1;padding:8px 12px}
 .sidebar-section-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);padding:12px 8px 5px}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:3px;cursor:pointer;transition:all .2s;font-size:15px;color:var(--gray3);margin-bottom:2px;text-decoration:none}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:3px;cursor:pointer;transition:all .2s;font-size:20px;color:var(--gray3);margin-bottom:2px;text-decoration:none}
 .sidebar-item:hover{background:var(--gray1);color:var(--white)}
 .sidebar-item.active{background:var(--green);color:var(--white)}
 .sidebar-item .s-icon{font-size:17px;width:20px;text-align:center;flex-shrink:0}
@@ -96,11 +96,11 @@ a{text-decoration:none;color:inherit}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
 .footer-brand{font-size:25px;font-weight:bold;color:var(--white);text-transform:uppercase;margin-bottom:12px;letter-spacing:1px}
 .footer-brand em{color:var(--green3);font-style:normal}
-.footer-tagline{font-size:15px;color:var(--gray3);line-height:1.8;font-style:italic;max-width:260px}
+.footer-tagline{font-size:20px;color:var(--gray3);line-height:1.8;font-style:italic;max-width:260px}
 .footer-col-title{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--green3);margin-bottom:18px;padding-bottom:8px;border-bottom:1px solid var(--gray1)}
 .footer-links{list-style:none}
 .footer-links li{padding:5px 0}
-.footer-links a{font-size:15px;color:var(--gray3);text-decoration:none;transition:color .2s}
+.footer-links a{font-size:20px;color:var(--gray3);text-decoration:none;transition:color .2s}
 .footer-links a:hover{color:var(--white)}
 .footer-bottom{border-top:1px solid var(--gray1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .footer-copy{font-size:14px;color:var(--gray2)}
@@ -131,7 +131,7 @@ a{text-decoration:none;color:inherit}
 .sec-black .split-text h2{color:var(--white)}
 .sec-black .split-text p{color:var(--gray3)}
 .split-list{list-style:none;padding:0;margin:0 0 28px}
-.split-list li{font-size:15px;color:var(--gray2);padding:8px 0 8px 26px;position:relative}
+.split-list li{font-size:20px;color:var(--gray2);padding:8px 0 8px 26px;position:relative}
 .sec-black .split-list li{color:var(--gray3)}
 .split-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:bold}
 .video-frame{position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
@@ -140,4 +140,23 @@ a{text-decoration:none;color:inherit}
   .split-row{grid-template-columns:1fr;gap:32px}
   .split-row.reverse .split-media{order:1}
   .split-row.reverse .split-text{order:2}
+}
+
+/* ── Slider "Votre profil, partout" (page d'accueil) ─────────────────── */
+.slider { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 4px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.14); background: #000; }
+.slider-track { display: flex; width: 100%; height: 100%; transition: transform .6s cubic-bezier(.65,0,.35,1); }
+.slider-track img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; display: block; }
+.slider-dots { position: absolute; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 7px; }
+.slider-dots .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; transition: background .2s, transform .2s; border: none; padding: 0; }
+.slider-dots .dot.active { background: var(--green); transform: scale(1.25); }
+
+/* ── Clients satisfaits (page d'accueil) ──────────────────────────────── */
+.clients-grid { max-width: 1100px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.client-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 4/5; box-shadow: 0 12px 32px rgba(0,0,0,.1); background: var(--gray6); }
+.client-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media(max-width:860px){
+  .clients-grid { grid-template-columns: 1fr 1fr; padding: 0 20px; }
+}
+@media(max-width:560px){
+  .clients-grid { grid-template-columns: 1fr; max-width: 340px; }
 }

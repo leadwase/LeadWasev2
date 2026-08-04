@@ -58,7 +58,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   width: 34px; height: 34px; border-radius: 50%;
   background: var(--green);
   color: var(--white);
-  font-size:15px; font-weight: bold;
+  font-size:20px; font-weight: bold;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
@@ -149,7 +149,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   margin-bottom: 22px; flex-wrap: wrap; gap: 8px;
 }
 .dash-h1 { font-size:25px; font-weight: bold; color: var(--black); }
-.dash-pub { font-size:15px; color: var(--green); text-decoration: underline; font-style: italic; }
+.dash-pub { font-size:20px; color: var(--green); text-decoration: underline; font-style: italic; }
 
 /* ══════════════════════════════════════════════
    TABS
@@ -213,7 +213,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   object-fit: cover;
 }
 .pf-name { font-size:23px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
-.pf-job  { font-size:15px; color: var(--gray2); font-style: italic; margin-bottom: 2px; }
+.pf-job  { font-size:20px; color: var(--gray2); font-style: italic; margin-bottom: 2px; }
 .pf-co   { font-size:13px; color: var(--green); font-weight: bold; letter-spacing: .5px; text-transform: uppercase; }
 .pf-id   { font-size:12px; color: var(--gray3); font-family: 'Courier New', monospace; margin-top: 4px; }
 
@@ -283,7 +283,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .f-input, .f-textarea {
   width: 100%; padding: 8px 10px;
   border: 1px solid var(--gray5); border-radius: 2px;
-  font-family: var(--serif); font-size:15px; color: var(--black);
+  font-family: var(--serif); font-size:20px; color: var(--black);
   background: var(--white); outline: none; transition: border-color .2s;
 }
 .f-input:focus, .f-textarea:focus { border-color: var(--green3); }
@@ -342,7 +342,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   margin-bottom: 6px;
 }
 .login-info-box .lib-value {
-  font-size:15px;
+  font-size:20px;
   color: var(--black);
   font-family: 'Courier New', monospace;
   word-break: break-all;
@@ -579,7 +579,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   background: linear-gradient(90deg, var(--green), var(--green3));
 }
 .upgrade h3 { font-size:20px; font-weight: bold; color: var(--white); margin-bottom: 8px; }
-.upgrade p  { font-size:15px; color: var(--gray3); line-height: 1.7; font-style: italic; margin-bottom: 16px; }
+.upgrade p  { font-size:20px; color: var(--gray3); line-height: 1.7; font-style: italic; margin-bottom: 16px; }
 .upgrade-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 .ucta {
   flex: 1; min-width: 150px; padding: 11px;
@@ -606,7 +606,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 
 .toast {
   position: fixed; bottom: 22px; right: 22px;
-  padding: 11px 18px; font-family: var(--serif); font-size:15px;
+  padding: 11px 18px; font-family: var(--serif); font-size:20px;
   z-index: 9999; animation: slideUp .25s ease;
   box-shadow: 0 4px 16px rgba(0,0,0,.18);
 }
