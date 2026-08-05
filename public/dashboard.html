@@ -134,9 +134,16 @@
           <div class="extras-section" id="location-section" style="display:none">
             <h3>📍 Localisation</h3>
             <div class="edit-grid edit-solo">
-              <div class="f-group"><label class="f-label">Adresse complète</label><input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin"></div>
+              <div class="f-group">
+                <label class="f-label">Adresse complète</label>
+                <div style="display:flex;gap:8px">
+                  <input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin" style="flex:1">
+                  <button type="button" class="geoloc-btn" id="geoloc-btn" style="white-space:nowrap">📍 Ma position</button>
+                </div>
+                <div id="geoloc-status" style="font-size:15px;color:var(--gray3);margin-top:6px;font-style:italic"></div>
+              </div>
             </div>
-            <div class="map-preview">🗺️ Aperçu carte Google Maps</div>
+            <div class="map-preview" id="map-preview">🗺️ Aperçu carte — détectez ou saisissez une adresse</div>
           </div>
 
           <div class="extras-section" id="rdv-section" style="display:none">
@@ -172,14 +179,18 @@
 
           <div class="extras-section" id="contact-section" style="display:none">
             <h3>📨 Formulaire de contact</h3>
-            <div class="edit-grid">
-              <div class="f-group"><label class="f-label">Lien du formulaire</label><input class="f-input" id="e-contact-link" placeholder="https://form.typeform.com/... ou https://exemple.com/contact"></div>
+            <div class="edit-grid edit-solo">
               <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
             </div>
-            <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-top:10px;cursor:pointer;color:var(--gray2)">
+            <label style="display:flex;align-items:center;gap:8px;font-size:20px;margin-top:10px;cursor:pointer;color:var(--gray2)">
               <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
               Afficher le formulaire sur mon profil public
             </label>
+
+            <div class="f-hint" style="margin-top:16px;margin-bottom:8px">Champs du formulaire — créez vous-même les champs que vos visiteurs devront remplir.</div>
+            <div id="contact-fields-list"></div>
+            <button type="button" class="geoloc-btn" id="add-field-btn" style="margin-top:8px">+ Ajouter un champ</button>
+            <div class="f-hint" style="margin-top:10px">Chaque soumission vous sera envoyée par email et ajoutée à "Mes Prospects".</div>
           </div>
 
           <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
@@ -244,6 +255,71 @@ import { auth, db } from './js/dashboard-shared.js';
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let lwId = null, currentPlan = 'free', currentProfileData = null;
+let locationLat = null, locationLng = null;
+
+// ── Localisation : géolocalisation + géocodage via Nominatim (OpenStreetMap, gratuit, sans compte) ──
+function showMapPreview(lat, lng) {
+  const box = document.getElementById('map-preview');
+  box.classList.add('has-map');
+  box.innerHTML = `<iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01}%2C${lat-0.008}%2C${lng+0.01}%2C${lat+0.008}&layer=mapnik&marker=${lat}%2C${lng}"></iframe>`;
+}
+
+async function reverseGeocode(lat, lng) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`, {
+    headers: { 'Accept-Language': 'fr' },
+  });
+  const d = await res.json();
+  return d.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+}
+
+async function forwardGeocode(address) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`, {
+    headers: { 'Accept-Language': 'fr' },
+  });
+  const d = await res.json();
+  return d[0] ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
+}
+
+document.getElementById('geoloc-btn').onclick = () => {
+  const status = document.getElementById('geoloc-status');
+  const btn    = document.getElementById('geoloc-btn');
+  if (!navigator.geolocation) { status.textContent = "Géolocalisation non disponible sur cet appareil."; return; }
+  btn.disabled = true; status.textContent = 'Localisation en cours...';
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    locationLat = pos.coords.latitude;
+    locationLng = pos.coords.longitude;
+    try {
+      const address = await reverseGeocode(locationLat, locationLng);
+      document.getElementById('e-location').value = address;
+      showMapPreview(locationLat, locationLng);
+      status.textContent = '✓ Position détectée';
+    } catch {
+      status.textContent = 'Position détectée, mais adresse introuvable — vous pouvez la saisir manuellement.';
+      showMapPreview(locationLat, locationLng);
+    }
+    btn.disabled = false;
+  }, (err) => {
+    status.textContent = err.code === 1
+      ? "Autorisation refusée. Activez la localisation dans les réglages de votre navigateur, ou saisissez l'adresse manuellement."
+      : "Impossible de vous localiser. Saisissez l'adresse manuellement.";
+    btn.disabled = false;
+  });
+};
+
+// Si l'adresse est saisie/modifiée manuellement, on la géocode pour garder la carte à jour.
+document.getElementById('e-location').addEventListener('blur', async () => {
+  const val = document.getElementById('e-location').value.trim();
+  if (!val) return;
+  const status = document.getElementById('geoloc-status');
+  try {
+    const coords = await forwardGeocode(val);
+    if (coords) {
+      locationLat = coords.lat; locationLng = coords.lng;
+      showMapPreview(locationLat, locationLng);
+      status.textContent = '';
+    }
+  } catch { /* pas bloquant */ }
+});
 
 // ── Compression d'image automatique ──────────────────────────────────────────
 async function compressImage(file, maxWidth = 200, quality = 0.6) {
@@ -350,18 +426,64 @@ window.saveLinks = async () => {
   }
 };
 
-// ── Sauvegarde extras (Business uniquement) ──────────────────────────────────
+// ── Constructeur de formulaire de contact (Business) ──────────────────────────
+let contactFields = [];
+
+function fieldId() { return 'f' + Math.random().toString(36).slice(2, 8); }
+
+function renderContactFields() {
+  const list = document.getElementById('contact-fields-list');
+  if (!contactFields.length) {
+    list.innerHTML = '<div class="f-hint" style="font-style:italic">Aucun champ pour le moment — ajoutez-en un ci-dessous.</div>';
+    return;
+  }
+  list.innerHTML = contactFields.map(f => `
+    <div class="cf-row" data-id="${f.id}">
+      <input type="text" class="cf-label" placeholder="Nom du champ (ex: Votre nom)" value="${(f.label || '').replace(/"/g, '&quot;')}">
+      <select class="cf-type">
+        <option value="text" ${f.type === 'text' ? 'selected' : ''}>Texte court</option>
+        <option value="email" ${f.type === 'email' ? 'selected' : ''}>Email</option>
+        <option value="tel" ${f.type === 'tel' ? 'selected' : ''}>Téléphone</option>
+        <option value="textarea" ${f.type === 'textarea' ? 'selected' : ''}>Message long</option>
+      </select>
+      <label><input type="checkbox" class="cf-required" ${f.required ? 'checked' : ''}> Obligatoire</label>
+      <button type="button" class="cf-remove" onclick="removeContactField('${f.id}')">✕</button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.cf-row').forEach(row => {
+    const id = row.dataset.id;
+    const f  = contactFields.find(x => x.id === id);
+    row.querySelector('.cf-label').addEventListener('input', e => f.label = e.target.value);
+    row.querySelector('.cf-type').addEventListener('change', e => f.type = e.target.value);
+    row.querySelector('.cf-required').addEventListener('change', e => f.required = e.target.checked);
+  });
+}
+
+window.removeContactField = (id) => {
+  contactFields = contactFields.filter(f => f.id !== id);
+  renderContactFields();
+};
+
+document.getElementById('add-field-btn').onclick = () => {
+  contactFields.push({ id: fieldId(), label: '', type: 'text', required: true });
+  renderContactFields();
+};
+
+
 window.saveExtras = async () => {
   try {
     const data = { updatedAt: new Date() };
     if (currentPlan === 'business') {
       data.location        = document.getElementById('e-location').value.trim();
+      data.locationLat     = locationLat;
+      data.locationLng     = locationLng;
       data.rdvLink         = document.getElementById('e-rdv').value.trim();
       data.rdvLabel        = document.getElementById('e-rdv-label').value.trim();
       data.googleReview    = document.getElementById('e-google-review').value.trim();
-      data.contactLink     = document.getElementById('e-contact-link').value.trim();
       data.contactMessage  = document.getElementById('e-contact-msg').value.trim();
       data.contactActive   = document.getElementById('e-contact-active').checked;
+      data.contactFields   = contactFields.filter(f => f.label.trim()).map(f => ({ ...f, label: f.label.trim() }));
       data.aiReviewEnabled = document.getElementById('ai-review-toggle').checked;
     }
     await updateDoc(doc(db, 'profiles', lwId), data);
@@ -409,6 +531,10 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
     if (isBusiness) {
       document.getElementById('location-section').style.display = 'block';
       document.getElementById('e-location').value = p.location || '';
+      if (p.locationLat && p.locationLng) {
+        locationLat = p.locationLat; locationLng = p.locationLng;
+        showMapPreview(locationLat, locationLng);
+      }
       document.getElementById('rdv-section').style.display = 'block';
       document.getElementById('e-rdv').value = p.rdvLink || '';
       document.getElementById('e-rdv-label').value = p.rdvLabel || 'Prendre rendez-vous';
@@ -418,9 +544,10 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
       document.getElementById('ai-review-box').style.display = 'block';
       document.getElementById('ai-review-toggle').checked = p.aiReviewEnabled || false;
       document.getElementById('contact-section').style.display = 'block';
-      document.getElementById('e-contact-link').value = p.contactLink || '';
       document.getElementById('e-contact-msg').value  = p.contactMessage || '';
       document.getElementById('e-contact-active').checked = p.contactActive || false;
+      contactFields = Array.isArray(p.contactFields) ? p.contactFields.map(f => ({ ...f })) : [];
+      renderContactFields();
     }
   }
 

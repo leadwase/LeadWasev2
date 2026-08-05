@@ -496,18 +496,46 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .extras-section:first-child { border-top: none; padding-top: 0; margin-top: 0; }
 .extras-section h3 { font-size:16px; font-weight: bold; margin-bottom: 10px; }
 
+.geoloc-btn {
+  padding: 0 16px; background: var(--white); color: var(--green);
+  border: 1px solid var(--green); font-family: var(--serif);
+  font-size:15px; font-weight: bold; cursor: pointer; transition: background .2s, color .2s;
+  border-radius: 2px;
+}
+.geoloc-btn:hover { background: var(--green); color: var(--white); }
+.geoloc-btn:disabled { opacity: .6; cursor: not-allowed; }
+
 .map-preview {
   margin-top: 8px; height: 72px;
   background: var(--gray6); border: 1px solid var(--gray5);
   display: flex; align-items: center; justify-content: center;
-  font-size:14px; color: var(--gray3); font-style: italic;
+  font-size:19px; color: var(--gray3); font-style: italic;
+  overflow: hidden;
 }
+.map-preview.has-map { height: 220px; }
+.map-preview.has-map iframe { width: 100%; height: 100%; border: 0; }
 .rdv-preview-btn {
   display: inline-block; margin-top: 8px;
   padding: 9px 18px; background: var(--black); color: var(--white);
   font-family: var(--serif); font-size:13px; font-weight: bold;
   letter-spacing: 1px; text-transform: uppercase;
 }
+
+.cf-row {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+  padding: 10px; background: var(--gray6); border: 1px solid var(--gray5);
+}
+.cf-row input[type="text"] {
+  flex: 1; padding: 8px 10px; border: 1px solid var(--gray5); font-family: var(--serif);
+  font-size:19px; color: var(--black); background: var(--white);
+}
+.cf-row select {
+  padding: 8px 10px; border: 1px solid var(--gray5); font-family: var(--serif);
+  font-size:19px; color: var(--black); background: var(--white);
+}
+.cf-row label { display: flex; align-items: center; gap: 5px; font-size:15px; color: var(--gray3); white-space: nowrap; }
+.cf-remove { border: none; background: none; color: var(--gray4); cursor: pointer; font-size: 18px; padding: 0 4px; }
+.cf-remove:hover { color: #c0392b; }
 .review-preview {
   margin-top: 8px; display: flex; align-items: center; gap: 8px;
   padding: 8px 12px; border: 1px solid #f9e08b; background: #fef9e7;

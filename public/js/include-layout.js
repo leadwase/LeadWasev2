@@ -21,15 +21,30 @@ async function initLayout() {
 
   // Surligne le lien de nav correspondant à la page courante.
   const current = location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.main-nav .nav-item').forEach(a => {
+  document.querySelectorAll('.main-nav .nav-item, .nav-mobile-panel .nav-mobile-item').forEach(a => {
     const href = a.getAttribute('href').split('/').pop();
     if (href === current || (current === '' && href === 'index.html')) a.classList.add('active');
   });
 
+  // Menu mobile (hamburger).
+  const burger = document.getElementById('nav-burger');
+  const panel  = document.getElementById('nav-mobile-panel');
+  if (burger && panel) {
+    burger.addEventListener('click', () => {
+      const open = panel.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      panel.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    }));
+  }
+
   // Connexion ⇄ Mon profil selon l'état d'authentification.
   onAuthStateChanged(auth, user => {
-    const el = document.getElementById('nav-auth');
-    if (el && user) { el.textContent = 'Mon profil'; el.href = '/dashboard.html'; }
+    [document.getElementById('nav-auth'), document.getElementById('nav-auth-mobile')].forEach(el => {
+      if (el && user) { el.textContent = 'Mon profil'; el.href = '/dashboard.html'; }
+    });
   });
 
   document.dispatchEvent(new CustomEvent('layout:ready'));

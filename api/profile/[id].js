@@ -79,6 +79,55 @@ async function captureLead(req, res, leadwaseId) {
   res.json({ success: true });
 }
 
+// POST /api/profile/[id]?action=submit-contact-form — public, formulaire de contact
+// personnalisé du profil public. Enregistre un prospect ET notifie le propriétaire par email.
+async function submitContactForm(req, res, leadwaseId) {
+  const { values, source } = req.body || {};
+  if (!values || typeof values !== 'object' || !Object.keys(values).length) {
+    return res.status(400).json({ success: false, error: 'Formulaire vide' });
+  }
+
+  const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+  if (!profileDoc.exists) return res.status(404).json({ success: false, error: 'Profil introuvable' });
+  const p = profileDoc.data();
+
+  // Tente de retrouver un nom/téléphone/email dans les champs soumis pour l'annuaire prospects.
+  const entries = Object.entries(values);
+  const findByKeyword = (words) => {
+    const hit = entries.find(([label]) => words.some(w => label.toLowerCase().includes(w)));
+    return hit ? String(hit[1]).trim().slice(0, 120) : '';
+  };
+  const name  = findByKeyword(['nom', 'name'])   || 'Visiteur formulaire';
+  const phone = findByKeyword(['tel', 'phone']);
+  const email = findByKeyword(['email', 'mail']);
+  const object = entries.map(([label, val]) => `${label} : ${val}`).join(' — ').slice(0, 500);
+
+  await db.collection('prospects').add({
+    ownerId:   leadwaseId,
+    name, phone, email, object,
+    source:    source === 'nfc' ? 'nfc' : 'lien_direct',
+    viaForm:   true,
+    createdAt: new Date(),
+  });
+
+  if (p.email) {
+    try {
+      const { notifyOwnerContactForm } = await import('../../lib/brevo.js');
+      await notifyOwnerContactForm({
+        ownerEmail: p.email,
+        ownerName:  p.firstName || '',
+        leadwaseId,
+        values,
+      });
+    } catch (e) {
+      console.error('[submitContactForm] envoi email échoué:', e.message);
+      // On ne bloque pas la réponse au visiteur si l'email échoue — le prospect est déjà enregistré.
+    }
+  }
+
+  res.json({ success: true });
+}
+
 // GET /api/profile/[id]?action=prospects — authentifié (propriétaire uniquement).
 async function listProspects(req, res, leadwaseId) {
   await verifyOwner(req, leadwaseId);
@@ -146,6 +195,10 @@ export default async function handler(req, res) {
     const action = req.query.action;
     if (action === 'capture-lead' && req.method === 'POST') {
       return captureLead(req, res, leadwaseId).catch(e =>
+        res.status(500).json({ success: false, error: e.message }));
+    }
+    if (action === 'submit-contact-form' && req.method === 'POST') {
+      return submitContactForm(req, res, leadwaseId).catch(e =>
         res.status(500).json({ success: false, error: e.message }));
     }
     if (action === 'prospects' && req.method === 'GET') {

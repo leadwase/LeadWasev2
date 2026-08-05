@@ -344,11 +344,33 @@ svg.icon-lg { width: 22px; height: 22px; }
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   font-size:18px;
   color: var(--text-secondary);
+  cursor: pointer;
+  transition: background .15s;
 }
+.pf-location:hover { background: var(--green-pale); }
 .pf-location-icon {
   color: var(--green);
   flex-shrink: 0;
 }
+.pf-location-arrow { margin-left: auto; color: var(--green); font-size:16px; flex-shrink: 0; }
+
+/* ─── Modal carte (OpenStreetMap, gratuit, sans compte) ─── */
+.map-overlay {
+  display: none; position: fixed; inset: 0; z-index: 998;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(3px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.map-overlay.open { display: flex; }
+.map-modal {
+  background: var(--white); border-radius: var(--radius-sm);
+  max-width: 560px; width: 100%; padding: 0; position: relative; overflow: hidden;
+}
+.map-modal-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.map-modal-title { font-size: 19px; font-weight: 700; color: var(--black); }
+.map-modal-close { width: 28px; height: 28px; border: none; background: #f0f0f0; border-radius: 50%; font-size: 18px; cursor: pointer; color: #666; line-height: 1; }
+.map-modal iframe { width: 100%; height: 340px; border: 0; display: block; }
+.map-modal-footer { padding: 12px 18px; }
+.map-modal-footer a { font-size: 15px; color: var(--green); text-decoration: underline; }
 
 /* ─── Divider ──────────────────────────── */
 .pf-divider {
@@ -601,6 +623,14 @@ svg.icon-lg { width: 22px; height: 22px; }
   transition: background .2s;
 }
 .contact-form-link:hover { background: var(--green); }
+.cf-field-group { margin-bottom: 12px; }
+.cf-field-group label { display: block; font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
+.cf-field-group input, .cf-field-group textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;
+  font-family: var(--sans); font-size: 18px; color: var(--black); resize: vertical; box-sizing: border-box;
+}
+.cf-field-group input:focus, .cf-field-group textarea:focus { outline: none; border-color: var(--green-bright); }
+.contact-form-err { color: #c0392b; font-size: 15px; margin-bottom: 10px; min-height: 14px; }
 
 /* ─── Footer ───────────────────────────── */
 .pf-footer {
@@ -759,6 +789,7 @@ svg.icon-lg { width: 22px; height: 22px; }
   <div class="pf-location a2" id="pf-location">
     <svg class="icon pf-location-icon"><use href="#icon-pin"/></svg>
     <span id="pf-location-text"></span>
+    <span class="pf-location-arrow">🗺️</span>
   </div>
 
   <div class="pf-divider"></div>
@@ -856,16 +887,31 @@ svg.icon-lg { width: 22px; height: 22px; }
         Formulaire de contact
       </h4>
       <p id="contact-form-message">Contactez-moi via le formulaire</p>
-      <a class="contact-form-link" id="contact-form-link" href="#" target="_blank">
-        Accéder au formulaire
+      <div id="contact-form-fields"></div>
+      <div class="contact-form-err" id="contact-form-err"></div>
+      <button type="button" class="contact-form-link" id="contact-form-submit" style="border:none;cursor:pointer;width:100%;justify-content:center">
+        Envoyer
         <svg class="icon icon-sm"><use href="#icon-arrow-right"/></svg>
-      </a>
+      </button>
+      <div id="contact-form-success" style="display:none;text-align:center;padding:10px 0;color:var(--green-mid);font-weight:600">✅ Message envoyé, merci !</div>
     </div>
   </div>
 
   <div class="pf-footer a6">
     <p>Profil créé avec</p>
     <a href="/">Lead<em>Wase</em> — Créez le vôtre</a>
+  </div>
+</div>
+
+<!-- ── Modal carte (OpenStreetMap intégré, gratuit, sans compte) ──── -->
+<div class="map-overlay" id="map-overlay">
+  <div class="map-modal">
+    <div class="map-modal-head">
+      <span class="map-modal-title">📍 Localisation</span>
+      <button class="map-modal-close" id="map-close" aria-label="Fermer">&times;</button>
+    </div>
+    <iframe id="map-iframe" loading="lazy" src=""></iframe>
+    <div class="map-modal-footer"><a id="map-external-link" href="#" target="_blank" rel="noopener">Ouvrir dans OpenStreetMap →</a></div>
   </div>
 </div>
 
@@ -1006,12 +1052,29 @@ async function load(leadwaseId) {
       el.style.display = 'block';
     }
 
-    // Location (Business)
+    // Location (Business) — cliquable, ouvre une carte OpenStreetMap intégrée (gratuite, sans compte)
     if (isBusiness && p.location?.trim()) {
       const el = document.getElementById('pf-location');
       document.getElementById('pf-location-text').textContent = p.location;
       el.style.display = 'flex';
+      el.onclick = async () => {
+        let lat = p.locationLat, lng = p.locationLng;
+        if (!lat || !lng) {
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(p.location)}&limit=1`);
+            const d = await r.json();
+            if (d[0]) { lat = parseFloat(d[0].lat); lng = parseFloat(d[0].lon); }
+          } catch (e) { /* ignore */ }
+        }
+        if (!lat || !lng) return;
+        document.getElementById('map-iframe').src =
+          `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01}%2C${lat-0.008}%2C${lng+0.01}%2C${lat+0.008}&layer=mapnik&marker=${lat}%2C${lng}`;
+        document.getElementById('map-external-link').href = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`;
+        document.getElementById('map-overlay').classList.add('open');
+      };
     }
+    document.getElementById('map-close').onclick = () => document.getElementById('map-overlay').classList.remove('open');
+    document.getElementById('map-overlay').addEventListener('click', e => { if (e.target.id === 'map-overlay') e.currentTarget.classList.remove('open'); });
 
     // Website
     if (p.website?.trim()) {
@@ -1058,11 +1121,46 @@ async function load(leadwaseId) {
         lnk.addEventListener('click', () => recordAnalytics('click_google_review', leadwaseId));
         document.getElementById('pf-google-review-wrap').style.display = 'block';
       }
-      if (p.contactActive && p.contactLink?.trim()) {
+      if (p.contactActive && Array.isArray(p.contactFields) && p.contactFields.length) {
         document.getElementById('contact-form-message').textContent = p.contactMessage || 'Contactez-moi via le formulaire';
-        const lnk = document.getElementById('contact-form-link');
-        lnk.href = p.contactLink.startsWith('http') ? p.contactLink : `https://${p.contactLink}`;
-        lnk.addEventListener('click', () => recordAnalytics('click_contact_form', leadwaseId));
+        const fieldsWrap = document.getElementById('contact-form-fields');
+        fieldsWrap.innerHTML = p.contactFields.map(f => {
+          const inputEl = f.type === 'textarea'
+            ? `<textarea id="cf-${f.id}" rows="3" ${f.required ? 'required' : ''}></textarea>`
+            : `<input id="cf-${f.id}" type="${f.type === 'email' ? 'email' : f.type === 'tel' ? 'tel' : 'text'}" ${f.required ? 'required' : ''}>`;
+          return `<div class="cf-field-group"><label>${f.label}${f.required ? ' *' : ''}</label>${inputEl}</div>`;
+        }).join('');
+
+        document.getElementById('contact-form-submit').onclick = async () => {
+          const err = document.getElementById('contact-form-err');
+          err.textContent = '';
+          const values = {};
+          for (const f of p.contactFields) {
+            const el  = document.getElementById('cf-' + f.id);
+            const val = el.value.trim();
+            if (f.required && !val) { err.textContent = `Le champ "${f.label}" est obligatoire.`; el.focus(); return; }
+            values[f.label] = val;
+          }
+          const btn = document.getElementById('contact-form-submit');
+          btn.disabled = true; btn.textContent = 'Envoi...';
+          try {
+            const source = document.referrer ? 'lien_direct' : 'nfc';
+            const res = await fetch(`/api/profile/${leadwaseId}?action=submit-contact-form`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ values, source }),
+            });
+            const d = await res.json();
+            if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+            document.getElementById('contact-form-fields').style.display = 'none';
+            document.getElementById('contact-form-submit').style.display = 'none';
+            document.getElementById('contact-form-success').style.display = 'block';
+            recordAnalytics('click_contact_form', leadwaseId);
+          } catch (e) {
+            err.textContent = 'Erreur : ' + e.message;
+            btn.disabled = false; btn.textContent = 'Envoyer';
+          }
+        };
         document.getElementById('pf-contact-form-wrap').style.display = 'block';
       }
     }
