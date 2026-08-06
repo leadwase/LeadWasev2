@@ -37,6 +37,7 @@
       <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
       <a class="sb-item" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
       <a class="sb-item" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" href="messages.html" id="nav-messages"><span class="ico">✉️</span> Messages</a>
       <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
       <a class="sb-item active" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
       <div class="sb-section">Finances</div>
@@ -67,6 +68,14 @@
 
           <div class="card">
             <div class="card-head"><span class="card-title">Demandes B2B</span><button class="act-btn btn-view" onclick="loadB2B()">↻ Actualiser</button></div>
+            <div class="filter-bar" style="padding:14px 20px 0">
+              <input class="filter-input" id="filter-search" placeholder="🔍 Rechercher (entreprise, responsable, email)..." style="min-width:280px">
+              <select class="filter-input" id="filter-status">
+                <option value="">Tous les statuts</option>
+                <option value="b2b_pending">En cours</option>
+                <option value="b2b_done">Traité</option>
+              </select>
+            </div>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Référence</th><th>Entreprise</th><th>Responsable</th><th>Email</th><th>Téléphone</th><th>Quantité</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
@@ -92,31 +101,53 @@
 <script type="module">
 import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
 
+let allB2B = [];
+
+function renderB2BTable(rows) {
+  const tbody = document.getElementById('b2b-body');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
+  tbody.innerHTML = rows.map(o => `<tr>
+    <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
+    <td style="font-weight:600">${o.company||'—'}</td>
+    <td>${o.firstName||'—'}</td>
+    <td style="color:var(--gray4)">${o.email||'—'}</td>
+    <td style="color:var(--gray4)">${o.phone||'—'}</td>
+    <td style="color:var(--gray4)">${o.quantity||'—'}</td>
+    <td style="color:var(--gray4);font-size:13px">${fmtDate(o.createdAt)}</td>
+    <td>${badge(o.status)}</td>
+    <td><a href="mailto:${o.email}" class="act-btn btn-gen" style="text-decoration:none">Répondre</a></td>
+  </tr>`).join('');
+}
+
+function applyB2BFilters() {
+  const q      = document.getElementById('filter-search').value.trim().toLowerCase();
+  const status = document.getElementById('filter-status').value;
+  let rows = allB2B;
+  if (status) rows = rows.filter(o => o.status === status);
+  if (q) rows = rows.filter(o =>
+    (o.company||'').toLowerCase().includes(q) ||
+    (o.firstName||'').toLowerCase().includes(q) ||
+    (o.email||'').toLowerCase().includes(q)
+  );
+  renderB2BTable(rows);
+}
+
 window.loadB2B = async () => {
   const tbody = document.getElementById('b2b-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Chargement...</td></tr>';
   try {
     const d = await api('b2b');
     if (!d.success) throw new Error(d.error);
-    const orders = d.orders;
-    const count  = orders.filter(o => o.status === 'b2b_pending').length;
-    document.getElementById('sb-b2b-count').textContent = count;
-    if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Aucune demande B2B</td></tr>'; return; }
-    tbody.innerHTML = orders.map(o => `<tr>
-      <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
-      <td style="font-weight:600">${o.company||'—'}</td>
-      <td>${o.firstName||'—'}</td>
-      <td style="color:var(--gray4)">${o.email||'—'}</td>
-      <td style="color:var(--gray4)">${o.phone||'—'}</td>
-      <td style="color:var(--gray4)">${o.quantity||'—'}</td>
-      <td style="color:var(--gray4);font-size:13px">${fmtDate(o.createdAt)}</td>
-      <td>${badge(o.status)}</td>
-      <td><a href="mailto:${o.email}" class="act-btn btn-gen" style="text-decoration:none">Répondre</a></td>
-    </tr>`).join('');
+    allB2B = d.orders;
+    document.getElementById('sb-b2b-count').textContent = allB2B.filter(o => o.status === 'b2b_pending').length;
+    applyB2BFilters();
   } catch(e) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="9" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
+
+document.getElementById('filter-search').addEventListener('input', applyB2BFilters);
+document.getElementById('filter-status').addEventListener('change', applyB2BFilters);
 
 initAuth(() => window.loadB2B());
 

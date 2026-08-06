@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Messages — Admin LeadWase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Lead<em>Wase</em></div>
+    <div class="login-badge">Administration</div>
+    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com"></div>
+    <div class="fl"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="••••••••••"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ APP ══ -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-text">Lead<em>Wase</em></div>
+        <div class="sb-logo-sub">Administration</div>
+      </div>
+      <div class="sb-section">Principal</div>
+      <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
+      <a class="sb-item" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
+      <a class="sb-item" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item active" href="messages.html" id="nav-messages"><span class="ico">✉️</span> Messages</a>
+      <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
+      <a class="sb-item" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
+      <div class="sb-section">Finances</div>
+      <a class="sb-item" href="paiements.html" id="nav-paiements"><span class="ico">💳</span> Paiements</a>
+      <a class="sb-item" href="abonnements.html" id="nav-abonnements"><span class="ico">🔄</span> Abonnements</a>
+      <div class="sb-section">Système</div>
+      <a class="sb-item" href="parametres.html" id="nav-parametres"><span class="ico">⚙️</span> Paramètres</a>
+      <a class="sb-item" href="notifications.html" id="nav-notifications"><span class="ico">🔔</span> Notifications</a>
+      <div class="sb-bottom">
+        <div class="sb-user" id="sb-user-email">—</div>
+        <button class="sb-logout" onclick="doLogout()">Déconnexion</button>
+      </div>
+    </aside>
+    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+    <div class="main-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <span class="page-title" id="page-title">Messages</span>
+        </div>
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+
+      <div class="content">
+
+        <div class="msg-layout">
+
+          <!-- Destinataires -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Destinataires</span>
+              <span id="msg-selected-count" style="font-size:15px;color:var(--gray4)">0 sélectionné(s)</span>
+            </div>
+            <div style="padding:16px 20px 0">
+              <label class="msg-radio-row">
+                <input type="radio" name="msg-target" id="msg-target-all" checked>
+                Tous les utilisateurs <span id="msg-total-count" style="color:var(--gray4)"></span>
+              </label>
+              <label class="msg-radio-row">
+                <input type="radio" name="msg-target" id="msg-target-selected">
+                Sélection manuelle
+              </label>
+            </div>
+
+            <div id="msg-picker" style="display:none;padding:0 20px 20px">
+              <div class="filter-bar" style="margin-top:10px">
+                <input class="filter-input" id="msg-search" placeholder="🔍 Rechercher (nom, email, ID)...">
+                <select class="filter-input" id="msg-plan-filter" style="min-width:140px">
+                  <option value="">Tous les plans</option>
+                  <option value="free">Free</option>
+                  <option value="pro">Pro</option>
+                  <option value="business">Business</option>
+                </select>
+                <button class="act-btn btn-view" id="msg-select-all-btn">Tout cocher</button>
+                <button class="act-btn btn-view" id="msg-select-none-btn">Tout décocher</button>
+              </div>
+              <div class="msg-user-list" id="msg-user-list">
+                <div class="empty-row" style="padding:20px;text-align:center;color:var(--gray4)">Chargement...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compose -->
+          <div class="card">
+            <div class="card-head"><span class="card-title">Rédiger le message</span></div>
+            <div style="padding:20px">
+              <div class="fl2"><label>Objet</label><input class="filter-input" id="msg-subject" placeholder="Ex : Nouvelle fonctionnalité disponible !" style="width:100%"></div>
+              <div class="fl2" style="margin-top:14px"><label>Message</label>
+                <textarea id="msg-body" rows="10" placeholder="Rédigez votre message ici..." style="width:100%;padding:12px;border:1px solid var(--gray5);font-family:'DM Sans',sans-serif;font-size:20px;color:var(--gray1);resize:vertical;box-sizing:border-box"></textarea>
+              </div>
+              <div id="msg-feedback" style="margin-top:12px;font-size:15px"></div>
+              <button class="act-btn btn-gen" id="msg-send-btn" style="margin-top:14px;padding:11px 24px">Envoyer le message</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main-wrap -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<script type="module">
+import { initAuth, api } from './js/admin-shared.js';
+
+let allUsers = [];
+let selectedIds = new Set();
+
+function renderUserList() {
+  const search = document.getElementById('msg-search').value.trim().toLowerCase();
+  const plan   = document.getElementById('msg-plan-filter').value;
+  const list   = document.getElementById('msg-user-list');
+
+  let rows = allUsers;
+  if (plan) rows = rows.filter(u => u.plan === plan);
+  if (search) rows = rows.filter(u =>
+    u.clientName.toLowerCase().includes(search) ||
+    u.email.toLowerCase().includes(search) ||
+    u.leadwaseId.toLowerCase().includes(search));
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-row" style="padding:20px;text-align:center;color:var(--gray4)">Aucun utilisateur trouvé</div>';
+    return;
+  }
+  list.innerHTML = rows.map(u => `
+    <label class="msg-user-row">
+      <input type="checkbox" class="msg-user-check" data-id="${u.leadwaseId}" ${selectedIds.has(u.leadwaseId) ? 'checked' : ''}>
+      <span style="font-weight:600">${u.clientName || u.leadwaseId}</span>
+      <span style="color:var(--gray4);font-size:15px">${u.email}</span>
+      <span class="badge b-pending" style="margin-left:auto">${(u.plan || 'free').toUpperCase()}</span>
+    </label>
+  `).join('');
+
+  list.querySelectorAll('.msg-user-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) selectedIds.add(cb.dataset.id);
+      else selectedIds.delete(cb.dataset.id);
+      updateSelectedCount();
+    });
+  });
+}
+
+function updateSelectedCount() {
+  document.getElementById('msg-selected-count').textContent = `${selectedIds.size} sélectionné(s)`;
+}
+
+async function loadUsers() {
+  try {
+    const d = await api('credentials');
+    if (!d.success) throw new Error(d.error);
+    allUsers = d.credentials.filter(c => c.email && c.email !== '—');
+    document.getElementById('msg-total-count').textContent = `(${allUsers.length})`;
+    renderUserList();
+  } catch (e) {
+    document.getElementById('msg-user-list').innerHTML =
+      `<div class="empty-row" style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
+  }
+}
+
+document.getElementById('msg-target-all').addEventListener('change', () => {
+  document.getElementById('msg-picker').style.display = 'none';
+});
+document.getElementById('msg-target-selected').addEventListener('change', () => {
+  document.getElementById('msg-picker').style.display = 'block';
+});
+document.getElementById('msg-search').addEventListener('input', renderUserList);
+document.getElementById('msg-plan-filter').addEventListener('change', renderUserList);
+document.getElementById('msg-select-all-btn').addEventListener('click', () => {
+  allUsers.forEach(u => selectedIds.add(u.leadwaseId));
+  renderUserList(); updateSelectedCount();
+});
+document.getElementById('msg-select-none-btn').addEventListener('click', () => {
+  selectedIds.clear();
+  renderUserList(); updateSelectedCount();
+});
+
+document.getElementById('msg-send-btn').onclick = async () => {
+  const subject = document.getElementById('msg-subject').value.trim();
+  const message = document.getElementById('msg-body').value.trim();
+  const feedback = document.getElementById('msg-feedback');
+  const btn = document.getElementById('msg-send-btn');
+  feedback.textContent = ''; feedback.style.color = '';
+
+  if (!subject || !message) { feedback.textContent = 'Objet et message requis.'; feedback.style.color = 'var(--red)'; return; }
+
+  const useAll = document.getElementById('msg-target-all').checked;
+  const recipients = useAll ? 'all' : Array.from(selectedIds);
+  if (!useAll && !recipients.length) { feedback.textContent = 'Sélectionnez au moins un destinataire.'; feedback.style.color = 'var(--red)'; return; }
+
+  const count = useAll ? allUsers.length : recipients.length;
+  if (!confirm(`Envoyer ce message à ${count} utilisateur(s) ?`)) return;
+
+  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+  try {
+    const d = await api('credentials?action=send-message', {
+      method: 'POST',
+      body: JSON.stringify({ recipients, subject, message }),
+    });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    feedback.style.color = 'var(--green)';
+    feedback.textContent = `✅ Message envoyé à ${d.sent}/${d.total} destinataire(s)${d.failed ? ` (${d.failed} échec(s))` : ''}.`;
+    document.getElementById('msg-subject').value = '';
+    document.getElementById('msg-body').value = '';
+  } catch (e) {
+    feedback.style.color = 'var(--red)';
+    feedback.textContent = 'Erreur : ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Envoyer le message';
+  }
+};
+
+initAuth(() => loadUsers());
+</script>
+</body>
+</html>

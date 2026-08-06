@@ -37,6 +37,7 @@
       <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
       <a class="sb-item" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
       <a class="sb-item active" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" href="messages.html" id="nav-messages"><span class="ico">✉️</span> Messages</a>
       <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
       <a class="sb-item" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
       <div class="sb-section">Finances</div>
@@ -67,6 +68,9 @@
 
           <div class="card">
             <div class="card-head"><span class="card-title">Profils créés</span><button class="act-btn btn-view" onclick="loadProfiles()">↻ Actualiser</button></div>
+            <div class="filter-bar" style="padding:14px 20px 0">
+              <input class="filter-input" id="filter-search" placeholder="🔍 Rechercher (nom, email, ID, téléphone)..." style="min-width:280px">
+            </div>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>ID LeadWase</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Plan</th><th>Date</th></tr></thead>
@@ -92,26 +96,44 @@
 <script type="module">
 import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
 
+let allProfiles = [];
+
+function renderProfilesTable(rows) {
+  const tbody = document.getElementById('profiles-body');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun profil trouvé</td></tr>'; return; }
+  tbody.innerHTML = rows.map(o => `<tr>
+    <td style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700">${o.leadwaseId}</td>
+    <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
+    <td style="color:var(--gray4)">${o.email||'—'}</td>
+    <td style="color:var(--gray4)">${o.phone||'—'}</td>
+    <td>${badge('free')}</td>
+    <td style="color:var(--gray4)">${fmtDate(o.paidAt||o.createdAt)}</td>
+  </tr>`).join('');
+}
+
 window.loadProfiles = async () => {
   const tbody = document.getElementById('profiles-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Chargement...</td></tr>';
   try {
     const d = await api('orders');
     if (!d.success) throw new Error(d.error);
-    const delivered = d.orders.filter(o => o.leadwaseId);
-    if (!delivered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun profil créé</td></tr>'; return; }
-    tbody.innerHTML = delivered.map(o => `<tr>
-      <td style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700">${o.leadwaseId}</td>
-      <td style="font-weight:600">${o.firstName||''} ${o.lastName||''}</td>
-      <td style="color:var(--gray4)">${o.email||'—'}</td>
-      <td style="color:var(--gray4)">${o.phone||'—'}</td>
-      <td>${badge('free')}</td>
-      <td style="color:var(--gray4)">${fmtDate(o.paidAt||o.createdAt)}</td>
-    </tr>`).join('');
+    allProfiles = d.orders.filter(o => o.leadwaseId);
+    renderProfilesTable(allProfiles);
   } catch(e) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="6" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
+
+document.getElementById('filter-search').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) return renderProfilesTable(allProfiles);
+  renderProfilesTable(allProfiles.filter(o =>
+    `${o.firstName||''} ${o.lastName||''}`.toLowerCase().includes(q) ||
+    (o.email||'').toLowerCase().includes(q) ||
+    (o.leadwaseId||'').toLowerCase().includes(q) ||
+    (o.phone||'').toLowerCase().includes(q)
+  ));
+});
 
 initAuth(() => window.loadProfiles());
 

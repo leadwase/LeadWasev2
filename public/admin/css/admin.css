@@ -208,3 +208,18 @@ select.f-input{cursor:pointer}
   .filter-group .filter-input{min-width:140px}.settings-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr}}
+
+/* ── Page Messages ─────────────────────────────────────────────────── */
+.msg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media(max-width: 1000px) { .msg-layout { grid-template-columns: 1fr; } }
+
+.msg-radio-row { display: flex; align-items: center; gap: 8px; font-size:20px; color: var(--gray1); padding: 8px 0; cursor: pointer; }
+.msg-radio-row input { accent-color: var(--green); width: 15px; height: 15px; }
+
+.msg-user-list { max-height: 360px; overflow-y: auto; border: 1px solid var(--gray5); margin-top: 12px; }
+.msg-user-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--gray6); font-size:15px; cursor: pointer; }
+.msg-user-row:last-child { border-bottom: none; }
+.msg-user-row:hover { background: var(--gray6); }
+.msg-user-row input { accent-color: var(--green); width: 14px; height: 14px; flex-shrink: 0; }
+
+.fl2 label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--gray3); margin-bottom: 6px; }

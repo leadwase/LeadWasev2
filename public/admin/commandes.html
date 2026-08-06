@@ -37,6 +37,7 @@
       <a class="sb-item" href="dashboard.html" id="nav-dashboard"><span class="ico">📊</span> Tableau de bord</a>
       <a class="sb-item active" href="commandes.html" id="nav-commandes"><span class="ico">📦</span> Commandes<span class="sb-badge" id="sb-pending-count">0</span></a>
       <a class="sb-item" href="utilisateurs.html" id="nav-utilisateurs"><span class="ico">👤</span> Utilisateurs</a>
+      <a class="sb-item" href="messages.html" id="nav-messages"><span class="ico">✉️</span> Messages</a>
       <a class="sb-item" href="credentials.html" id="nav-credentials"><span class="ico">🔑</span> Credentials<span class="sb-badge" id="sb-cred-count">0</span></a>
       <a class="sb-item" href="b2b.html" id="nav-b2b"><span class="ico">📋</span> Devis B2B<span class="sb-badge" id="sb-b2b-count">0</span></a>
       <div class="sb-section">Finances</div>
@@ -67,6 +68,21 @@
 
           <div class="card">
             <div class="card-head"><span class="card-title">Toutes les commandes</span><button class="act-btn btn-view" onclick="loadAllOrders()">↻ Actualiser</button></div>
+            <div class="filter-bar" style="padding:14px 20px 0">
+              <input class="filter-input" id="filter-search" placeholder="🔍 Rechercher (client, ID, email)..." style="min-width:260px">
+              <select class="filter-input" id="filter-status">
+                <option value="">Tous les statuts</option>
+                <option value="pending">En attente</option>
+                <option value="paid">Payé</option>
+                <option value="delivered">Livré</option>
+                <option value="failed">Échoué</option>
+              </select>
+              <select class="filter-input" id="filter-type">
+                <option value="">Tous les types</option>
+                <option value="b2b">B2B</option>
+                <option value="classic">Classique</option>
+              </select>
+            </div>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Commande</th><th>Client</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th><th>ID LeadWase</th><th>Action</th></tr></thead>
@@ -92,18 +108,46 @@
 <script type="module">
 import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
 
+let allOrders = [];
+
+function renderOrdersTable(rows) {
+  const tbody = document.getElementById('all-orders-body');
+  if (!rows.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucune commande</td></tr>'; return; }
+  tbody.innerHTML = rows.map(o => orderRow(o, true)).join('');
+}
+
+function applyOrderFilters() {
+  const q      = document.getElementById('filter-search').value.trim().toLowerCase();
+  const status = document.getElementById('filter-status').value;
+  const type   = document.getElementById('filter-type').value;
+  let rows = allOrders;
+  if (status) rows = rows.filter(o => o.status === status);
+  if (type)   rows = rows.filter(o => (type === 'b2b' ? o.cardType === 'b2b' : o.cardType !== 'b2b'));
+  if (q) rows = rows.filter(o =>
+    `${o.firstName||''} ${o.lastName||''}`.toLowerCase().includes(q) ||
+    (o.email||'').toLowerCase().includes(q) ||
+    (o.leadwaseId||'').toLowerCase().includes(q) ||
+    (o.id||'').toLowerCase().includes(q)
+  );
+  renderOrdersTable(rows);
+}
+
 window.loadAllOrders = async () => {
   const tbody = document.getElementById('all-orders-body');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Chargement...</td></tr>';
   try {
     const d = await api('orders');
     if (!d.success) throw new Error(d.error);
-    if (!d.orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucune commande</td></tr>'; return; }
-    tbody.innerHTML = d.orders.map(o => orderRow(o, true)).join('');
+    allOrders = d.orders;
+    applyOrderFilters();
   } catch(e) {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="8" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
+
+document.getElementById('filter-search').addEventListener('input', applyOrderFilters);
+document.getElementById('filter-status').addEventListener('change', applyOrderFilters);
+document.getElementById('filter-type').addEventListener('change', applyOrderFilters);
 
 initAuth(() => window.loadAllOrders());
 document.addEventListener('admin:orders-updated', () => window.loadAllOrders());
