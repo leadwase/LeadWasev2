@@ -3,12 +3,15 @@
 // authentification Firebase, appel API, sidebar, helpers de formatage, modal.
 
 import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, getIdToken }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, getIdToken, setPersistence, browserSessionPersistence }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 const cfg  = await fetch('/api/config').then(r => r.json());
 const app  = initializeApp(cfg);
 const auth = getAuth(app);
+// Session isolée par onglet : évite qu'une connexion admin écrase une session
+// utilisateur ouverte ailleurs dans le même navigateur (et inversement).
+await setPersistence(auth, browserSessionPersistence);
 let TOKEN  = null;
 
 // ── API helper ────────────────────────────────────────────────
