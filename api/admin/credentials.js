@@ -71,10 +71,11 @@ async function sendMessage(req, res) {
   const results = await Promise.allSettled(
     targets.map(t => sendAdminMessage({ to: t.email, firstName: t.firstName, subject, message }))
   );
-  const sent   = results.filter(r => r.status === 'fulfilled').length;
-  const failed = results.length - sent;
+  const sent    = results.filter(r => r.status === 'fulfilled').length;
+  const failed  = results.length - sent;
+  const firstError = results.find(r => r.status === 'rejected')?.reason?.message;
 
-  res.json({ success: true, sent, failed, total: targets.length });
+  res.json({ success: true, sent, failed, total: targets.length, firstError });
 }
 
 export default async function handler(req, res) {

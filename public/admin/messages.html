@@ -221,7 +221,7 @@ document.getElementById('msg-send-btn').onclick = async () => {
     });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     feedback.style.color = 'var(--green)';
-    feedback.textContent = `✅ Message envoyé à ${d.sent}/${d.total} destinataire(s)${d.failed ? ` (${d.failed} échec(s))` : ''}.`;
+    feedback.textContent = `✅ Message envoyé à ${d.sent}/${d.total} destinataire(s)${d.failed ? ` (${d.failed} échec(s) — ${d.firstError || 'raison inconnue'})` : ''}.`;
     document.getElementById('msg-subject').value = '';
     document.getElementById('msg-body').value = '';
   } catch (e) {
