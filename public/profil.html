@@ -623,6 +623,25 @@ svg.icon-lg { width: 22px; height: 22px; }
   transition: background .2s;
 }
 .contact-form-link:hover { background: var(--green); }
+
+/* ─── Google Reviews card (avis en direct) ────────── */
+.reviews-card {
+  margin-top: 12px; padding: 20px 22px;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.reviews-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.reviews-score { font-size: 32px; font-weight: 800; color: var(--black); line-height: 1; }
+.reviews-stars { color: #f5b400; font-size: 16px; letter-spacing: 1px; }
+.reviews-count { font-size:15px; color: var(--text-muted); margin-top: 2px; }
+.review-item { padding: 12px 0; border-top: 1px solid var(--border); }
+.review-item:first-child { border-top: none; padding-top: 0; }
+.review-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.review-item-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; background: var(--gray5, #eee); }
+.review-item-author { font-size:15px; font-weight: 600; color: var(--black); }
+.review-item-stars { color: #f5b400; font-size: 12px; }
+.review-item-time { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+.review-item-text { font-size:16px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.reviews-all-link { display: block; margin-top: 12px; text-align: center; font-size: 15px; color: var(--green); text-decoration: underline; }
 .cf-field-group { margin-bottom: 12px; }
 .cf-field-group label { display: block; font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
 .cf-field-group input, .cf-field-group textarea {
@@ -864,7 +883,20 @@ svg.icon-lg { width: 22px; height: 22px; }
 
   <!-- Google Reviews (Business) -->
   <div id="pf-google-review-wrap" style="display:none" class="a5">
-    <a class="google-reviews" id="google-review-link" href="#" target="_blank">
+    <!-- Version enrichie : note + avis récents, chargée automatiquement si un Place ID est configuré -->
+    <div class="reviews-card" id="reviews-card" style="display:none">
+      <div class="reviews-head">
+        <div class="reviews-score" id="reviews-score">–</div>
+        <div>
+          <div class="reviews-stars" id="reviews-stars">★★★★★</div>
+          <div class="reviews-count" id="reviews-count"></div>
+        </div>
+      </div>
+      <div class="reviews-list" id="reviews-list"></div>
+      <a class="reviews-all-link" id="reviews-all-link" href="#" target="_blank" rel="noopener">Voir tous les avis sur Google →</a>
+    </div>
+    <!-- Version simple (repli) : juste un lien, si pas de Place ID configuré -->
+    <a class="google-reviews" id="google-review-link" href="#" target="_blank" style="display:none">
       <div class="google-stars">
         <svg><use href="#icon-star"/></svg>
         <svg><use href="#icon-star"/></svg>
@@ -966,6 +998,50 @@ import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/fi
 
 const id = new URLSearchParams(window.location.search).get('id');
 if (!id) showErr(); else load(id.toUpperCase());
+
+async function loadGoogleReviews(leadwaseId, fallbackLink) {
+  try {
+    const res = await fetch(`/api/profile/${leadwaseId}?action=google-reviews`);
+    const d = await res.json();
+    if (!d.success || !d.configured || !d.rating) {
+      // Pas de données exploitables (clé API absente côté serveur, etc.) : repli sur le simple lien.
+      if (fallbackLink?.trim()) {
+        const lnk = document.getElementById('google-review-link');
+        lnk.style.display = 'flex';
+        lnk.href = fallbackLink.startsWith('http') ? fallbackLink : `https://${fallbackLink}`;
+      }
+      return;
+    }
+    const card = document.getElementById('reviews-card');
+    document.getElementById('reviews-score').textContent = d.rating.toFixed(1);
+    document.getElementById('reviews-stars').textContent = '★'.repeat(Math.round(d.rating)) + '☆'.repeat(5 - Math.round(d.rating));
+    document.getElementById('reviews-count').textContent = `${d.totalRatings} avis Google`;
+    document.getElementById('reviews-list').innerHTML = (d.reviews || []).slice(0, 3).map(rv => `
+      <div class="review-item">
+        <div class="review-item-head">
+          ${rv.profilePhoto ? `<img class="review-item-avatar" src="${rv.profilePhoto}" alt="">` : ''}
+          <span class="review-item-author">${rv.author}</span>
+          <span class="review-item-time">${rv.relativeTime || ''}</span>
+        </div>
+        <div class="review-item-stars">${'★'.repeat(rv.rating)}${'☆'.repeat(5 - rv.rating)}</div>
+        <div class="review-item-text">${(rv.text || '').replace(/</g, '&lt;')}</div>
+      </div>
+    `).join('');
+    const allLink = document.getElementById('reviews-all-link');
+    const target = fallbackLink?.trim() || d.mapsUrl;
+    if (target) { allLink.href = target.startsWith('http') ? target : `https://${target}`; }
+    else { allLink.style.display = 'none'; }
+    allLink.addEventListener('click', () => recordAnalytics('click_google_review', leadwaseId));
+    card.style.display = 'block';
+  } catch (e) {
+    console.error('loadGoogleReviews', e);
+    if (fallbackLink?.trim()) {
+      const lnk = document.getElementById('google-review-link');
+      lnk.style.display = 'flex';
+      lnk.href = fallbackLink.startsWith('http') ? fallbackLink : `https://${fallbackLink}`;
+    }
+  }
+}
 
 async function recordAnalytics(type, leadwaseId) {
   if (!leadwaseId) return;
@@ -1142,8 +1218,12 @@ async function load(leadwaseId) {
         });
         document.getElementById('pf-appointment-wrap').style.display = 'block';
       }
-      if (p.googleReview?.trim()) {
+      if (p.googlePlaceId?.trim()) {
+        document.getElementById('pf-google-review-wrap').style.display = 'block';
+        loadGoogleReviews(leadwaseId, p.googleReview);
+      } else if (p.googleReview?.trim()) {
         const lnk = document.getElementById('google-review-link');
+        lnk.style.display = 'flex';
         lnk.href = p.googleReview.startsWith('http') ? p.googleReview : `https://${p.googleReview}`;
         lnk.addEventListener('click', () => recordAnalytics('click_google_review', leadwaseId));
         document.getElementById('pf-google-review-wrap').style.display = 'block';

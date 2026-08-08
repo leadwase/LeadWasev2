@@ -181,6 +181,55 @@ function getPublicCode(lwId) {
   return `LW-${positiveHash}`;
 }
 
+// GET /api/profile/[id]?action=google-reviews — public. Récupère la note +
+// les derniers avis Google via l'API Google Places (Place Details), avec un
+// cache Firestore de 6h pour limiter le coût des appels API.
+const REVIEWS_CACHE_MS = 6 * 60 * 60 * 1000;
+
+async function getGoogleReviews(req, res, leadwaseId) {
+  const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
+  if (!profileDoc.exists) return res.status(404).json({ success: false, error: 'Profil introuvable' });
+  const p = profileDoc.data();
+
+  if (!p.googlePlaceId) {
+    return res.json({ success: true, configured: false });
+  }
+
+  const cache = p.reviewsCache;
+  if (cache && cache.fetchedAt && (Date.now() - cache.fetchedAt) < REVIEWS_CACHE_MS) {
+    return res.json({ success: true, configured: true, ...cache.data, cached: true });
+  }
+
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey) {
+    // Pas de clé configurée côté serveur : on retourne le cache existant (même expiré) si dispo.
+    if (cache?.data) return res.json({ success: true, configured: true, ...cache.data, cached: true, stale: true });
+    return res.json({ success: false, configured: true, error: 'GOOGLE_PLACES_API_KEY non configurée côté serveur' });
+  }
+
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(p.googlePlaceId)}&fields=rating,user_ratings_total,reviews,url&language=fr&key=${apiKey}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  if (d.status !== 'OK') {
+    console.error('[getGoogleReviews] Places API error:', d.status, d.error_message);
+    if (cache?.data) return res.json({ success: true, configured: true, ...cache.data, cached: true, stale: true });
+    return res.json({ success: false, configured: true, error: d.error_message || d.status });
+  }
+
+  const data = {
+    rating:      d.result.rating || 0,
+    totalRatings: d.result.user_ratings_total || 0,
+    mapsUrl:     d.result.url || '',
+    reviews: (d.result.reviews || []).slice(0, 5).map(rv => ({
+      author: rv.author_name, rating: rv.rating, text: rv.text,
+      relativeTime: rv.relative_time_description, profilePhoto: rv.profile_photo_url,
+    })),
+  };
+
+  await profileDoc.ref.set({ reviewsCache: { data, fetchedAt: Date.now() } }, { merge: true });
+  res.json({ success: true, configured: true, ...data });
+}
+
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
@@ -212,6 +261,10 @@ export default async function handler(req, res) {
     if (action === 'clear-prospects' && req.method === 'POST') {
       return clearProspects(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'google-reviews' && req.method === 'GET') {
+      return getGoogleReviews(req, res, leadwaseId).catch(e =>
+        res.status(500).json({ success: false, error: e.message }));
     }
 
     console.log(`🔍 Recherche du profil: ${leadwaseId}`);

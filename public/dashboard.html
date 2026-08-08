@@ -8,6 +8,10 @@
 <title>Mon profil — LeadWase</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/app-dashboard.css">
+<style>
+  .app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
+  #content.dash { max-width: 900px; width: 100%; margin: 0; padding: 0; }
+</style>
 </head>
 <body>
 
@@ -161,19 +165,19 @@
           <div class="extras-section" id="google-review-section" style="display:none">
             <h3>⭐ Avis Google</h3>
             <div class="edit-grid edit-solo">
-              <div class="f-group"><label class="f-label">Lien vers vos avis Google</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
+              <div class="f-group">
+                <label class="f-label">ID de fiche établissement Google (Place ID)</label>
+                <input class="f-input" id="e-google-place-id" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4">
+                <div class="f-hint">
+                  Permet d'afficher automatiquement votre note et vos derniers avis Google sur votre profil.
+                  <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" style="color:var(--green)">Trouver mon Place ID →</a>
+                </div>
+              </div>
+              <div class="f-group"><label class="f-label">Lien "Voir tous les avis" (optionnel)</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
             </div>
             <div class="review-preview" id="review-preview" style="display:none">
               <span class="stars">★★★★★</span>
               <span>Voir nos avis sur Google →</span>
-            </div>
-            <div class="ai-box" id="ai-review-box" style="display:none">
-              <strong style="font-size:13px">🤖 Réponse automatique aux avis <span class="biz-tag">BUSINESS</span></strong>
-              <p>Activez la réponse IA automatique à vos nouveaux avis Google.</p>
-              <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
-                <input type="checkbox" id="ai-review-toggle" style="accent-color:var(--green);width:13px;height:13px">
-                Activer les réponses automatiques
-              </label>
             </div>
           </div>
 
@@ -481,10 +485,10 @@ window.saveExtras = async () => {
       data.rdvLink         = document.getElementById('e-rdv').value.trim();
       data.rdvLabel        = document.getElementById('e-rdv-label').value.trim();
       data.googleReview    = document.getElementById('e-google-review').value.trim();
+      data.googlePlaceId   = document.getElementById('e-google-place-id').value.trim();
       data.contactMessage  = document.getElementById('e-contact-msg').value.trim();
       data.contactActive   = document.getElementById('e-contact-active').checked;
       data.contactFields   = contactFields.filter(f => f.label.trim()).map(f => ({ ...f, label: f.label.trim() }));
-      data.aiReviewEnabled = document.getElementById('ai-review-toggle').checked;
     }
     await updateDoc(doc(db, 'profiles', lwId), data);
     if (data.googleReview) document.getElementById('review-preview').style.display = 'flex';
@@ -540,9 +544,8 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
       document.getElementById('e-rdv-label').value = p.rdvLabel || 'Prendre rendez-vous';
       document.getElementById('google-review-section').style.display = 'block';
       document.getElementById('e-google-review').value = p.googleReview || '';
+      document.getElementById('e-google-place-id').value = p.googlePlaceId || '';
       if (p.googleReview) document.getElementById('review-preview').style.display = 'flex';
-      document.getElementById('ai-review-box').style.display = 'block';
-      document.getElementById('ai-review-toggle').checked = p.aiReviewEnabled || false;
       document.getElementById('contact-section').style.display = 'block';
       document.getElementById('e-contact-msg').value  = p.contactMessage || '';
       document.getElementById('e-contact-active').checked = p.contactActive || false;
