@@ -4,18 +4,15 @@
 // de la sidebar, helpers partagés.
 
 import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence }
+import { getAuth, onAuthStateChanged, signOut }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { getFirestore, doc, getDoc }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 const cfg  = await fetch('/api/config').then(r => r.json());
-const app  = initializeApp(cfg);
+const app  = initializeApp(cfg, 'client-app');
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
-// Session isolée par onglet : évite qu'une connexion client écrase une session
-// admin ouverte ailleurs dans le même navigateur (et inversement).
-await setPersistence(auth, browserSessionPersistence);
 
 export function lwIdFromInternalEmail(email) {
   if (!email) return null;
