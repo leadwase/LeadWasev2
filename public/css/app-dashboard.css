@@ -357,21 +357,21 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   word-break: break-all;
 }
 
-.pwd-section {
-  border-top: 1px solid var(--gray5);
-  padding-top: 22px;
-}
-.pwd-section h3 {
-  font-size:16px;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-.pwd-section .pwd-desc {
+.pwd-desc {
   font-size:14px;
   color: var(--gray3);
   font-style: italic;
   margin-bottom: 18px;
+  line-height: 1.6;
 }
+
+.security-tips-list { list-style: none; padding: 0; margin: 0; }
+.security-tips-list li {
+  font-size:14px; color: var(--gray2); line-height: 1.6;
+  padding: 10px 0; border-bottom: 1px dotted var(--gray5);
+}
+.security-tips-list li:last-child { border-bottom: none; }
+.security-tips-list strong { color: var(--black); display: block; margin-bottom: 2px; }
 
 .pwd-grid {
   display: grid;

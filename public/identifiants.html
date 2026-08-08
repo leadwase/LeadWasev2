@@ -11,6 +11,13 @@
 <style>
   .app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
   #content.dash { max-width: none; width: 100%; margin: 0; padding: 0; }
+  @media (min-width: 900px) {
+    #content.dash { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+    #content.dash > .dash-header { flex: 1 1 100%; }
+    #content.dash > .credentials-card,
+    #content.dash > .security-tips-card { flex: 1 1 380px; }
+    #content.dash > .pwd-card { flex: 2 1 480px; }
+  }
 </style>
 </head>
 <body>
@@ -66,20 +73,23 @@
 
 
 
-        <!-- Infos de connexion -->
+        <!-- Identifiant de connexion -->
         <div class="credentials-card">
-          <div class="card-head"><span class="card-title">🔑 Mes identifiants de connexion</span></div>
+          <div class="card-head"><span class="card-title">🔑 Identifiant de connexion</span></div>
           <div class="card-body">
-          <p class="section-desc">Consultez vos informations de connexion et modifiez votre mot de passe. Ces identifiants vous permettent d'accéder à votre espace LeadWase.</p>
-
+          <p class="section-desc">Cet identifiant vous permet d'accéder à votre espace LeadWase.</p>
           <div class="login-info-box">
             <div class="lib-label">Identifiant LeadWase</div>
             <div class="lib-value" id="cred-lwid">–</div>
           </div>
-          <!-- Section changement de mot de passe -->
-          <div class="pwd-section">
-            <h3>🔒 Modifier mon mot de passe</h3>
-            <p class="pwd-desc">Choisissez un mot de passe sécurisé d'au moins 8 caractères. Il sera utilisé lors de votre prochaine connexion.</p>
+          </div>
+        </div>
+
+        <!-- Modifier mon mot de passe -->
+        <div class="credentials-card pwd-card">
+          <div class="card-head"><span class="card-title">🔒 Modifier mon mot de passe</span></div>
+          <div class="card-body">
+          <p class="pwd-desc">Choisissez un mot de passe sécurisé d'au moins 8 caractères. Il sera utilisé lors de votre prochaine connexion.</p>
 
             <div class="pwd-grid">
               <!-- Mot de passe actuel -->
@@ -121,8 +131,21 @@
               </div>
             </div>
 
-            <button class="save-btn" id="pwd-save-btn" onclick="changePassword()" style="margin-top:18px">Changer le mot de passe</button>
+          <button class="save-btn" id="pwd-save-btn" onclick="changePassword()" style="margin-top:18px">Changer le mot de passe</button>
           </div>
+        </div>
+
+        <!-- Conseils de sécurité -->
+        <div class="credentials-card security-tips-card">
+          <div class="card-head"><span class="card-title">🛡️ Conseils de sécurité</span></div>
+          <div class="card-body">
+            <ul class="security-tips-list">
+              <li><strong>Mot de passe unique</strong> — n'utilisez pas le même mot de passe que sur d'autres sites.</li>
+              <li><strong>Longueur avant tout</strong> — un mot de passe long (12+ caractères) est plus sûr qu'un mot de passe complexe mais court.</li>
+              <li><strong>Gestionnaire de mots de passe</strong> — utilisez-en un pour générer et stocker des mots de passe robustes.</li>
+              <li><strong>Restez vigilant</strong> — LeadWase ne vous demandera jamais votre mot de passe par email ou téléphone.</li>
+              <li><strong>Changez-le régulièrement</strong> — surtout si vous pensez qu'il a pu être exposé.</li>
+            </ul>
           </div>
         </div>
 
