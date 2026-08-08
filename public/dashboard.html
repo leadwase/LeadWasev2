@@ -10,7 +10,17 @@
 <link rel="stylesheet" href="css/app-dashboard.css">
 <style>
   .app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
-  #content.dash { max-width: 900px; width: 100%; margin: 0; padding: 0; }
+  #content.dash { max-width: 1240px; width: 100%; margin: 0; padding: 0; }
+  @media (min-width: 900px) {
+    #content.dash { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+    #content.dash > .dash-header { flex: 1 1 100%; }
+    #content.dash > .card,
+    #content.dash > .locked-card,
+    #content.dash > .plan-compare,
+    #content.dash > .upgrade,
+    #content.dash > .links-card,
+    #content.dash > .extras-card { flex: 1 1 480px; min-width: 0; }
+  }
 </style>
 </head>
 <body>
