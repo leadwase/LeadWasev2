@@ -18,6 +18,7 @@
     #content.dash > .locked-card,
     #content.dash > .plan-compare,
     #content.dash > .upgrade,
+    #content.dash > .analytics-teaser,
     #content.dash > .links-card,
     #content.dash > .extras-card { flex: 1 1 480px; min-width: 0; }
   }
@@ -79,6 +80,8 @@
 
         <!-- ── Profil + Infos ── -->
         <div class="card">
+          <div class="card-head"><span class="card-title">👤 Informations personnelles</span></div>
+          <div class="card-body">
           <div class="profile-top">
             <div class="pf-av" id="pf-av">
               <span id="pf-av-text">?</span>
@@ -118,6 +121,7 @@
             </div>
             <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
           </div>
+          </div>
         </div>
 
         <!-- ── Analytics teaser (Pro/Business) ── -->
@@ -131,7 +135,8 @@
 
         <!-- ── Réseaux sociaux (Pro/Business) ── -->
         <div class="links-card" id="links-sec" style="display:none">
-          <h3>🔗 Réseaux sociaux &amp; liens</h3>
+          <div class="card-head"><span class="card-title">🔗 Réseaux sociaux &amp; liens</span></div>
+          <div class="card-body">
           <div class="link-row"><div class="link-icon">💼</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">LinkedIn</label><input class="f-input" id="l-li" placeholder="https://linkedin.com/in/..."></div></div>
           <div class="link-row"><div class="link-icon">📷</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Instagram</label><input class="f-input" id="l-ig" placeholder="https://instagram.com/..."></div></div>
           <div class="link-row"><div class="link-icon">🎵</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">TikTok</label><input class="f-input" id="l-tk" placeholder="https://tiktok.com/@..."></div></div>
@@ -140,10 +145,13 @@
           <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Twitter / X</label><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
           <div class="link-row"><div class="link-icon">💬</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div></div>
           <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
+          </div>
         </div>
 
         <!-- ── Extras (Business uniquement) ── -->
         <div class="extras-card" id="extras-sec" style="display:none">
+          <div class="card-head"><span class="card-title">⚙️ Fonctionnalités Business</span></div>
+          <div class="card-body">
 
           <div class="extras-section" id="location-section" style="display:none">
             <h3>📍 Localisation</h3>
@@ -208,6 +216,7 @@
           </div>
 
           <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
+          </div>
         </div>
 
         <!-- ── Fonctionnalités verrouillées (Free) ── -->

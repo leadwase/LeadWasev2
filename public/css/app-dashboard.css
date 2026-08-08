@@ -152,6 +152,17 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .dash-pub { font-size:20px; color: var(--green); text-decoration: underline; font-style: italic; }
 
 /* ══════════════════════════════════════════════
+   CARD HEAD (bandeau titre — même anatomie que .pros-card sur Mes Prospects)
+══════════════════════════════════════════════ */
+.card-head {
+  padding: 16px 24px; border-bottom: 1px solid var(--gray5);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+}
+.card-title { font-size:16px; font-weight: 700; color: var(--black); }
+.card-sub   { font-size:13px; color: var(--gray4); margin-top: 3px; }
+.card-body  { padding: 32px; }
+
+/* ══════════════════════════════════════════════
    TABS
 ══════════════════════════════════════════════ */
 .tabs-bar {
@@ -191,7 +202,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 ══════════════════════════════════════════════ */
 .card {
   background: var(--white); border: 1px solid var(--gray5);
-  padding: 32px; margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 .profile-top { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 24px; }
 .pf-av {
@@ -282,7 +293,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .f-label { font-size:10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray3); }
 .f-input, .f-textarea {
   width: 100%; padding: 8px 10px;
-  border: 1px solid var(--gray5); border-radius: 2px;
+  border: 1px solid var(--gray5); border-radius: 3px;
   font-family: var(--serif); font-size:20px; color: var(--black);
   background: var(--white); outline: none; transition: border-color .2s;
 }
@@ -291,17 +302,16 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .f-hint { font-size:12px; color: var(--gray3); font-style: italic; margin-top: 2px; }
 
 .save-btn {
-  padding: 10px 26px;
+  padding: 10px 16px;
   background: var(--black); color: var(--white);
-  border: none; font-family: var(--serif);
-  font-size:14px; font-weight: bold;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  cursor: pointer; transition: background .2s;
-  border-radius: 2px; margin-top: 12px;
+  border: 1px solid var(--black); font-family: var(--serif);
+  font-size:14px; font-weight: 600;
+  cursor: pointer; transition: background .2s, border-color .2s;
+  border-radius: 3px; margin-top: 12px;
   display: inline-block; text-decoration: none; text-align: center;
 }
-.save-btn:hover { background: var(--green); }
-.save-btn:disabled { background: var(--gray4); cursor: not-allowed; }
+.save-btn:hover { background: var(--green); border-color: var(--green); }
+.save-btn:disabled { background: var(--gray4); border-color: var(--gray4); cursor: not-allowed; }
 
 /* ══════════════════════════════════════════════
    CREDENTIALS TAB
@@ -309,7 +319,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .credentials-card {
   background: var(--white);
   border: 1px solid var(--gray5);
-  padding: 32px;
   margin-bottom: 18px;
 }
 .credentials-card h2 {
@@ -473,9 +482,13 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 /* ══════════════════════════════════════════════
    SECTION CARDS
 ══════════════════════════════════════════════ */
-.locked-card, .links-card, .extras-card {
+.locked-card {
   background: var(--white); border: 1px solid var(--gray5);
   padding: 22px; margin-bottom: 18px;
+}
+.links-card, .extras-card {
+  background: var(--white); border: 1px solid var(--gray5);
+  margin-bottom: 18px;
 }
 .locked-title { font-size:14px; font-weight: bold; color: var(--gray3); margin-bottom: 12px; }
 .locked-item {
@@ -500,7 +513,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   padding: 0 16px; background: var(--white); color: var(--green);
   border: 1px solid var(--green); font-family: var(--serif);
   font-size:15px; font-weight: bold; cursor: pointer; transition: background .2s, color .2s;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 .geoloc-btn:hover { background: var(--green); color: var(--white); }
 .geoloc-btn:disabled { opacity: .6; cursor: not-allowed; }
