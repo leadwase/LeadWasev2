@@ -856,10 +856,10 @@ svg.icon-lg { width: 22px; height: 22px; }
 
   <!-- Appointment (Business) -->
   <div id="pf-appointment-wrap" style="display:none" class="a5">
-    <a class="appointment-btn" id="appointment-link" href="#" target="_blank">
+    <button type="button" class="appointment-btn" id="appointment-link">
       <svg class="icon"><use href="#icon-calendar"/></svg>
       Prendre rendez-vous
-    </a>
+    </button>
   </div>
 
   <!-- Google Reviews (Business) -->
@@ -900,6 +900,18 @@ svg.icon-lg { width: 22px; height: 22px; }
   <div class="pf-footer a6">
     <p>Profil créé avec</p>
     <a href="/">Lead<em>Wase</em> — Créez le vôtre</a>
+  </div>
+</div>
+
+<!-- ── Modal calendrier (Calendly / Cal.com / Google Calendar intégré) ── -->
+<div class="map-overlay" id="rdv-overlay">
+  <div class="map-modal" style="max-width:640px">
+    <div class="map-modal-head">
+      <span class="map-modal-title" id="rdv-modal-title">📅 Prendre rendez-vous</span>
+      <button class="map-modal-close" id="rdv-close" aria-label="Fermer">&times;</button>
+    </div>
+    <iframe id="rdv-iframe" loading="lazy" src="" style="height:560px"></iframe>
+    <div class="map-modal-footer"><a id="rdv-external-link" href="#" target="_blank" rel="noopener">Ouvrir dans un nouvel onglet →</a></div>
   </div>
 </div>
 
@@ -1075,6 +1087,13 @@ async function load(leadwaseId) {
     }
     document.getElementById('map-close').onclick = () => document.getElementById('map-overlay').classList.remove('open');
     document.getElementById('map-overlay').addEventListener('click', e => { if (e.target.id === 'map-overlay') e.currentTarget.classList.remove('open'); });
+    document.getElementById('rdv-close').onclick = () => {
+      document.getElementById('rdv-overlay').classList.remove('open');
+      document.getElementById('rdv-iframe').src = '';
+    };
+    document.getElementById('rdv-overlay').addEventListener('click', e => {
+      if (e.target.id === 'rdv-overlay') { e.currentTarget.classList.remove('open'); document.getElementById('rdv-iframe').src = ''; }
+    });
 
     // Website
     if (p.website?.trim()) {
@@ -1109,10 +1128,18 @@ async function load(leadwaseId) {
     // Business features
     if (isBusiness) {
       if (p.rdvLink?.trim()) {
+        const rdvUrl = p.rdvLink.startsWith('http') ? p.rdvLink : `https://${p.rdvLink}`;
         const btn = document.getElementById('appointment-link');
-        btn.href = p.rdvLink.startsWith('http') ? p.rdvLink : `https://${p.rdvLink}`;
-        if (p.rdvLabel) btn.querySelector('span') && (btn.lastChild.textContent = p.rdvLabel);
-        btn.addEventListener('click', () => recordAnalytics('click_appointment', leadwaseId));
+        if (p.rdvLabel) {
+          const lastNode = btn.childNodes[btn.childNodes.length - 1];
+          if (lastNode && lastNode.nodeType === 3) lastNode.textContent = ' ' + p.rdvLabel;
+        }
+        btn.addEventListener('click', () => {
+          recordAnalytics('click_appointment', leadwaseId);
+          document.getElementById('rdv-iframe').src = rdvUrl;
+          document.getElementById('rdv-external-link').href = rdvUrl;
+          document.getElementById('rdv-overlay').classList.add('open');
+        });
         document.getElementById('pf-appointment-wrap').style.display = 'block';
       }
       if (p.googleReview?.trim()) {
