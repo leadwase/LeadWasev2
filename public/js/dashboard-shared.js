@@ -121,6 +121,6 @@ export function initDashboardAuth(onReady) {
     onReady({ user, p, lwId, plan: planFinal, isPro, isBusiness, currentLoginEmail });
 
     document.getElementById('loader').style.display  = 'none';
-    document.getElementById('content').style.display = 'block';
+    document.getElementById('content').style.display = '';
   });
 }
