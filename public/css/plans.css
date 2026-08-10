@@ -121,10 +121,21 @@
 /* ── Skeleton loader pour les plans ── */
 .plans-loading{text-align:center;padding:48px 20px;color:var(--gray3);font-style:italic;font-size:20px}
 
+.compare-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
 @media(max-width:900px){
   .plans-grid{grid-template-columns:1fr;padding:20px;gap:20px}
   .plan-col{border-right:1px solid var(--gray5)}
   .plan-col.featured{transform:none}
   .offers-hero,.plans-intro,.compare-wrap{padding-left:20px;padding-right:20px}
   .carte-banner,.login-banner{margin-left:16px;margin-right:16px}
+
+  /* Comparaison détaillée : version compacte, tient sans scroll horizontal */
+  .compare-table{min-width:0}
+  .compare-table th, .compare-table td{padding:9px 6px;font-size:13px}
+  .compare-table th:first-child, .compare-table td:first-child{font-size:13px;padding-left:4px}
+  .compare-table td:first-child{font-style:normal}
+}
+@media(max-width:520px){
+  .compare-table th, .compare-table td{padding:8px 4px;font-size:11.5px}
 }
