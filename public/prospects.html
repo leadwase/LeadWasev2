@@ -12,6 +12,13 @@
 </head>
 <body>
 
+<div id="access-denied">
+  <div style="font-size:55px">📇</div>
+  <h2>Mes Prospects réservé aux abonnés Business</h2>
+  <p>Passez à l'offre Business pour collecter et gérer les contacts capturés via votre carte NFC.</p>
+  <a href="offres.html">Voir les offres</a>
+</div>
+
 <!-- MOBILE TOPBAR -->
 <header class="topbar" id="topbar">
   <div class="topbar-brand">Lead<em>Wase</em></div>
@@ -34,7 +41,7 @@
     <div class="sidebar-section-label">Principal</div>
       <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
       <a class="sidebar-item" href="identifiants.html"><span class="s-icon">🔑</span>Identifiants</a>
-      <a class="sidebar-item active" href="prospects.html"><span class="s-icon">📇</span>Mes Prospects</a>
+      <div id="prospects-nav-item"></div>
       <div id="analytics-nav-item"></div>
       <a class="sidebar-item" href="offres.html" target="_blank" rel="noopener"><span class="s-icon">⭐</span>Offres</a>
       <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
@@ -293,7 +300,12 @@ document.getElementById('filter-today').onclick = () => {
   renderTable();
 };
 
-initDashboardAuth(async ({ lwId: id }) => {
+initDashboardAuth(async ({ lwId: id, isBusiness }) => {
+  if (!isBusiness) {
+    document.getElementById('app-layout').style.display = 'none';
+    document.getElementById('access-denied').style.display = 'flex';
+    return;
+  }
   lwId = id;
   document.getElementById('view-profile-btn').href = 'profil.html?id=' + lwId;
   try {

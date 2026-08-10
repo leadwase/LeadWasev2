@@ -97,3 +97,17 @@
 @media (max-width: 560px) {
   .pros-stats { grid-template-columns: 1fr; }
 }
+
+/* ── Accès refusé (réservé Business) ── */
+#access-denied {
+  position: fixed; inset: 0; background: rgba(255,255,255,.97); z-index: 999;
+  display: none; align-items: center; justify-content: center; flex-direction: column;
+  gap: 14px; padding: 32px; text-align: center;
+}
+#access-denied h2 { font-size:25px; font-weight: bold; color: var(--black); }
+#access-denied p { font-size:16px; color: var(--gray3); max-width: 400px; line-height: 1.7; }
+#access-denied a {
+  padding: 12px 28px; background: var(--green); color: var(--white);
+  text-decoration: none; font-weight: bold; font-size:15px;
+  letter-spacing: 1px; text-transform: uppercase; border-radius: 3px;
+}

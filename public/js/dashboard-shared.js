@@ -111,6 +111,12 @@ export function initDashboardAuth(onReady) {
     if (isPro && analyticsNav) {
       analyticsNav.innerHTML = '<a class="sidebar-item" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>';
     }
+    const prospectsNav = document.getElementById('prospects-nav-item');
+    if (isBusiness && prospectsNav) {
+      const current = location.pathname.split('/').pop();
+      const active  = current === 'prospects.html' ? ' active' : '';
+      prospectsNav.innerHTML = `<a class="sidebar-item${active}" href="prospects.html"><span class="s-icon">📇</span>Mes Prospects</a>`;
+    }
 
     let currentLoginEmail = user.email;
     try {

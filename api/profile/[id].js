@@ -56,7 +56,7 @@ async function verifyOwner(req, leadwaseId) {
     await profileDoc.ref.set({ firebaseUid: decoded.uid }, { merge: true }).catch(() => {});
   }
 
-  return decoded;
+  return { decoded, profile: pd };
 }
 
 // POST /api/profile/[id]?action=capture-lead — public, appelé depuis le bouton
@@ -128,9 +128,10 @@ async function submitContactForm(req, res, leadwaseId) {
   res.json({ success: true });
 }
 
-// GET /api/profile/[id]?action=prospects — authentifié (propriétaire uniquement).
+// GET /api/profile/[id]?action=prospects — authentifié (propriétaire, plan Business uniquement).
 async function listProspects(req, res, leadwaseId) {
-  await verifyOwner(req, leadwaseId);
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business') throw new Error('Accès refusé');
   const snap = await db.collection('prospects')
     .where('ownerId', '==', leadwaseId)
     .orderBy('createdAt', 'desc')
@@ -140,9 +141,10 @@ async function listProspects(req, res, leadwaseId) {
   res.json({ success: true, prospects });
 }
 
-// DELETE /api/profile/[id]?action=prospects&prospectId=xxx — authentifié.
+// DELETE /api/profile/[id]?action=prospects&prospectId=xxx — authentifié, plan Business uniquement.
 async function deleteProspect(req, res, leadwaseId) {
-  await verifyOwner(req, leadwaseId);
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business') throw new Error('Accès refusé');
   const { prospectId } = req.query;
   if (!prospectId) return res.status(400).json({ success: false, error: 'prospectId requis' });
   const ref = db.collection('prospects').doc(prospectId);
@@ -154,9 +156,10 @@ async function deleteProspect(req, res, leadwaseId) {
   res.json({ success: true });
 }
 
-// POST /api/profile/[id]?action=clear-prospects — authentifié, vide tout l'annuaire.
+// POST /api/profile/[id]?action=clear-prospects — authentifié, plan Business uniquement.
 async function clearProspects(req, res, leadwaseId) {
-  await verifyOwner(req, leadwaseId);
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business') throw new Error('Accès refusé');
   const snap = await db.collection('prospects').where('ownerId', '==', leadwaseId).get();
   const batch = db.batch();
   snap.docs.forEach(d => batch.delete(d.ref));
