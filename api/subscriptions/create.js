@@ -21,17 +21,20 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   try {
     const user   = await verifyToken(req);
-    const { plan } = req.body;
-    //const prices = { pro: 2999, business: 50 };
-    // const amount = prices[plan];
+    const { plan, duration } = req.body;
     const { getPrices } = await import('../../lib/getPrices.js');
     const prices = await getPrices();
-    const amount = prices[plan];
-   
-    if (!amount) return res.status(400).json({ error: 'Plan invalide' });
+    const monthly = prices[plan];
+
+    if (!monthly) return res.status(400).json({ error: 'Plan invalide' });
+
+    const DURATIONS = { 1: 0, 3: 0.05, 6: 0.10, 12: 0.15 };
+    const durationMonths = DURATIONS.hasOwnProperty(duration) ? Number(duration) : 1;
+    const discount = DURATIONS[durationMonths];
+    const amount = Math.round(monthly * durationMonths * (1 - discount));
 
     const subRef = await db.collection('subscriptions').add({
-      uid: user.uid, plan, amount, status: 'pending', createdAt: new Date(),
+      uid: user.uid, plan, amount, durationMonths, status: 'pending', createdAt: new Date(),
     });
     const payRef = await db.collection('payments').add({
       uid: user.uid, subscriptionId: subRef.id, amount, status: 'pending', createdAt: new Date(),
@@ -39,12 +42,13 @@ export default async function handler(req, res) {
 
     const GW_URL = 'https://paymentgateway.lfdweb.com';
     const SITE   = process.env.SITE_URL || 'https://leadwase.com';
+    const durationLabel = durationMonths === 1 ? '1 mois' : durationMonths === 12 ? '1 an' : `${durationMonths} mois`;
     const gRes   = await fetch(`${GW_URL}/api/gateway/generate-link`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.GATEWAY_API_KEY },
       body: JSON.stringify({
         amount, country: 'bj',
-        description: `LeadWase ${plan.toUpperCase()} — 1 mois`,
+        description: `LeadWase ${plan.toUpperCase()} — ${durationLabel}`,
         origin: SITE, sendWebhook: true,
         metadata: { transactionId: payRef.id, subscriptionId: subRef.id, plan, uid: user.uid, origin: SITE, sendWebhook: true },
       }),

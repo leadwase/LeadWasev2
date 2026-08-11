@@ -288,8 +288,9 @@ export default async function handler(req, res) {
     if (ok && pay.subscriptionId) {
       const sub   = await db.collection('subscriptions').doc(pay.subscriptionId).get();
       const sData = sub.data();
+      const durationMonths = sData?.durationMonths || 1;
       const exp   = new Date(); 
-      exp.setMonth(exp.getMonth() + 1);
+      exp.setMonth(exp.getMonth() + durationMonths);
       const expTimestamp = Timestamp.fromDate(exp);
 
       await sub.ref.update({

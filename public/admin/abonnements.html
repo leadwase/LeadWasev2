@@ -94,12 +94,13 @@
                     <th>Réf. Abonnement</th>
                     <th>UID Utilisateur</th>
                     <th>Plan</th>
+                    <th>Durée</th>
                     <th>Montant</th>
                     <th>Statut</th>
                     <th>PID Gateway</th>
                   </tr>
                 </thead>
-                <tbody id="subs-body"><tr class="empty-row"><td colspan="7">Chargement...</td></tr></tbody>
+                <tbody id="subs-body"><tr class="empty-row"><td colspan="8">Chargement...</td></tr></tbody>
               </table>
             </div>
             <!-- Stats abonnements -->
@@ -139,7 +140,7 @@ import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow }
 
 window.loadSubs = async () => {
   const tbody = document.getElementById('subs-body');
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Chargement...</td></tr>';
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Chargement...</td></tr>';
   try {
     const filterPlan   = document.getElementById('sub-filter-plan').value;
     const filterStatus = document.getElementById('sub-filter-status').value;
@@ -150,7 +151,7 @@ window.loadSubs = async () => {
     if (filterStatus) subs = subs.filter(s => s.status === filterStatus);
 
     if (!subs.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucun abonnement trouvé</td></tr>';
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Aucun abonnement trouvé</td></tr>';
       document.getElementById('subs-total-count').textContent = '0';
       document.getElementById('subs-active-count').textContent = '0';
       document.getElementById('subs-revenue').textContent = '0';
@@ -164,11 +165,13 @@ window.loadSubs = async () => {
         ? '<span class="badge b-paid">BUSINESS</span>'
         : `<span class="badge b-pending">${(s.plan||'—').toUpperCase()}</span>`;
       const uid = s.uid ? `<span style="font-size:12px;font-family:'Space Mono',monospace;color:var(--gray4)">${s.uid.slice(0,12)}…</span>` : '—';
+      const dur = s.durationMonths === 12 ? '1 an' : s.durationMonths === 1 || !s.durationMonths ? '1 mois' : `${s.durationMonths} mois`;
       return `<tr>
         <td style="font-size:14px;color:var(--gray4)">${fmtDateTime(s.createdAt)}</td>
         <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${shortId(s.id)}</td>
         <td>${uid}</td>
         <td>${planLabel}</td>
+        <td style="color:var(--gray3);font-size:14px">${dur}</td>
         <td style="font-weight:700;font-family:'Space Mono',monospace;color:var(--gray1)">${s.amount ? fmtNum(s.amount)+' FCFA' : '—'}</td>
         <td>${badge(s.status)}</td>
         <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">${s.pid||'—'}</td>
@@ -182,7 +185,7 @@ window.loadSubs = async () => {
     document.getElementById('subs-active-count').textContent = actives.length;
     document.getElementById('subs-revenue').textContent      = fmtNum(revenue);
   } catch(e) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="7" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
 

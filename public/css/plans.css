@@ -20,6 +20,15 @@
 .featured .plan-price small{color:rgba(255,255,255,.5)}
 .plan-period{font-size:14px;color:var(--gray3);margin-bottom:8px}
 .featured .plan-period{color:rgba(255,255,255,.5)}
+
+.plan-duration-picker{display:flex;gap:4px;margin-bottom:14px;background:var(--gray6);padding:3px;border-radius:20px}
+.featured .plan-duration-picker{background:rgba(255,255,255,.1)}
+.dur-btn{flex:1;padding:6px 4px;border:none;background:transparent;border-radius:16px;font-size:11px;font-weight:600;color:var(--gray3);cursor:pointer;font-family:var(--sans, inherit);transition:background .15s,color .15s;white-space:nowrap}
+.featured .dur-btn{color:rgba(255,255,255,.6)}
+.dur-btn.active{background:var(--black);color:var(--white)}
+.featured .dur-btn.active{background:var(--green);color:var(--white)}
+.plan-savings{font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px;min-height:16px}
+.featured .plan-savings{color:var(--green3)}
 .plan-desc{font-size:20px;color:var(--gray2);font-style:italic;margin-bottom:20px;line-height:1.6}
 .featured .plan-desc{color:rgba(255,255,255,.6)}
 .plan-features{list-style:none;margin-bottom:24px;border-top:1px solid var(--gray5);padding-top:14px}

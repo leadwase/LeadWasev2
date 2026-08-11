@@ -71,8 +71,15 @@
     <div class="plan-col featured">
       <div class="rec-badge">⭐ Recommandé</div>
       <div class="plan-name">Pro</div>
-      <div class="plan-price">2 999 <small>XOF</small></div>
-      <div class="plan-period">par mois · résiliable à tout moment</div>
+      <div class="plan-duration-picker" data-plan="pro">
+        <button class="dur-btn active" data-months="1">1 mois</button>
+        <button class="dur-btn" data-months="3">3 mois</button>
+        <button class="dur-btn" data-months="6">6 mois</button>
+        <button class="dur-btn" data-months="12">1 an</button>
+      </div>
+      <div class="plan-price" id="price-pro">2 999 <small>XOF</small></div>
+      <div class="plan-period" id="period-pro">par mois · résiliable à tout moment</div>
+      <div class="plan-savings" id="savings-pro"></div>
       <p class="plan-desc">Pour les professionnels qui veulent plus de visibilité.</p>
       <ul class="plan-features">
         <li><span class="ck">✓</span>Profil</li>
@@ -87,8 +94,15 @@
     </div>
     <div class="plan-col">
       <div class="plan-name">Business</div>
-      <div class="plan-price">4 566 <small>XOF</small></div>
-      <div class="plan-period">par mois · facturation annuelle</div>
+      <div class="plan-duration-picker" data-plan="business">
+        <button class="dur-btn active" data-months="1">1 mois</button>
+        <button class="dur-btn" data-months="3">3 mois</button>
+        <button class="dur-btn" data-months="6">6 mois</button>
+        <button class="dur-btn" data-months="12">1 an</button>
+      </div>
+      <div class="plan-price" id="price-business">4 566 <small>XOF</small></div>
+      <div class="plan-period" id="period-business">par mois · facturation annuelle</div>
+      <div class="plan-savings" id="savings-business"></div>
       <p class="plan-desc">Pour les équipes et entreprises qui veulent tout maîtriser.</p>
       <ul class="plan-features">
         <li><span class="ck">✓</span>Profil</li>
@@ -258,6 +272,42 @@ btnBiz.disabled = true;
 btnPro.textContent = 'Chargement…';
 btnBiz.textContent = 'Chargement…';
 
+// ── Sélecteur de durée d'abonnement (1 / 3 / 6 / 12 mois) ─────────────────────
+const DURATIONS = {
+  1:  { label: 'par mois · résiliable à tout moment', discount: 0 },
+  3:  { label: 'facturé tous les 3 mois',              discount: 0.05 },
+  6:  { label: 'facturé tous les 6 mois',               discount: 0.10 },
+  12: { label: 'facturé une fois par an',                discount: 0.15 },
+};
+const BASE_PRICES = { pro: 2999, business: 4566 };
+const selectedDuration = { pro: 1, business: 1 };
+
+function fmtXOF(n) { return Math.round(n).toLocaleString('fr-FR'); }
+
+function updatePlanDisplay(plan) {
+  const months = selectedDuration[plan];
+  const d       = DURATIONS[months];
+  const total   = BASE_PRICES[plan] * months * (1 - d.discount);
+  document.getElementById('price-' + plan).innerHTML  = fmtXOF(total) + ' <small>XOF</small>';
+  document.getElementById('period-' + plan).textContent = d.label;
+  document.getElementById('savings-' + plan).textContent = d.discount > 0
+    ? `Économisez ${Math.round(d.discount * 100)}% vs paiement mensuel` : '';
+}
+
+document.querySelectorAll('.plan-duration-picker').forEach(picker => {
+  const plan = picker.dataset.plan;
+  picker.querySelectorAll('.dur-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      picker.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDuration[plan] = parseInt(btn.dataset.months, 10);
+      updatePlanDisplay(plan);
+    });
+  });
+});
+updatePlanDisplay('pro');
+updatePlanDisplay('business');
+
 // ── Fonction subscribe ────────────────────────────────────────────────────────
 window.subscribe = async plan => {
   // Vérifications de sécurité côté client
@@ -281,7 +331,7 @@ window.subscribe = async plan => {
     const r = await fetch('/api/subscriptions/create', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body:    JSON.stringify({ plan }),
+      body:    JSON.stringify({ plan, duration: selectedDuration[plan] }),
     });
     const d = await r.json();
 
