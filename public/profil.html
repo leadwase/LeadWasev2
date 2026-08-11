@@ -821,7 +821,7 @@ svg.icon-lg { width: 22px; height: 22px; }
       </span>
       Enregistrer
     </button>
-    <button class="vcf-btn xchg-btn" id="xchg-btn" style="margin-bottom:0">
+    <button class="vcf-btn xchg-btn" id="xchg-btn" style="margin-bottom:0;display:none">
       <span class="icon-wrap">
         <svg class="icon"><use href="#icon-arrow-right"/></svg>
       </span>
@@ -1296,13 +1296,15 @@ async function load(leadwaseId) {
       URL.revokeObjectURL(url);
     };
 
-    // Échanger (capture des coordonnées du visiteur)
-    document.getElementById('xchg-owner-name').textContent = (p.firstName || 'ce contact');
-    document.getElementById('xchg-btn').onclick = () => {
-      document.getElementById('xchg-form-state').style.display    = 'block';
-      document.getElementById('xchg-success-state').style.display = 'none';
-      document.getElementById('xchg-err').textContent = '';
-      document.getElementById('xchg-overlay').classList.add('open');
+    // Échanger (capture des coordonnées du visiteur) — réservé aux profils Business
+    if (isBusiness) {
+      document.getElementById('xchg-btn').style.display = '';
+      document.getElementById('xchg-owner-name').textContent = (p.firstName || 'ce contact');
+      document.getElementById('xchg-btn').onclick = () => {
+        document.getElementById('xchg-form-state').style.display    = 'block';
+        document.getElementById('xchg-success-state').style.display = 'none';
+        document.getElementById('xchg-err').textContent = '';
+        document.getElementById('xchg-overlay').classList.add('open');
       recordAnalytics('click_xchg', leadwaseId);
     };
     const closeXchg = () => document.getElementById('xchg-overlay').classList.remove('open');
@@ -1347,6 +1349,7 @@ async function load(leadwaseId) {
         btn.textContent = 'Envoyer mes coordonnées';
       }
     };
+    } // fin if (isBusiness) — Échanger
 
     await recordAnalytics('profile_view', leadwaseId);
 
