@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   
   try {
-    const { cardType, firstName, lastName, jobTitle, company, phone, email, address, quantity, description } = req.body;
+    const { cardType, firstName, lastName, jobTitle, company, phone, email, address, quantity, description, subPlan, employees } = req.body;
 
     // Validation des données requises
     if (!cardType || !firstName || !email) {
@@ -28,6 +28,17 @@ export default async function handler(req, res) {
 
     // ── Commande B2B ────────────────────────────────
     if (cardType === 'b2b') {
+      const cleanEmployees = Array.isArray(employees)
+        ? employees
+            .filter(e => e && (e.name || e.email || e.phone))
+            .slice(0, 500)
+            .map(e => ({
+              name:  String(e.name  || '').trim().slice(0, 120),
+              email: String(e.email || '').trim().slice(0, 120),
+              phone: String(e.phone || '').trim().slice(0, 40),
+            }))
+        : [];
+
       const orderRef = await db.collection('orders').add({
         cardType:    'b2b',
         firstName,
@@ -36,6 +47,8 @@ export default async function handler(req, res) {
         email,
         quantity:    quantity || '',
         description: description || '',
+        subPlan:     ['free', 'pro', 'business'].includes(subPlan) ? subPlan : 'free',
+        employees:   cleanEmployees,
         status:      'b2b_pending',
         amount:      null,
         createdAt:   new Date(),

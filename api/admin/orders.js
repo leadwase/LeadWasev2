@@ -50,6 +50,74 @@ async function generateCredentials(req, res) {
   res.json({ success: true, leadwaseId: lwId, password: pwd });
 }
 
+// POST /api/admin/orders?action=provision-b2b-team  { orderId, confirmedQuantity }
+// Crée le profil du chef d'entreprise + un sous-profil par carte confirmée,
+// tous liés (parentLeadwaseId / teamMembers), avec le forfait choisi à la commande.
+async function provisionB2BTeam(req, res) {
+  const { orderId, confirmedQuantity } = req.body;
+  const qty = parseInt(confirmedQuantity, 10);
+  if (!orderId || !qty || qty < 1 || qty > 500) {
+    return res.status(400).json({ success: false, error: 'orderId et confirmedQuantity (1-500) requis' });
+  }
+
+  const orderRef = db.collection('orders').doc(orderId);
+  const order = await orderRef.get();
+  if (!order.exists) return res.status(404).json({ success: false, error: 'Commande introuvable' });
+  const d = order.data();
+  if (d.cardType !== 'b2b') return res.status(400).json({ success: false, error: "Cette commande n'est pas une commande B2B" });
+  if (d.teamProvisioned) return res.json({ success: true, alreadyCreated: true, chefLeadwaseId: d.chefLeadwaseId });
+
+  const plan = ['free', 'pro', 'business'].includes(d.subPlan) ? d.subPlan : 'free';
+  const usedIds = new Set();
+  async function uniqueId() {
+    let id = genId();
+    while (usedIds.has(id) || (await db.collection('profiles').doc(id).get()).exists) id = genId();
+    usedIds.add(id);
+    return id;
+  }
+
+  // ── Chef d'entreprise ──────────────────────────────────────────────────────
+  const chefId  = await uniqueId();
+  const chefPwd = genPwd();
+  await db.collection('profiles').doc(chefId).set({
+    leadwaseId: chefId, firstName: d.firstName, lastName: '', company: d.company,
+    phone: d.phone || '', email: d.email, plan,
+    isTeamOwner: true, teamMembers: [], teamOrderId: orderId, createdAt: new Date(),
+  });
+  await db.collection('credentials').doc(chefId).set({ leadwaseId: chefId, passwordHash: chefPwd, createdAt: new Date() });
+
+  // ── Sous-comptes (employés) ──────────────────────────────────────────────────
+  const employees = Array.isArray(d.employees) ? d.employees : [];
+  const teamMembers = [];
+  for (let i = 0; i < qty; i++) {
+    const emp = employees[i] || {};
+    const subId  = await uniqueId();
+    const subPwd = genPwd();
+    await db.collection('profiles').doc(subId).set({
+      leadwaseId: subId, firstName: emp.name || '', lastName: '', company: d.company,
+      phone: emp.phone || '', email: emp.email || '', plan,
+      parentLeadwaseId: chefId, teamOrderId: orderId, createdAt: new Date(),
+    });
+    await db.collection('credentials').doc(subId).set({ leadwaseId: subId, passwordHash: subPwd, createdAt: new Date() });
+    teamMembers.push(subId);
+  }
+  await db.collection('profiles').doc(chefId).update({ teamMembers });
+
+  await orderRef.update({
+    status: 'delivered', deliveredAt: new Date(),
+    chefLeadwaseId: chefId, teamProvisioned: true, confirmedQuantity: qty,
+  });
+
+  try {
+    const { notifyB2BTeamProvisioned } = await import('../../lib/brevo.js');
+    await notifyB2BTeamProvisioned({ firstName: d.firstName, email: d.email, leadwaseId: chefId, password: chefPwd, teamSize: qty });
+  } catch (e) {
+    console.error('[provisionB2BTeam] email échoué:', e.message);
+  }
+
+  res.json({ success: true, chefLeadwaseId: chefId, teamSize: qty });
+}
+
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -60,6 +128,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET' && !action) return listOrders(req, res);
     if (req.method === 'POST' && action === 'deliver') return deliver(req, res);
     if (req.method === 'POST' && action === 'generate-credentials') return generateCredentials(req, res);
+    if (req.method === 'POST' && action === 'provision-b2b-team') return provisionB2BTeam(req, res);
 
     res.status(400).json({ success: false, error: 'Requête invalide' });
   } catch (e) {
