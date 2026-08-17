@@ -94,7 +94,7 @@ tbody td{padding:13px 16px;color:var(--gray2);white-space:nowrap}
 .btn-view{background:var(--gray6);color:var(--gray2);border:1px solid var(--gray5)}
 .btn-view:hover{background:var(--gray5)}
 .btn-done{background:var(--gray6);color:var(--gray4);cursor:default}
-.empty-row td{text-align:center;padding:40px;color:var(--gray4);font-style:italic}
+.empty-row td{text-align:center;padding:40px;color:var(--gray4);}
 .bottom-grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
 
 /* ── Credentials ── */

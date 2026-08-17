@@ -67,7 +67,7 @@
     <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
       <div style="text-align:center">
         <div class="loader" style="margin:0 auto"></div>
-        <p style="margin-top:14px;color:var(--gray3);font-style:italic">Chargement...</p>
+        <p style="margin-top:14px;color:var(--gray3);">Chargement...</p>
       </div>
     </div>
 
@@ -163,7 +163,7 @@
                   <input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin" style="flex:1">
                   <button type="button" class="geoloc-btn" id="geoloc-btn" style="white-space:nowrap">📍 Ma position</button>
                 </div>
-                <div id="geoloc-status" style="font-size:15px;color:var(--gray3);margin-top:6px;font-style:italic"></div>
+                <div id="geoloc-status" style="font-size:15px;color:var(--gray3);margin-top:6px;"></div>
               </div>
             </div>
             <div class="map-preview" id="map-preview">🗺️ Aperçu carte — détectez ou saisissez une adresse</div>
@@ -458,7 +458,7 @@ function fieldId() { return 'f' + Math.random().toString(36).slice(2, 8); }
 function renderContactFields() {
   const list = document.getElementById('contact-fields-list');
   if (!contactFields.length) {
-    list.innerHTML = '<div class="f-hint" style="font-style:italic">Aucun champ pour le moment — ajoutez-en un ci-dessous.</div>';
+    list.innerHTML = '<div class="f-hint" style="">Aucun champ pour le moment — ajoutez-en un ci-dessous.</div>';
     return;
   }
   list.innerHTML = contactFields.map(f => `

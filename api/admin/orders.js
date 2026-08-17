@@ -6,9 +6,24 @@
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
 
 function genId()  { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
-function genPwd(n = 10) {
-  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
-  return Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join('');
+function genPwd(n = 12) {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const special = '@#!$%&*';
+  const all = upper + lower + digits + special;
+  const pwd = [
+    upper[Math.floor(Math.random() * upper.length)],
+    lower[Math.floor(Math.random() * lower.length)],
+    digits[Math.floor(Math.random() * digits.length)],
+    special[Math.floor(Math.random() * special.length)],
+  ];
+  for (let i = pwd.length; i < n; i++) pwd.push(all[Math.floor(Math.random() * all.length)]);
+  for (let i = pwd.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pwd[i], pwd[j]] = [pwd[j], pwd[i]];
+  }
+  return pwd.join('');
 }
 
 async function listOrders(req, res) {

@@ -149,7 +149,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   margin-bottom: 22px; flex-wrap: wrap; gap: 8px;
 }
 .dash-h1 { font-size:25px; font-weight: bold; color: var(--black); }
-.dash-pub { font-size:20px; color: var(--green); text-decoration: underline; font-style: italic; }
+.dash-pub { font-size:20px; color: var(--green); text-decoration: underline; }
 
 /* ══════════════════════════════════════════════
    CARD HEAD (bandeau titre — même anatomie que .pros-card sur Mes Prospects)
@@ -224,7 +224,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   object-fit: cover;
 }
 .pf-name { font-size:23px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
-.pf-job  { font-size:20px; color: var(--gray2); font-style: italic; margin-bottom: 2px; }
+.pf-job  { font-size:20px; color: var(--gray2); margin-bottom: 2px; }
 .pf-co   { font-size:13px; color: var(--green); font-weight: bold; letter-spacing: .5px; text-transform: uppercase; }
 .pf-id   { font-size:12px; color: var(--gray3); font-family: 'Courier New', monospace; margin-top: 4px; }
 
@@ -299,7 +299,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 }
 .f-input:focus, .f-textarea:focus { border-color: var(--green3); }
 .f-textarea { min-height: 76px; resize: vertical; }
-.f-hint { font-size:12px; color: var(--gray3); font-style: italic; margin-top: 2px; }
+.f-hint { font-size:12px; color: var(--gray3); margin-top: 2px; }
 
 .save-btn {
   padding: 10px 16px;
@@ -330,7 +330,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .credentials-card .section-desc {
   font-size:14px;
   color: var(--gray3);
-  font-style: italic;
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -360,7 +359,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .pwd-desc {
   font-size:14px;
   color: var(--gray3);
-  font-style: italic;
   margin-bottom: 18px;
   line-height: 1.6;
 }
@@ -420,7 +418,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .pwd-strength-label {
   font-size:12px;
   color: var(--gray3);
-  font-style: italic;
 }
 
 .pwd-rules {
@@ -459,7 +456,6 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .danger-zone p {
   font-size:14px;
   color: var(--gray3);
-  font-style: italic;
   margin-bottom: 14px;
   line-height: 1.6;
 }
@@ -494,7 +490,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .locked-item {
   display: flex; align-items: center; gap: 10px;
   padding: 6px 0; border-bottom: 1px dotted var(--gray5);
-  font-size:14px; color: var(--gray4); font-style: italic;
+  font-size:14px; color: var(--gray4);
 }
 .locked-item:last-child { border-bottom: none; }
 
@@ -522,7 +518,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   margin-top: 8px; height: 72px;
   background: var(--gray6); border: 1px solid var(--gray5);
   display: flex; align-items: center; justify-content: center;
-  font-size:19px; color: var(--gray3); font-style: italic;
+  font-size:19px; color: var(--gray3);
   overflow: hidden;
 }
 .map-preview.has-map { height: 220px; }
@@ -560,7 +556,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   margin-top: 10px; padding: 12px;
   border: 1px dashed var(--gray4); background: var(--gray6);
 }
-.ai-box p { font-size:13px; color: var(--gray3); font-style: italic; margin: 6px 0 8px; }
+.ai-box p { font-size:13px; color: var(--gray3); margin: 6px 0 8px; }
 .biz-tag {
   font-size:10px; background: var(--black); color: var(--white);
   padding: 2px 5px; letter-spacing: .5px; vertical-align: middle;
@@ -620,7 +616,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   background: linear-gradient(90deg, var(--green), var(--green3));
 }
 .upgrade h3 { font-size:20px; font-weight: bold; color: var(--white); margin-bottom: 8px; }
-.upgrade p  { font-size:20px; color: var(--gray3); line-height: 1.7; font-style: italic; margin-bottom: 16px; }
+.upgrade p  { font-size:20px; color: var(--gray3); line-height: 1.7; margin-bottom: 16px; }
 .upgrade-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 .ucta {
   flex: 1; min-width: 150px; padding: 11px;
