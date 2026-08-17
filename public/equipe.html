@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon équipe — LeadWase</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app-dashboard.css">
+<link rel="stylesheet" href="css/prospects.css">
+<style>
+  .xchg-overlay { display:none; position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.5); backdrop-filter:blur(2px); align-items:center; justify-content:center; padding:20px; }
+  .xchg-overlay.open { display:flex; }
+  .xchg-modal { background:var(--white); border-radius:4px; max-width:380px; width:100%; padding:26px 24px; position:relative; max-height:90vh; overflow-y:auto; }
+  .xchg-close { position:absolute; top:14px; right:14px; width:28px; height:28px; border:none; background:#f0f0f0; border-radius:50%; font-size:18px; cursor:pointer; color:#666; line-height:1; }
+  .xchg-title { font-size:17px; font-weight:700; margin:0 0 16px; color:var(--black); }
+  .xchg-field { margin-bottom:12px; }
+  .xchg-field label { display:block; font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:#888; margin-bottom:5px; }
+  .xchg-field input { width:100%; padding:9px 12px; border:1px solid var(--gray5); border-radius:3px; font-family:inherit; font-size:15px; color:var(--black); box-sizing:border-box; }
+  .xchg-field input:focus { outline:none; border-color:var(--green); }
+  .xchg-err { color:#c0392b; font-size:12px; margin-bottom:10px; min-height:14px; }
+</style>
+</head>
+<body>
+
+<div id="access-denied">
+  <div style="font-size:55px">👥</div>
+  <h2>Mon équipe réservé aux comptes entreprise</h2>
+  <p>Cette page n'est disponible que pour les comptes créés via une commande B2B (chef d'entreprise).</p>
+  <a href="dashboard.html">Retour à mon profil</a>
+</div>
+
+<!-- MOBILE TOPBAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-brand">Lead<em>Wase</em></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout" id="app-layout" style="display:none">
+
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="/"><div class="brand">Lead<em>Wase</em></div><div class="sub">Mon espace</div></a>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-av">?</div>
+      <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">FREE</div></div>
+    </div>
+    <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Principal</div>
+      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
+      <a class="sidebar-item" href="identifiants.html"><span class="s-icon">🔑</span>Identifiants</a>
+      <div id="prospects-nav-item"></div>
+      <div id="team-nav-item"></div>
+      <div id="analytics-nav-item"></div>
+      <a class="sidebar-item" href="offres.html" target="_blank" rel="noopener"><span class="s-icon">⭐</span>Offres</a>
+      <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
+      <a class="sidebar-item" href="commander.html" target="_blank" rel="noopener"><span class="s-icon">🛒</span>Commander une carte</a>
+      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+    <div class="sidebar-section-label" style="margin-top:8px">Légal</div>
+      <a class="sidebar-item" href="cgu.html" target="_blank" rel="noopener"><span class="s-icon">📄</span>CGU</a>
+      <a class="sidebar-item" href="confidentialite.html" target="_blank" rel="noopener"><span class="s-icon">🔒</span>Confidentialité</a>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
+  </aside>
+
+  <main class="app-content">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div style="text-align:center">
+        <div class="loader" style="margin:0 auto"></div>
+        <p style="margin-top:14px;color:var(--gray4);font-style:italic">Chargement...</p>
+      </div>
+    </div>
+
+    <div id="content" style="display:none">
+      <div class="pros-wrap">
+
+        <div class="pros-head">
+          <div>
+            <div class="pros-h1">Mon équipe</div>
+            <div class="pros-sub">Gérez les cartes et identifiants de vos employés</div>
+          </div>
+          <div class="pros-actions">
+            <button class="pros-btn primary" id="add-member-btn">+ Ajouter un employé</button>
+          </div>
+        </div>
+
+        <div class="pros-infobar">
+          <div><strong id="team-count">0 carte(s)</strong> dans votre équipe · Entreprise : <span id="team-company">–</span></div>
+        </div>
+
+        <div class="pros-card">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">Cartes de l'équipe</div>
+              <div class="pros-card-sub">Identifiants et mots de passe à distribuer à vos employés</div>
+            </div>
+            <div class="pros-search-row">
+              <div class="pros-search"><input id="search-input" type="text" placeholder="Rechercher..."></div>
+            </div>
+          </div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>Employé</th><th>Identifiant</th><th>Mot de passe</th><th>Téléphone</th><th>Plan</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="team-tbody">
+              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Modal éditer employé ── -->
+<div class="xchg-overlay" id="edit-overlay">
+  <div class="xchg-modal">
+    <button class="xchg-close" id="edit-close" aria-label="Fermer">&times;</button>
+    <h3 class="xchg-title" id="edit-title">Modifier l'employé</h3>
+    <div class="xchg-field"><label>Nom complet</label><input id="edit-name" type="text" placeholder="Nom de l'employé"></div>
+    <div class="xchg-field"><label>Email</label><input id="edit-email" type="email" placeholder="employe@email.com"></div>
+    <div class="xchg-field"><label>Téléphone</label><input id="edit-phone" type="tel" placeholder="+229 00 00 00 00"></div>
+    <div class="xchg-err" id="edit-err"></div>
+    <button class="pros-btn primary" id="edit-save-btn" style="width:100%;justify-content:center">Enregistrer</button>
+  </div>
+</div>
+
+<script type="module">
+import { initDashboardAuth, toast, auth } from './js/dashboard-shared.js';
+
+let lwId = null, allMembers = [], editingId = null;
+
+async function api(action, opts = {}) {
+  const token = await auth.currentUser.getIdToken();
+  const url = `/api/profile/${lwId}?action=${action}`;
+  const res = await fetch(url, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: opts.body,
+  });
+  return res.json();
+}
+
+function renderTable() {
+  const tbody  = document.getElementById('team-tbody');
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+  let rows = allMembers;
+  if (search) {
+    rows = rows.filter(m =>
+      (m.name || '').toLowerCase().includes(search) ||
+      (m.email || '').toLowerCase().includes(search) ||
+      (m.leadwaseId || '').toLowerCase().includes(search));
+  }
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun employé pour le moment.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(m => `
+    <tr>
+      <td>
+        <div class="pros-name">${m.name || '(non renseigné)'}</div>
+        <div class="pros-email">${m.email || '—'}</div>
+      </td>
+      <td style="font-family:'Space Mono',monospace;font-weight:700;color:var(--green)">${m.leadwaseId}</td>
+      <td style="font-family:'Space Mono',monospace">${m.password || '—'}
+        ${m.password ? `<button class="pros-act-btn" style="display:inline-flex;width:auto;height:auto;padding:2px 8px;margin-left:6px" onclick="copyCred('${m.leadwaseId}','${(m.password||'').replace(/'/g,"\\'")}')">Copier</button>` : ''}
+      </td>
+      <td>${m.phone || '—'}</td>
+      <td><span class="pros-badge lien">${(m.plan || 'free').toUpperCase()}</span></td>
+      <td>
+        <div class="pros-act">
+          <button class="pros-act-btn" title="Modifier" onclick="editMember('${m.leadwaseId}')">✏️</button>
+          <button class="pros-act-btn" title="Voir le profil public" onclick="window.open('profil.html?id=${m.leadwaseId}','_blank')">🔗</button>
+          <button class="pros-act-btn del" title="Régénérer le mot de passe" onclick="regenPassword('${m.leadwaseId}')">🔄</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.copyCred = (id, pwd) => {
+  navigator.clipboard.writeText(`Identifiant LeadWase : ${id}\nMot de passe : ${pwd}`);
+  toast('Identifiants copiés', 'success');
+};
+
+window.regenPassword = async (memberId) => {
+  if (!confirm("Générer un nouveau mot de passe pour cette carte ? L'ancien ne fonctionnera plus.")) return;
+  try {
+    const d = await api('team-regenerate-password', { method: 'POST', body: JSON.stringify({ memberId }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const m = allMembers.find(x => x.leadwaseId === memberId);
+    if (m) m.password = d.password;
+    renderTable();
+    toast('Mot de passe régénéré', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+window.editMember = (memberId) => {
+  const m = allMembers.find(x => x.leadwaseId === memberId);
+  if (!m) return;
+  editingId = memberId;
+  document.getElementById('edit-title').textContent = 'Modifier — ' + memberId;
+  document.getElementById('edit-name').value  = m.name  || '';
+  document.getElementById('edit-email').value = m.email || '';
+  document.getElementById('edit-phone').value = m.phone || '';
+  document.getElementById('edit-err').textContent = '';
+  document.getElementById('edit-overlay').classList.add('open');
+};
+
+document.getElementById('add-member-btn').addEventListener('click', () => {
+  if (!allMembers.length) { toast('Aucune carte disponible à assigner pour le moment', 'error'); return; }
+  const unassigned = allMembers.find(m => !m.name && !m.email);
+  if (!unassigned) { toast('Toutes les cartes de votre équipe sont déjà assignées', 'error'); return; }
+  window.editMember(unassigned.leadwaseId);
+});
+
+document.getElementById('edit-close').onclick = () => document.getElementById('edit-overlay').classList.remove('open');
+document.getElementById('edit-overlay').addEventListener('click', e => { if (e.target.id === 'edit-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('edit-save-btn').onclick = async () => {
+  const name  = document.getElementById('edit-name').value.trim();
+  const email = document.getElementById('edit-email').value.trim();
+  const phone = document.getElementById('edit-phone').value.trim();
+  const err   = document.getElementById('edit-err');
+  const btn   = document.getElementById('edit-save-btn');
+  err.textContent = '';
+  btn.disabled = true; btn.textContent = 'Enregistrement...';
+  try {
+    const d = await api('team-update-member', {
+      method: 'POST',
+      body: JSON.stringify({ memberId: editingId, name, email, phone }),
+    });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const m = allMembers.find(x => x.leadwaseId === editingId);
+    if (m) { m.name = name; m.email = email; m.phone = phone; }
+    renderTable();
+    document.getElementById('edit-overlay').classList.remove('open');
+    toast('Employé mis à jour', 'success');
+  } catch (e) {
+    err.textContent = 'Erreur : ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Enregistrer';
+  }
+};
+
+document.getElementById('search-input').addEventListener('input', renderTable);
+
+initDashboardAuth(async ({ lwId: id, p }) => {
+  if (!p.isTeamOwner) {
+    document.getElementById('app-layout').style.display = 'none';
+    document.getElementById('access-denied').style.display = 'flex';
+    return;
+  }
+  lwId = id;
+  document.getElementById('team-company').textContent = p.company || '–';
+  try {
+    const d = await api('team-list');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allMembers = d.members || [];
+  } catch (e) {
+    toast('Erreur de chargement : ' + e.message, 'error');
+    allMembers = [];
+  }
+  document.getElementById('team-count').textContent = `${allMembers.length} carte${allMembers.length > 1 ? 's' : ''}`;
+  renderTable();
+});
+
+document.querySelectorAll('.sidebar-item').forEach(a =>
+  a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));
+</script>
+</body>
+</html>

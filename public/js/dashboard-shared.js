@@ -117,6 +117,12 @@ export function initDashboardAuth(onReady) {
       const active  = current === 'prospects.html' ? ' active' : '';
       prospectsNav.innerHTML = `<a class="sidebar-item${active}" href="prospects.html"><span class="s-icon">📇</span>Mes Prospects</a>`;
     }
+    const teamNav = document.getElementById('team-nav-item');
+    if (p.isTeamOwner && teamNav) {
+      const current = location.pathname.split('/').pop();
+      const active  = current === 'equipe.html' ? ' active' : '';
+      teamNav.innerHTML = `<a class="sidebar-item${active}" href="equipe.html"><span class="s-icon">👥</span>Mon équipe</a>`;
+    }
 
     let currentLoginEmail = user.email;
     try {

@@ -233,6 +233,71 @@ async function getGoogleReviews(req, res, leadwaseId) {
   res.json({ success: true, configured: true, ...data });
 }
 
+function genPwd(n = 10) {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  return Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join('');
+}
+
+// GET /api/profile/[id]?action=team-list — authentifié, réservé au chef d'équipe (isTeamOwner).
+async function listTeam(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const memberIds = Array.isArray(profile.teamMembers) ? profile.teamMembers : [];
+  const members = [];
+  for (const mid of memberIds) {
+    const [pDoc, cDoc] = await Promise.all([
+      db.collection('profiles').doc(mid).get(),
+      db.collection('credentials').doc(mid).get(),
+    ]);
+    if (!pDoc.exists) continue;
+    const p = pDoc.data();
+    members.push({
+      leadwaseId: mid,
+      name: p.firstName || '', email: p.email || '', phone: p.phone || '',
+      plan: p.plan || 'free',
+      password: cDoc.exists ? (cDoc.data().passwordHash || '') : '',
+      createdAt: p.createdAt || null,
+    });
+  }
+  res.json({ success: true, members, company: profile.company || '' });
+}
+
+// POST /api/profile/[id]?action=team-update-member — { memberId, name, email, phone }
+async function updateTeamMember(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const { memberId, name, email, phone } = req.body || {};
+  if (!memberId || !(profile.teamMembers || []).includes(memberId)) {
+    return res.status(400).json({ success: false, error: 'memberId invalide' });
+  }
+  await db.collection('profiles').doc(memberId).update({
+    firstName: (name  || '').trim().slice(0, 120),
+    email:     (email || '').trim().slice(0, 120),
+    phone:     (phone || '').trim().slice(0, 40),
+    updatedAt: new Date(),
+  });
+  res.json({ success: true });
+}
+
+// POST /api/profile/[id]?action=team-regenerate-password — { memberId }
+async function regenerateTeamMemberPassword(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const { memberId } = req.body || {};
+  if (!memberId || !(profile.teamMembers || []).includes(memberId)) {
+    return res.status(400).json({ success: false, error: 'memberId invalide' });
+  }
+  const newPwd = genPwd();
+  await db.collection('credentials').doc(memberId).set(
+    { leadwaseId: memberId, passwordHash: newPwd, updatedAt: new Date() },
+    { merge: true }
+  );
+  res.json({ success: true, password: newPwd });
+}
+
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
@@ -268,6 +333,18 @@ export default async function handler(req, res) {
     if (action === 'google-reviews' && req.method === 'GET') {
       return getGoogleReviews(req, res, leadwaseId).catch(e =>
         res.status(500).json({ success: false, error: e.message }));
+    }
+    if (action === 'team-list' && req.method === 'GET') {
+      return listTeam(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'team-update-member' && req.method === 'POST') {
+      return updateTeamMember(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'team-regenerate-password' && req.method === 'POST') {
+      return regenerateTeamMemberPassword(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
 
     console.log(`🔍 Recherche du profil: ${leadwaseId}`);

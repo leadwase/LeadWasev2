@@ -31,6 +31,9 @@ async function listCredentials(req, res) {
         ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
         : '—',
       plan:      profile?.plan || 'free',
+      company:   profile?.company || '',
+      isTeamOwner: !!profile?.isTeamOwner,
+      parentLeadwaseId: profile?.parentLeadwaseId || '',
       createdAt: credData.createdAt || null,
     });
   }
