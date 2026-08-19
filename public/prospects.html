@@ -137,7 +137,7 @@
 </div>
 
 <script type="module">
-import { initDashboardAuth, toast } from './js/dashboard-shared.js';
+import { initDashboardAuth, toast, confirmDialog } from './js/dashboard-shared.js';
 import { auth } from './js/dashboard-shared.js';
 
 let lwId = null, allProspects = [], currentFilter = 'all';
@@ -247,7 +247,7 @@ function renderTable() {
 }
 
 window.deleteProspect = async (id) => {
-  if (!confirm('Supprimer ce prospect de votre annuaire ?')) return;
+  if (!(await confirmDialog('Supprimer ce prospect de votre annuaire ?', { okLabel: 'Supprimer', danger: true }))) return;
   try {
     const d = await api('prospects', { method: 'DELETE', qs: '&prospectId=' + id });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
@@ -259,7 +259,11 @@ window.deleteProspect = async (id) => {
 
 document.getElementById('clear-btn').onclick = async () => {
   if (!allProspects.length) return;
-  if (!confirm(`Supprimer définitivement les ${allProspects.length} prospect(s) de votre annuaire ? Cette action est irréversible.`)) return;
+  const ok = await confirmDialog(
+    `Supprimer définitivement les ${allProspects.length} prospect(s) de votre annuaire ? Cette action est irréversible.`,
+    { okLabel: 'Tout supprimer', danger: true }
+  );
+  if (!ok) return;
   try {
     const d = await api('clear-prospects', { method: 'POST', body: '{}' });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');

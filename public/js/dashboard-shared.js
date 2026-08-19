@@ -29,6 +29,40 @@ export function toast(msg, type) {
   setTimeout(() => t.remove(), 3500);
 }
 
+// ── Confirmation modale (remplace window.confirm) ─────────────────────────────
+let confirmModalEl = null;
+function ensureConfirmModal() {
+  if (confirmModalEl) return confirmModalEl;
+  const el = document.createElement('div');
+  el.className = 'lw-confirm-overlay';
+  el.innerHTML = `
+    <div class="lw-confirm-box">
+      <div class="lw-confirm-msg"></div>
+      <div class="lw-confirm-actions">
+        <button class="lw-confirm-cancel">Annuler</button>
+        <button class="lw-confirm-ok">Confirmer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  confirmModalEl = el;
+  return el;
+}
+export function confirmDialog(message, { okLabel = 'Confirmer', danger = false } = {}) {
+  const el = ensureConfirmModal();
+  el.querySelector('.lw-confirm-msg').textContent = message;
+  const okBtn = el.querySelector('.lw-confirm-ok');
+  const cancelBtn = el.querySelector('.lw-confirm-cancel');
+  okBtn.textContent = okLabel;
+  okBtn.classList.toggle('danger', !!danger);
+  el.classList.add('open');
+  return new Promise((resolve) => {
+    const cleanup = (result) => { el.classList.remove('open'); resolve(result); };
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+    el.onclick = (e) => { if (e.target === el) cleanup(false); };
+  });
+}
+
 // ── Code public (masqué) ─────────────────────────────────────────────────────
 export function getPublicCode(lwId) {
   if (!lwId) return 'LW-????';

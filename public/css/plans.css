@@ -132,6 +132,15 @@
 
 .compare-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
+/* ── Popup d'erreur (remplace window.alert) ── */
+.err-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;align-items:center;justify-content:center;padding:20px}
+.err-popup-overlay.open{display:flex}
+.err-popup{background:var(--white);padding:32px 30px;max-width:380px;width:100%;text-align:center;border-top:4px solid #c0392b}
+.err-popup-icon{font-size:40px;margin-bottom:12px}
+.err-popup-msg{font-size:15px;color:var(--gray2);line-height:1.6;margin-bottom:22px}
+.err-popup-close{padding:11px 28px;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:13px;font-weight:bold;letter-spacing:1px;cursor:pointer;border-radius:2px}
+.err-popup-close:hover{background:var(--green)}
+
 @media(max-width:900px){
   .plans-grid{grid-template-columns:1fr;padding:20px;gap:20px}
   .plan-col{border-right:1px solid var(--gray5)}

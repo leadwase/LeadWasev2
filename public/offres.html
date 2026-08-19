@@ -146,6 +146,14 @@
 
 <div id="site-footer"></div>
 
+<div class="err-popup-overlay" id="err-popup-overlay">
+  <div class="err-popup">
+    <div class="err-popup-icon">⚠️</div>
+    <div class="err-popup-msg" id="err-popup-msg"></div>
+    <button class="err-popup-close" onclick="document.getElementById('err-popup-overlay').classList.remove('open')">Fermer</button>
+  </div>
+</div>
+
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
 import { onAuthStateChanged, getIdToken }                          from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
@@ -340,16 +348,21 @@ window.subscribe = async plan => {
       sessionStorage.setItem('last_subscription_id', d.subscriptionId);
       window.location.href = d.payUrl;
     } else {
-      alert('Erreur : ' + (d.error || 'Impossible de créer l\'abonnement'));
+      showErrPopup('Erreur : ' + (d.error || "Impossible de créer l'abonnement"));
       btn.disabled  = false;
       btn.textContent = plan === 'pro' ? 'Passer au Pro →' : 'Choisir Business →';
     }
   } catch (e) {
-    alert('Erreur réseau. Vérifiez votre connexion et réessayez.');
+    showErrPopup('Erreur réseau. Vérifiez votre connexion et réessayez.');
     btn.disabled  = false;
     btn.textContent = plan === 'pro' ? 'Passer au Pro →' : 'Choisir Business →';
   }
 };
+
+function showErrPopup(msg) {
+  document.getElementById('err-popup-msg').textContent = msg;
+  document.getElementById('err-popup-overlay').classList.add('open');
+}
 </script>
 <script type="module" src="js/include-layout.js"></script>
 </body>

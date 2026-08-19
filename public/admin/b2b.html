@@ -99,7 +99,7 @@
 </div>
 
 <script type="module">
-import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
+import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow, confirmDialog, promptDialog, toast } from './js/admin-shared.js';
 
 let allB2B = [];
 
@@ -128,14 +128,15 @@ function renderB2BTable(rows) {
 
 window.provisionTeam = async (orderId, quantityRange) => {
   const suggestion = (quantityRange.match(/\d+/g) || [])[0] || '';
-  const qty = prompt(
+  const qty = await promptDialog(
     `Quantité finale confirmée avec le client (fourchette demandée : "${quantityRange}") :`,
-    suggestion
+    { defaultValue: suggestion, okLabel: 'Continuer' }
   );
   if (!qty) return;
   const n = parseInt(qty, 10);
-  if (!n || n < 1) { alert('Quantité invalide.'); return; }
-  if (!confirm(`Créer le profil du chef d'entreprise + ${n} carte(s) employé ? Cette action déclenche l'envoi d'un email au client.`)) return;
+  if (!n || n < 1) { toast('Quantité invalide.', 'error'); return; }
+  const ok = await confirmDialog(`Créer le profil du chef d'entreprise + ${n} carte(s) employé ? Cette action déclenche l'envoi d'un email au client.`, { okLabel: "Créer l'équipe" });
+  if (!ok) return;
 
   try {
     const d = await api('orders?action=provision-b2b-team', {
@@ -143,10 +144,10 @@ window.provisionTeam = async (orderId, quantityRange) => {
       body: JSON.stringify({ orderId, confirmedQuantity: n }),
     });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
-    alert(`✅ Équipe créée : chef = ${d.chefLeadwaseId}, ${d.teamSize} carte(s) employé.`);
+    toast(`✅ Équipe créée : chef = ${d.chefLeadwaseId}, ${d.teamSize} carte(s) employé.`, 'success');
     window.loadB2B();
   } catch (e) {
-    alert('❌ Erreur : ' + e.message);
+    toast('❌ Erreur : ' + e.message, 'error');
   }
 };
 

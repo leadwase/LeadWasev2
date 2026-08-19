@@ -124,7 +124,7 @@
 </div><!-- /app -->
 
 <script type="module">
-import { initAuth, api } from './js/admin-shared.js';
+import { initAuth, api, confirmDialog } from './js/admin-shared.js';
 
 let allUsers = [];
 let selectedIds = new Set();
@@ -211,7 +211,8 @@ document.getElementById('msg-send-btn').onclick = async () => {
   if (!useAll && !recipients.length) { feedback.textContent = 'Sélectionnez au moins un destinataire.'; feedback.style.color = 'var(--red)'; return; }
 
   const count = useAll ? allUsers.length : recipients.length;
-  if (!confirm(`Envoyer ce message à ${count} utilisateur(s) ?`)) return;
+  const ok = await confirmDialog(`Envoyer ce message à ${count} utilisateur(s) ?`, { okLabel: 'Envoyer' });
+  if (!ok) return;
 
   btn.disabled = true; btn.textContent = 'Envoi en cours...';
   try {

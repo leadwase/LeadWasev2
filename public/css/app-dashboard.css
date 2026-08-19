@@ -651,6 +651,29 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 .toast.success { background: var(--green); color: var(--white); }
 .toast.error   { background: #c0392b; color: var(--white); }
 
+/* ── Confirmation modale (remplace window.confirm) ── */
+.lw-confirm-overlay {
+  display: none; position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(2px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.lw-confirm-overlay.open { display: flex; }
+.lw-confirm-box {
+  background: var(--white); border-radius: 4px; max-width: 380px; width: 100%;
+  padding: 26px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.lw-confirm-msg { font-size: 15px; color: var(--black); line-height: 1.6; margin-bottom: 20px; white-space: pre-line; }
+.lw-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.lw-confirm-actions button {
+  padding: 9px 18px; border-radius: 3px; font-family: var(--serif); font-size: 14px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--gray5); background: var(--white); color: var(--gray2);
+}
+.lw-confirm-cancel:hover { background: var(--gray6); }
+.lw-confirm-ok { background: var(--black); border-color: var(--black); color: var(--white); }
+.lw-confirm-ok:hover { background: var(--green); border-color: var(--green); }
+.lw-confirm-ok.danger { background: #c0392b; border-color: #c0392b; }
+.lw-confirm-ok.danger:hover { background: #a5301f; border-color: #a5301f; }
+
 /* ══════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════ */

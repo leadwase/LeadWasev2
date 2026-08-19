@@ -47,6 +47,73 @@ export function badge(s) {
   return `<span class="badge ${map[s] || 'b-pending'}">${labels[s] || s || '—'}</span>`;
 }
 export function shortId(id) { return id ? '#' + id.slice(-6).toUpperCase() : '—'; }
+
+// ── Confirmation / saisie modales (remplacent window.confirm / window.prompt) ──
+let confirmModalEl = null;
+function ensureConfirmModal() {
+  if (confirmModalEl) return confirmModalEl;
+  const el = document.createElement('div');
+  el.className = 'adm-confirm-overlay';
+  el.innerHTML = `
+    <div class="adm-confirm-box">
+      <div class="adm-confirm-msg"></div>
+      <div class="adm-confirm-field" style="display:none"><input type="text" class="adm-confirm-input"></div>
+      <div class="adm-confirm-actions">
+        <button class="adm-confirm-cancel">Annuler</button>
+        <button class="adm-confirm-ok">Confirmer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  confirmModalEl = el;
+  return el;
+}
+export function confirmDialog(message, { okLabel = 'Confirmer', danger = false } = {}) {
+  const el = ensureConfirmModal();
+  el.querySelector('.adm-confirm-msg').textContent = message;
+  el.querySelector('.adm-confirm-field').style.display = 'none';
+  const okBtn = el.querySelector('.adm-confirm-ok');
+  const cancelBtn = el.querySelector('.adm-confirm-cancel');
+  okBtn.textContent = okLabel;
+  okBtn.classList.toggle('danger', !!danger);
+  el.classList.add('open');
+  return new Promise((resolve) => {
+    const cleanup = (result) => { el.classList.remove('open'); resolve(result); };
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+    el.onclick = (e) => { if (e.target === el) cleanup(false); };
+  });
+}
+export function promptDialog(message, { defaultValue = '', okLabel = 'Valider' } = {}) {
+  const el = ensureConfirmModal();
+  el.querySelector('.adm-confirm-msg').textContent = message;
+  const field = el.querySelector('.adm-confirm-field');
+  const input = el.querySelector('.adm-confirm-input');
+  field.style.display = 'block';
+  input.value = defaultValue;
+  const okBtn = el.querySelector('.adm-confirm-ok');
+  const cancelBtn = el.querySelector('.adm-confirm-cancel');
+  okBtn.textContent = okLabel;
+  okBtn.classList.remove('danger');
+  el.classList.add('open');
+  setTimeout(() => input.focus(), 50);
+  return new Promise((resolve) => {
+    const cleanup = (result) => { el.classList.remove('open'); resolve(result); };
+    okBtn.onclick = () => cleanup(input.value);
+    cancelBtn.onclick = () => cleanup(null);
+    input.onkeydown = (e) => { if (e.key === 'Enter') cleanup(input.value); };
+    el.onclick = (e) => { if (e.target === el) cleanup(null); };
+  });
+}
+
+// ── Notification toast (remplace window.alert) ──────────────────────────────
+export function toast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = 'adm-toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
 export function orderRow(o, showId) {
   const shortId_ = o.id ? '#CMD-' + o.id.slice(-4).toUpperCase() : '—';
   const action = o.leadwaseId
@@ -92,14 +159,15 @@ window.closeModal = closeModal;
 // Génère les accès (identifiant + mot de passe) pour une commande payée,
 // directement depuis la liste (remplace l'ancien renvoi vers une page inexistante).
 window.generateAccess = async (orderId) => {
-  if (!confirm('Générer les identifiants de connexion pour cette commande ?')) return;
+  const ok = await confirmDialog('Générer les identifiants de connexion pour cette commande ?', { okLabel: 'Générer' });
+  if (!ok) return;
   try {
     const d = await api('orders?action=generate-credentials', { method: 'POST', body: JSON.stringify({ orderId }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
-    alert(`✅ Accès générés !\nIdentifiant : ${d.leadwaseId}\nMot de passe : ${d.password || '(déjà généré précédemment)'}`);
+    toast(`✅ Accès générés — Identifiant : ${d.leadwaseId} / Mot de passe : ${d.password || '(déjà généré précédemment)'}`, 'success');
     document.dispatchEvent(new CustomEvent('admin:orders-updated'));
   } catch (e) {
-    alert('❌ Erreur : ' + e.message);
+    toast('❌ Erreur : ' + e.message, 'error');
   }
 };
 
@@ -107,7 +175,7 @@ window.generateAccess = async (orderId) => {
 window.copyText = (text) => navigator.clipboard.writeText(text);
 window.copyFullCredentials = (lid, login, pwd) => {
   navigator.clipboard.writeText(`🔐 Vos identifiants LeadWase :\nIdentifiant : ${login}\nMot de passe : ${pwd}`);
-  alert('✅ Identifiants copiés !');
+  toast('✅ Identifiants copiés !', 'success');
 };
 
 // ── Sidebar / topbar ─────────────────────────────────────────────

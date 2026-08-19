@@ -132,7 +132,7 @@
 </div>
 
 <script type="module">
-import { initDashboardAuth, toast, auth } from './js/dashboard-shared.js';
+import { initDashboardAuth, toast, auth, confirmDialog } from './js/dashboard-shared.js';
 
 let lwId = null, allMembers = [], editingId = null;
 
@@ -190,7 +190,8 @@ window.copyCred = (id, pwd) => {
 };
 
 window.regenPassword = async (memberId) => {
-  if (!confirm("Générer un nouveau mot de passe pour cette carte ? L'ancien ne fonctionnera plus.")) return;
+  const ok = await confirmDialog("Générer un nouveau mot de passe pour cette carte ? L'ancien ne fonctionnera plus.", { okLabel: 'Régénérer', danger: true });
+  if (!ok) return;
   try {
     const d = await api('team-regenerate-password', { method: 'POST', body: JSON.stringify({ memberId }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
