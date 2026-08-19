@@ -128,7 +128,12 @@ export function initDashboardAuth(onReady) {
       return;
     }
 
-    const p         = profileDoc.data();
+    const p = profileDoc.data();
+    if (p.disabled) {
+      await signOut(auth);
+      window.location.href = 'connexion.html?msg=disabled';
+      return;
+    }
     const planFinal = p.plan || plan;
     const isPro     = ['pro', 'business'].includes(planFinal);
     const isBusiness = planFinal === 'business';

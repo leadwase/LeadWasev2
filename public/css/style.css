@@ -8,7 +8,9 @@
   --serif:'Times New Roman',Times,serif;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--serif);background:var(--white);color:var(--black);min-height:100vh}
+html{overflow-x:hidden;max-width:100%}
+body{font-family:var(--serif);background:var(--white);color:var(--black);min-height:100vh;overflow-x:hidden;max-width:100%}
+img,video,iframe,table{max-width:100%}
 a{text-decoration:none;color:inherit}
 
 /* Navbar */

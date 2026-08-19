@@ -34,6 +34,7 @@ async function listCredentials(req, res) {
       company:   profile?.company || '',
       isTeamOwner: !!profile?.isTeamOwner,
       parentLeadwaseId: profile?.parentLeadwaseId || '',
+      disabled:  !!profile?.disabled,
       createdAt: credData.createdAt || null,
     });
   }
@@ -81,6 +82,34 @@ async function sendMessage(req, res) {
   res.json({ success: true, sent, failed, total: targets.length, firstError });
 }
 
+// POST /api/admin/credentials?action=disable-user { leadwaseId } — désactive un compte (bloque la connexion).
+async function disableUser(req, res) {
+  const { leadwaseId } = req.body || {};
+  if (!leadwaseId) return res.status(400).json({ success: false, error: 'leadwaseId requis' });
+  await db.collection('profiles').doc(leadwaseId).update({ disabled: true, disabledAt: new Date() });
+  res.json({ success: true });
+}
+
+// POST /api/admin/credentials?action=enable-user { leadwaseId } — réactive un compte désactivé.
+async function enableUser(req, res) {
+  const { leadwaseId } = req.body || {};
+  if (!leadwaseId) return res.status(400).json({ success: false, error: 'leadwaseId requis' });
+  await db.collection('profiles').doc(leadwaseId).update({ disabled: false, disabledAt: null });
+  res.json({ success: true });
+}
+
+// POST /api/admin/credentials?action=delete-user { leadwaseId } — supprime définitivement un profil + ses identifiants.
+// Si le profil est un chef d'équipe, ses sous-comptes ne sont PAS supprimés automatiquement (à traiter séparément).
+async function deleteUser(req, res) {
+  const { leadwaseId } = req.body || {};
+  if (!leadwaseId) return res.status(400).json({ success: false, error: 'leadwaseId requis' });
+  await Promise.all([
+    db.collection('profiles').doc(leadwaseId).delete(),
+    db.collection('credentials').doc(leadwaseId).delete(),
+  ]);
+  res.json({ success: true });
+}
+
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -91,9 +120,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (req.query.action === 'send-message' && req.method === 'POST') {
-      return await sendMessage(req, res);
-    }
+    const action = req.query.action;
+    if (action === 'send-message'  && req.method === 'POST') return await sendMessage(req, res);
+    if (action === 'disable-user'  && req.method === 'POST') return await disableUser(req, res);
+    if (action === 'enable-user'   && req.method === 'POST') return await enableUser(req, res);
+    if (action === 'delete-user'   && req.method === 'POST') return await deleteUser(req, res);
     return await listCredentials(req, res);
   } catch (e) {
     console.error('[admin/credentials]', e);

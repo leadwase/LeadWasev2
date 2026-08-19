@@ -7,7 +7,9 @@
   --red:#dc2626;--orange:#d97706;--blue:#2563eb;
   --sidebar-w:220px;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);min-height:100vh;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--gray1);min-height:100vh;font-size:16px;overflow-x:hidden;max-width:100%}
+html{overflow-x:hidden;max-width:100%}
+img,video,iframe{max-width:100%}
 
 /* ── Login ── */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--black);background-image:radial-gradient(ellipse at 20% 60%,rgba(22,163,74,.12) 0%,transparent 55%)}

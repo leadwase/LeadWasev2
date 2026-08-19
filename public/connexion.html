@@ -209,7 +209,8 @@ import {
   createUserWithEmailAndPassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
-  updatePassword
+  updatePassword,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -222,6 +223,9 @@ let _resetEmail = null;
 const params = new URLSearchParams(window.location.search);
 if (params.get('msg') === 'identifiants') {
   document.getElementById('info-box').style.display = 'block';
+}
+if (params.get('msg') === 'disabled') {
+  showErr(document.getElementById('err-login'), 'Ce compte a été désactivé. Contactez le support LeadWase.');
 }
 
 // ── Navigation panneaux ───────────────────────────────────────────────────────
@@ -263,9 +267,16 @@ async function signInAndSyncUid(id, pwd) {
     // Ici on contourne en tentant une création → si le compte existait déjà on re-login.
     try {
       userCredential = await createUserWithEmailAndPassword(auth, email, pwd);
-      await setDoc(doc(db, 'users', userCredential.user.uid),
-        { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() },
-        { merge: true });
+      // Écrit users/{uid} séparément : les règles Firestore n'autorisent la création
+      // de ce document qu'à un admin, donc un échec ici ne doit JAMAIS faire échouer
+      // la connexion elle-même (le compte Auth est déjà créé à ce stade).
+      try {
+        await setDoc(doc(db, 'users', userCredential.user.uid),
+          { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() },
+          { merge: true });
+      } catch (usersDocErr) {
+        console.warn('[login] écriture users/{uid} ignorée (permissions) :', usersDocErr.code);
+      }
     } catch (createErr) {
       console.error('[login] createUser a échoué:', createErr.code, createErr.message);
       if (createErr.code === 'auth/email-already-in-use') {
@@ -291,6 +302,18 @@ async function signInAndSyncUid(id, pwd) {
   } catch (_) {
     // Peut échouer si la règle update l'interdit (firebaseUid déjà différent)
     // Ce cas ne doit pas bloquer la connexion
+  }
+
+  // ── Compte désactivé par l'admin → refuse la connexion ──────────────────────
+  try {
+    const profSnap = await getDoc(doc(db, 'profiles', id));
+    if (profSnap.exists() && profSnap.data().disabled) {
+      await signOut(auth);
+      throw new Error('Ce compte a été désactivé. Contactez le support LeadWase.');
+    }
+  } catch (e) {
+    if (e.message?.includes('désactivé')) throw e;
+    // Erreur de lecture non bloquante (ex: règles) : on laisse la connexion continuer.
   }
 
   return { user, email };
