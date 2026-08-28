@@ -9,25 +9,68 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/app-dashboard.css">
 <style>
+  /* ── Mise en page uniquement — aucune couleur ajoutée ici ── */
   .app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
   #content.dash { max-width: none; width: 100%; margin: 0; padding: 0; }
+
   @media (min-width: 960px) {
     #content.dash {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
       grid-auto-flow: row dense;
       align-items: start;
       gap: 24px;
     }
+    /* En-tête toujours pleine largeur */
     #content.dash > .dash-header { grid-column: 1 / -1; }
-    #content.dash > .card { grid-column: 1; }
+
+    /* Colonne gauche : carte profil, plus haute, occupe 2 lignes de la grille */
+    #content.dash > .card { grid-column: 1; grid-row: span 2; }
+
+    /* Colonne droite : Statistiques puis Réseaux sociaux, empilés */
+    #content.dash > .analytics-teaser,
+    #content.dash > .links-card { grid-column: 2; }
+
+    /* Sections pleine largeur en dessous */
     #content.dash > .locked-card,
     #content.dash > .plan-compare,
     #content.dash > .upgrade,
-    #content.dash > .analytics-teaser,
-    #content.dash > .links-card,
-    #content.dash > .extras-card { grid-column: 2; }
+    #content.dash > .extras-card { grid-column: 1 / -1; }
   }
+
+  /* Carte Analytics en version "Statistics" verticale pour la sidebar */
+  #content.dash > .analytics-teaser {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  #content.dash > .analytics-teaser .analytics-btn { align-self: stretch; text-align: center; }
+
+  /* Avatar + bouton d'upload alignés côte à côte */
+  .profile-top-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+  .profile-top-row .profile-top { margin: 0; flex: 1 1 auto; }
+  .profile-top-row .photo-upload { margin: 0; flex: 0 0 auto; }
+
+  /* Fonctionnalités Business : deux colonnes comme sur la maquette */
+  .extras-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  @media (min-width: 700px) {
+    .extras-columns {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+  }
+  .extras-columns .extras-col > .extras-section:last-child { margin-bottom: 0; }
 </style>
 </head>
 <body>
@@ -89,27 +132,30 @@
         <div class="card">
           <div class="card-head"><span class="card-title">👤 Informations personnelles</span></div>
           <div class="card-body">
-          <div class="profile-top">
-            <div class="pf-av" id="pf-av">
-              <span id="pf-av-text">?</span>
-              <img id="pf-av-img" style="display:none; width:100%; height:100%; object-fit:cover" alt="Photo de profil">
-            </div>
-            <div>
-              <div class="pf-name" id="pf-name">–</div>
-              <div class="pf-job" id="pf-job">–</div>
-              <div class="pf-co" id="pf-co"></div>
-              <div class="pf-id" id="pf-id">–</div>
-              <div class="plan-badge" id="pf-plan">FREE</div>
-            </div>
-          </div>
 
-          <!-- Upload photo (Pro et Business uniquement) -->
-          <div id="photo-upload-section" style="display:none" class="photo-upload">
-            <label>
-              📷 Changer la photo de profil
-              <input type="file" id="profile-photo" accept="image/jpeg,image/png,image/jpg">
-            </label>
-            <div class="photo-preview" id="photo-preview"></div>
+          <div class="profile-top-row">
+            <div class="profile-top">
+              <div class="pf-av" id="pf-av">
+                <span id="pf-av-text">?</span>
+                <img id="pf-av-img" style="display:none; width:100%; height:100%; object-fit:cover" alt="Photo de profil">
+              </div>
+              <div>
+                <div class="pf-name" id="pf-name">–</div>
+                <div class="pf-job" id="pf-job">–</div>
+                <div class="pf-co" id="pf-co"></div>
+                <div class="pf-id" id="pf-id">–</div>
+                <div class="plan-badge" id="pf-plan">FREE</div>
+              </div>
+            </div>
+
+            <!-- Upload photo (Pro et Business uniquement) -->
+            <div id="photo-upload-section" style="display:none" class="photo-upload">
+              <label>
+                📷 Changer la photo de profil
+                <input type="file" id="profile-photo" accept="image/jpeg,image/png,image/jpg">
+              </label>
+              <div class="photo-preview" id="photo-preview"></div>
+            </div>
           </div>
 
           <div class="edit-sec">
@@ -160,66 +206,76 @@
           <div class="card-head"><span class="card-title">⚙️ Fonctionnalités Business</span></div>
           <div class="card-body">
 
-          <div class="extras-section" id="location-section" style="display:none">
-            <h3>📍 Localisation</h3>
-            <div class="edit-grid edit-solo">
-              <div class="f-group">
-                <label class="f-label">Adresse complète</label>
-                <div style="display:flex;gap:8px">
-                  <input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin" style="flex:1">
-                  <button type="button" class="geoloc-btn" id="geoloc-btn" style="white-space:nowrap">📍 Ma position</button>
+          <div class="extras-columns">
+            <div class="extras-col">
+
+              <div class="extras-section" id="location-section" style="display:none">
+                <h3>📍 Localisation</h3>
+                <div class="edit-grid edit-solo">
+                  <div class="f-group">
+                    <label class="f-label">Adresse complète</label>
+                    <div style="display:flex;gap:8px">
+                      <input class="f-input" id="e-location" placeholder="Ex: Avenue Jean-Paul II, Cotonou, Bénin" style="flex:1">
+                      <button type="button" class="geoloc-btn" id="geoloc-btn" style="white-space:nowrap">📍 Ma position</button>
+                    </div>
+                    <div id="geoloc-status" style="font-size:15px;color:var(--gray3);margin-top:6px;"></div>
+                  </div>
                 </div>
-                <div id="geoloc-status" style="font-size:15px;color:var(--gray3);margin-top:6px;"></div>
+                <div class="map-preview" id="map-preview">🗺️ Aperçu carte — détectez ou saisissez une adresse</div>
               </div>
-            </div>
-            <div class="map-preview" id="map-preview">🗺️ Aperçu carte — détectez ou saisissez une adresse</div>
-          </div>
 
-          <div class="extras-section" id="rdv-section" style="display:none">
-            <h3>📅 Prise de rendez-vous</h3>
-            <div class="edit-grid">
-              <div class="f-group"><label class="f-label">Lien de réservation (Calendly, Cal.com, Google Calendar...)</label><input class="f-input" id="e-rdv" placeholder="https://calendly.com/... ou https://cal.com/..."></div>
-              <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
-            </div>
-            <div style="margin-top:10px">
-              <span style="font-size:13px;color:var(--gray3)">Aperçu bouton :</span><br>
-              <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
-            </div>
-          </div>
-
-          <div class="extras-section" id="google-review-section" style="display:none">
-            <h3>⭐ Avis Google</h3>
-            <div class="edit-grid edit-solo">
-              <div class="f-group">
-                <label class="f-label">ID de fiche établissement Google (Place ID)</label>
-                <input class="f-input" id="e-google-place-id" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4">
-                <div class="f-hint">
-                  Permet d'afficher automatiquement votre note et vos derniers avis Google sur votre profil.
-                  <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" style="color:var(--green)">Trouver mon Place ID →</a>
+              <div class="extras-section" id="google-review-section" style="display:none">
+                <h3>⭐ Avis Google</h3>
+                <div class="edit-grid edit-solo">
+                  <div class="f-group">
+                    <label class="f-label">ID de fiche établissement Google (Place ID)</label>
+                    <input class="f-input" id="e-google-place-id" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4">
+                    <div class="f-hint">
+                      Permet d'afficher automatiquement votre note et vos derniers avis Google sur votre profil.
+                      <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" style="color:var(--green)">Trouver mon Place ID →</a>
+                    </div>
+                  </div>
+                  <div class="f-group"><label class="f-label">Lien "Voir tous les avis" (optionnel)</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
+                </div>
+                <div class="review-preview" id="review-preview" style="display:none">
+                  <span class="stars">★★★★★</span>
+                  <span>Voir nos avis sur Google →</span>
                 </div>
               </div>
-              <div class="f-group"><label class="f-label">Lien "Voir tous les avis" (optionnel)</label><input class="f-input" id="e-google-review" placeholder="https://g.page/r/..." oninput="toggleReviewPreview(this.value)"></div>
-            </div>
-            <div class="review-preview" id="review-preview" style="display:none">
-              <span class="stars">★★★★★</span>
-              <span>Voir nos avis sur Google →</span>
-            </div>
-          </div>
 
-          <div class="extras-section" id="contact-section" style="display:none">
-            <h3>📨 Formulaire de contact</h3>
-            <div class="edit-grid edit-solo">
-              <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
             </div>
-            <label style="display:flex;align-items:center;gap:8px;font-size:20px;margin-top:10px;cursor:pointer;color:var(--gray2)">
-              <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
-              Afficher le formulaire sur mon profil public
-            </label>
 
-            <div class="f-hint" style="margin-top:16px;margin-bottom:8px">Champs du formulaire — créez vous-même les champs que vos visiteurs devront remplir.</div>
-            <div id="contact-fields-list"></div>
-            <button type="button" class="geoloc-btn" id="add-field-btn" style="margin-top:8px">+ Ajouter un champ</button>
-            <div class="f-hint" style="margin-top:10px">Chaque soumission vous sera envoyée par email et ajoutée à "Mes Prospects".</div>
+            <div class="extras-col">
+
+              <div class="extras-section" id="rdv-section" style="display:none">
+                <h3>📅 Prise de rendez-vous</h3>
+                <div class="edit-grid">
+                  <div class="f-group"><label class="f-label">Lien de réservation (Calendly, Cal.com, Google Calendar...)</label><input class="f-input" id="e-rdv" placeholder="https://calendly.com/... ou https://cal.com/..."></div>
+                  <div class="f-group"><label class="f-label">Texte du bouton</label><input class="f-input" id="e-rdv-label" value="Prendre rendez-vous"></div>
+                </div>
+                <div style="margin-top:10px">
+                  <span style="font-size:13px;color:var(--gray3)">Aperçu bouton :</span><br>
+                  <span class="rdv-preview-btn">📅 Prendre rendez-vous</span>
+                </div>
+              </div>
+
+              <div class="extras-section" id="contact-section" style="display:none">
+                <h3>📨 Formulaire de contact</h3>
+                <div class="edit-grid edit-solo">
+                  <div class="f-group"><label class="f-label">Message d'accueil</label><input class="f-input" id="e-contact-msg" placeholder="Contactez-moi via le formulaire..."></div>
+                </div>
+                <label style="display:flex;align-items:center;gap:8px;font-size:20px;margin-top:10px;cursor:pointer;color:var(--gray2)">
+                  <input type="checkbox" id="e-contact-active" style="accent-color:var(--green);width:13px;height:13px">
+                  Afficher le formulaire sur mon profil public
+                </label>
+
+                <div class="f-hint" style="margin-top:16px;margin-bottom:8px">Champs du formulaire — créez vous-même les champs que vos visiteurs devront remplir.</div>
+                <div id="contact-fields-list"></div>
+                <button type="button" class="geoloc-btn" id="add-field-btn" style="margin-top:8px">+ Ajouter un champ</button>
+                <div class="f-hint" style="margin-top:10px">Chaque soumission vous sera envoyée par email et ajoutée à "Mes Prospects".</div>
+              </div>
+
+            </div>
           </div>
 
           <button class="save-btn" onclick="saveExtras()">Enregistrer</button>
