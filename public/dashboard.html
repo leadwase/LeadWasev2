@@ -11,16 +11,22 @@
 <style>
   .app-content { display: block; padding: 28px; align-items: normal; justify-content: normal; }
   #content.dash { max-width: none; width: 100%; margin: 0; padding: 0; }
-  @media (min-width: 900px) {
-    #content.dash { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
-    #content.dash > .dash-header { flex: 1 1 100%; }
-    #content.dash > .card,
+  @media (min-width: 960px) {
+    #content.dash {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+      grid-auto-flow: row dense;
+      align-items: start;
+      gap: 24px;
+    }
+    #content.dash > .dash-header { grid-column: 1 / -1; }
+    #content.dash > .card { grid-column: 1; }
     #content.dash > .locked-card,
     #content.dash > .plan-compare,
     #content.dash > .upgrade,
     #content.dash > .analytics-teaser,
     #content.dash > .links-card,
-    #content.dash > .extras-card { flex: 1 1 480px; min-width: 0; }
+    #content.dash > .extras-card { grid-column: 2; }
   }
 </style>
 </head>

@@ -254,6 +254,73 @@ function genPwd(n = 12) {
 }
 
 // GET /api/profile/[id]?action=team-list — authentifié, réservé au chef d'équipe (isTeamOwner).
+// GET /api/profile/[id]?action=team-prospects — CRM agrégé : tous les prospects
+// captués par le chef ET par chacune des cartes de son équipe.
+async function getTeamProspects(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const memberIds = [leadwaseId, ...(Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  const [profileDocs, prospectLists] = await Promise.all([
+    Promise.all(memberIds.map(id => db.collection('profiles').doc(id).get())),
+    Promise.all(memberIds.map(id =>
+      db.collection('prospects').where('ownerId', '==', id).orderBy('createdAt', 'desc').limit(200).get()
+    )),
+  ]);
+
+  const nameMap = {};
+  profileDocs.forEach(d => { if (d.exists) nameMap[d.id] = (d.data().firstName || d.id); });
+
+  let prospects = [];
+  prospectLists.forEach((snap, i) => {
+    const ownerId = memberIds[i];
+    snap.docs.forEach(doc => prospects.push({
+      id: doc.id, ...doc.data(),
+      cardOwnerId: ownerId, cardOwnerName: nameMap[ownerId] || ownerId,
+    }));
+  });
+  prospects.sort((a, b) => {
+    const ta = a.createdAt?._seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+    const tb = b.createdAt?._seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+    return tb - ta;
+  });
+
+  res.json({ success: true, prospects: prospects.slice(0, 500), teamSize: memberIds.length });
+}
+
+// GET /api/profile/[id]?action=team-analytics — statistiques agrégées de visite
+// (30 derniers jours) pour le chef et chacune des cartes de son équipe.
+async function getTeamAnalytics(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const memberIds = [leadwaseId, ...(Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const [profileDocs, visitSnaps] = await Promise.all([
+    Promise.all(memberIds.map(id => db.collection('profiles').doc(id).get())),
+    Promise.all(memberIds.map(id =>
+      db.collection('analytics').doc(id).collection('visits')
+        .where('visitedAt', '>=', since).limit(1000).get().catch(() => null)
+    )),
+  ]);
+
+  const nameMap = {};
+  profileDocs.forEach(d => { if (d.exists) nameMap[d.id] = (d.data().firstName || d.id); });
+
+  let totalVisits = 0, totalClicks = 0;
+  const perMember = memberIds.map((id, i) => {
+    const docs = visitSnaps[i]?.docs || [];
+    const views  = docs.filter(d => d.data().type === 'profile_view').length;
+    const clicks = docs.length - views;
+    totalVisits += views;
+    totalClicks += clicks;
+    return { leadwaseId: id, name: nameMap[id] || id, views, clicks, total: docs.length };
+  }).sort((a, b) => b.total - a.total);
+
+  res.json({ success: true, totalVisits, totalClicks, teamSize: memberIds.length, perMember });
+}
+
 async function listTeam(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   if (!profile.isTeamOwner) throw new Error('Accès refusé');
@@ -351,6 +418,14 @@ export default async function handler(req, res) {
     }
     if (action === 'team-list' && req.method === 'GET') {
       return listTeam(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'team-prospects' && req.method === 'GET') {
+      return getTeamProspects(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'team-analytics' && req.method === 'GET') {
+      return getTeamAnalytics(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'team-update-member' && req.method === 'POST') {

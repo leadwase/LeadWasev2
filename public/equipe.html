@@ -113,6 +113,79 @@
           </table>
         </div>
 
+        <!-- Statistiques agrégées de l'équipe -->
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Statistiques de l'équipe</div>
+            <div class="pros-sub">Visites et interactions sur les 30 derniers jours, toutes cartes confondues</div>
+          </div>
+        </div>
+        <div class="pros-stats">
+          <div class="pros-stat c-green">
+            <div class="pros-stat-top"><span class="pros-stat-label">Total visites</span><span class="pros-stat-icon">👁️</span></div>
+            <div class="pros-stat-val" id="team-total-views">–</div>
+            <div class="pros-stat-sub up">30 derniers jours</div>
+          </div>
+          <div class="pros-stat c-blue">
+            <div class="pros-stat-top"><span class="pros-stat-label">Total interactions</span><span class="pros-stat-icon">👆</span></div>
+            <div class="pros-stat-val" id="team-total-clicks">–</div>
+            <div class="pros-stat-sub">Clics, appels, emails...</div>
+          </div>
+          <div class="pros-stat c-purple">
+            <div class="pros-stat-top"><span class="pros-stat-label">Prospects captés</span><span class="pros-stat-icon">🤝</span></div>
+            <div class="pros-stat-val" id="team-total-prospects">–</div>
+            <div class="pros-stat-sub">Toute l'équipe</div>
+          </div>
+        </div>
+
+        <div class="pros-card">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">Performance par carte</div>
+              <div class="pros-card-sub">Répartition des visites entre le chef et chaque employé</div>
+            </div>
+          </div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>Carte</th><th>Vues de profil</th><th>Interactions</th><th>Total</th></tr>
+            </thead>
+            <tbody id="team-stats-tbody">
+              <tr class="pros-empty"><td colspan="4">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Prospects agrégés de l'équipe -->
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Prospects de l'équipe</div>
+            <div class="pros-sub">Tous les contacts captés via chaque carte de votre équipe</div>
+          </div>
+          <div class="pros-actions">
+            <button class="pros-btn" id="export-team-csv-btn">📤 Exporter CSV</button>
+          </div>
+        </div>
+
+        <div class="pros-card">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">Annuaire des prospects — équipe</div>
+              <div class="pros-card-sub">Classés du plus récent au plus ancien</div>
+            </div>
+            <div class="pros-search-row">
+              <div class="pros-search"><input id="team-prospects-search" type="text" placeholder="Rechercher..."></div>
+            </div>
+          </div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Capté par</th><th>Source</th><th>Date</th></tr>
+            </thead>
+            <tbody id="team-prospects-tbody">
+              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
   </main>
@@ -270,6 +343,101 @@ initDashboardAuth(async ({ lwId: id, p }) => {
   }
   document.getElementById('team-count').textContent = `${allMembers.length} carte${allMembers.length > 1 ? 's' : ''}`;
   renderTable();
+  loadTeamAnalytics();
+  loadTeamProspects();
+});
+
+// ── Statistiques agrégées de l'équipe ────────────────────────────────────────
+async function loadTeamAnalytics() {
+  try {
+    const d = await api('team-analytics');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    document.getElementById('team-total-views').textContent  = d.totalVisits;
+    document.getElementById('team-total-clicks').textContent = d.totalClicks;
+    const tbody = document.getElementById('team-stats-tbody');
+    if (!d.perMember.length) {
+      tbody.innerHTML = '<tr class="pros-empty"><td colspan="4">Aucune donnée</td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.perMember.map(m => `
+      <tr>
+        <td><div class="pros-name">${m.name}</div><div class="pros-email">${m.leadwaseId}</div></td>
+        <td>${m.views}</td>
+        <td>${m.clicks}</td>
+        <td style="font-weight:700">${m.total}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    document.getElementById('team-stats-tbody').innerHTML =
+      `<tr class="pros-empty"><td colspan="4" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
+  }
+}
+
+// ── Prospects agrégés de l'équipe ─────────────────────────────────────────────
+let allTeamProspects = [];
+
+function fmtProspectDate(v) {
+  if (!v) return '–';
+  const d = v._seconds ? new Date(v._seconds * 1000) : new Date(v);
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function renderTeamProspects() {
+  const tbody  = document.getElementById('team-prospects-tbody');
+  const search = document.getElementById('team-prospects-search').value.trim().toLowerCase();
+  let rows = allTeamProspects;
+  if (search) {
+    rows = rows.filter(p =>
+      (p.name || '').toLowerCase().includes(search) ||
+      (p.email || '').toLowerCase().includes(search) ||
+      (p.phone || '').toLowerCase().includes(search) ||
+      (p.cardOwnerName || '').toLowerCase().includes(search));
+  }
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun prospect pour le moment.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td><div class="pros-name">${p.name || '—'}</div><div class="pros-email">${p.email || '—'}</div></td>
+      <td>${p.phone || '—'}</td>
+      <td style="max-width:220px">${p.object || '—'}</td>
+      <td><span class="pros-badge lien">${p.cardOwnerName}</span></td>
+      <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC</span>' : '<span class="pros-badge lien">🔗 Lien</span>'}</td>
+      <td style="color:var(--gray4);font-size:13px">${fmtProspectDate(p.createdAt)}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadTeamProspects() {
+  try {
+    const d = await api('team-prospects');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allTeamProspects = d.prospects || [];
+    document.getElementById('team-total-prospects').textContent = allTeamProspects.length;
+    renderTeamProspects();
+  } catch (e) {
+    document.getElementById('team-prospects-tbody').innerHTML =
+      `<tr class="pros-empty"><td colspan="6" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
+  }
+}
+
+document.getElementById('team-prospects-search').addEventListener('input', renderTeamProspects);
+
+document.getElementById('export-team-csv-btn').addEventListener('click', () => {
+  if (!allTeamProspects.length) { toast('Aucun prospect à exporter', 'error'); return; }
+  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Capté par', 'Source', 'Date'];
+  const lines = allTeamProspects.map(p => [
+    p.name || '', p.phone || '', p.email || '', (p.object || '').replace(/\n/g, ' '),
+    p.cardOwnerName || '', p.source === 'nfc' ? 'NFC Card' : 'Lien direct', fmtProspectDate(p.createdAt),
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+  const csv  = [header.join(','), ...lines].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `prospects-equipe-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 });
 
 document.querySelectorAll('.sidebar-item').forEach(a =>
