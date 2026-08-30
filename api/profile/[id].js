@@ -321,6 +321,50 @@ async function getTeamAnalytics(req, res, leadwaseId) {
   res.json({ success: true, totalVisits, totalClicks, teamSize: memberIds.length, perMember });
 }
 
+// POST /api/profile/[id]?action=buy-extra-card — le chef d'équipe achète une carte
+// supplémentaire (au prix négocié à la commande B2B). Retourne un lien de paiement ;
+// la carte n'est provisionnée qu'après paiement confirmé (webhook).
+async function buyExtraCard(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const amount = parseInt(profile.pricePerCard, 10);
+  if (!amount || amount < 1) {
+    return res.status(400).json({ success: false, error: "Prix par carte non défini pour votre équipe. Contactez le support." });
+  }
+
+  const orderRef = await db.collection('orders').add({
+    cardType: 'b2b_extra', orderContext: 'extra_team_card', parentChefId: leadwaseId,
+    firstName: profile.firstName || '', company: profile.company || '', email: profile.email || '',
+    amount, status: 'pending', createdAt: new Date(),
+  });
+  const payRef = await db.collection('payments').add({
+    orderId: orderRef.id, amount, status: 'pending', createdAt: new Date(),
+  });
+
+  const GW_URL = 'https://paymentgateway.lfdweb.com';
+  const SITE   = process.env.SITE_URL || 'https://leadwase.com';
+  const gRes = await fetch(`${GW_URL}/api/gateway/generate-link`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.GATEWAY_API_KEY },
+    body: JSON.stringify({
+      amount, country: 'bj',
+      description: `LeadWase — carte employé supplémentaire (${profile.company || leadwaseId})`,
+      origin: SITE, sendWebhook: true,
+      metadata: { transactionId: payRef.id, orderId: orderRef.id, origin: SITE, sendWebhook: true },
+    }),
+  });
+  const gData = await gRes.json().catch(() => null);
+  if (!gRes.ok || !gData?.pid || !gData?.url) {
+    await orderRef.update({ status: 'gateway_error' });
+    return res.status(502).json({ success: false, error: "Impossible de générer le lien de paiement" });
+  }
+  await payRef.update({ pid: gData.pid, payUrl: gData.url });
+  await orderRef.update({ paymentId: payRef.id, pid: gData.pid });
+
+  res.json({ success: true, payUrl: gData.url, amount });
+}
+
 async function listTeam(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   if (!profile.isTeamOwner) throw new Error('Accès refusé');
@@ -418,6 +462,10 @@ export default async function handler(req, res) {
     }
     if (action === 'team-list' && req.method === 'GET') {
       return listTeam(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'buy-extra-card' && req.method === 'POST') {
+      return buyExtraCard(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'team-prospects' && req.method === 'GET') {

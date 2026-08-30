@@ -16,7 +16,7 @@
   <div class="login-card">
     <div class="login-logo">Lead<em>Wase</em></div>
     <div class="login-badge">Administration</div>
-    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="supportleadwase@gmail.com" value="supportleadwase@gmail.com"></div>
+    <div class="fl"><label>Email</label><input id="l-email" type="email" placeholder="contact@leadwase.com" value="contact@leadwase.com"></div>
     <div class="fl"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="••••••••••"></div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Accéder au dashboard</button>
     <div class="login-err" id="login-err"></div>
@@ -135,13 +135,22 @@ window.provisionTeam = async (orderId, quantityRange) => {
   if (!qty) return;
   const n = parseInt(qty, 10);
   if (!n || n < 1) { toast('Quantité invalide.', 'error'); return; }
-  const ok = await confirmDialog(`Créer le profil du chef d'entreprise + ${n} carte(s) employé ? Cette action déclenche l'envoi d'un email au client.`, { okLabel: "Créer l'équipe" });
+
+  const price = await promptDialog(
+    'Prix négocié par carte (FCFA) — servira aussi si le client ajoute un employé supplémentaire plus tard :',
+    { defaultValue: '25000', okLabel: 'Continuer' }
+  );
+  if (!price) return;
+  const p = parseInt(price, 10);
+  if (!p || p < 1) { toast('Prix invalide.', 'error'); return; }
+
+  const ok = await confirmDialog(`Créer le profil du chef d'entreprise + ${n} carte(s) employé à ${p} FCFA/carte ? Cette action déclenche l'envoi d'un email au client.`, { okLabel: "Créer l'équipe" });
   if (!ok) return;
 
   try {
     const d = await api('orders?action=provision-b2b-team', {
       method: 'POST',
-      body: JSON.stringify({ orderId, confirmedQuantity: n }),
+      body: JSON.stringify({ orderId, confirmedQuantity: n, pricePerCard: p }),
     });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     toast(`✅ Équipe créée : chef = ${d.chefLeadwaseId}, ${d.teamSize} carte(s) employé.`, 'success');

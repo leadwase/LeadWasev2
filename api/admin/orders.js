@@ -69,10 +69,14 @@ async function generateCredentials(req, res) {
 // Crée le profil du chef d'entreprise + un sous-profil par carte confirmée,
 // tous liés (parentLeadwaseId / teamMembers), avec le forfait choisi à la commande.
 async function provisionB2BTeam(req, res) {
-  const { orderId, confirmedQuantity } = req.body;
+  const { orderId, confirmedQuantity, pricePerCard } = req.body;
   const qty = parseInt(confirmedQuantity, 10);
+  const cardPrice = parseInt(pricePerCard, 10);
   if (!orderId || !qty || qty < 1 || qty > 500) {
     return res.status(400).json({ success: false, error: 'orderId et confirmedQuantity (1-500) requis' });
+  }
+  if (!cardPrice || cardPrice < 1) {
+    return res.status(400).json({ success: false, error: 'pricePerCard requis (prix négocié par carte)' });
   }
 
   const orderRef = db.collection('orders').doc(orderId);
@@ -97,7 +101,7 @@ async function provisionB2BTeam(req, res) {
   await db.collection('profiles').doc(chefId).set({
     leadwaseId: chefId, firstName: d.firstName, lastName: '', company: d.company,
     phone: d.phone || '', email: d.email, plan,
-    isTeamOwner: true, teamMembers: [], teamOrderId: orderId, createdAt: new Date(),
+    isTeamOwner: true, teamMembers: [], teamOrderId: orderId, pricePerCard: cardPrice, createdAt: new Date(),
   });
   await db.collection('credentials').doc(chefId).set({ leadwaseId: chefId, passwordHash: chefPwd, createdAt: new Date() });
 

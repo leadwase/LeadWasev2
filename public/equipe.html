@@ -60,7 +60,7 @@
       <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
     <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
       <a class="sidebar-item" href="commander.html" target="_blank" rel="noopener"><span class="s-icon">🛒</span>Commander une carte</a>
-      <a class="sidebar-item" href="mailto:supportleadwase@gmail.com"><span class="s-icon">💬</span>Support</a>
+      <a class="sidebar-item" href="mailto:contact@leadwase.com"><span class="s-icon">💬</span>Support</a>
     <div class="sidebar-section-label" style="margin-top:8px">Légal</div>
       <a class="sidebar-item" href="cgu.html" target="_blank" rel="noopener"><span class="s-icon">📄</span>CGU</a>
       <a class="sidebar-item" href="confidentialite.html" target="_blank" rel="noopener"><span class="s-icon">🔒</span>Confidentialité</a>
@@ -94,15 +94,17 @@
         </div>
 
         <div class="pros-card">
-          <div class="pros-card-head">
+          <div class="pros-card-head" id="team-cards-toggle" style="cursor:pointer">
             <div>
               <div class="pros-card-title">Cartes de l'équipe</div>
               <div class="pros-card-sub">Identifiants et mots de passe à distribuer à vos employés</div>
             </div>
             <div class="pros-search-row">
-              <div class="pros-search"><input id="search-input" type="text" placeholder="Rechercher..."></div>
+              <div class="pros-search"><input id="search-input" type="text" placeholder="Rechercher..." onclick="event.stopPropagation()"></div>
+              <span id="team-cards-chevron" style="font-size:14px;color:var(--gray4);transition:transform .2s;user-select:none">▾</span>
             </div>
           </div>
+          <div id="team-cards-body">
           <table class="pros-table">
             <thead>
               <tr><th>Employé</th><th>Identifiant</th><th>Mot de passe</th><th>Téléphone</th><th>Plan</th><th>Actions</th></tr>
@@ -110,7 +112,9 @@
             <tbody id="team-tbody">
               <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
             </tbody>
+
           </table>
+          </div>
         </div>
 
         <!-- Statistiques agrégées de l'équipe -->
@@ -287,11 +291,22 @@ window.editMember = (memberId) => {
   document.getElementById('edit-overlay').classList.add('open');
 };
 
-document.getElementById('add-member-btn').addEventListener('click', () => {
-  if (!allMembers.length) { toast('Aucune carte disponible à assigner pour le moment', 'error'); return; }
+document.getElementById('add-member-btn').addEventListener('click', async () => {
   const unassigned = allMembers.find(m => !m.name && !m.email);
-  if (!unassigned) { toast('Toutes les cartes de votre équipe sont déjà assignées', 'error'); return; }
-  window.editMember(unassigned.leadwaseId);
+  if (unassigned) { window.editMember(unassigned.leadwaseId); return; }
+
+  const ok = await confirmDialog(
+    "Toutes les cartes de votre équipe sont déjà assignées. Pour ajouter un nouvel employé, une carte supplémentaire doit être achetée.\n\nContinuer vers le paiement ?",
+    { okLabel: 'Acheter une carte' }
+  );
+  if (!ok) return;
+  try {
+    const d = await api('buy-extra-card', { method: 'POST', body: '{}' });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    window.location.href = d.payUrl;
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'error');
+  }
 });
 
 document.getElementById('edit-close').onclick = () => document.getElementById('edit-overlay').classList.remove('open');
@@ -324,6 +339,14 @@ document.getElementById('edit-save-btn').onclick = async () => {
 };
 
 document.getElementById('search-input').addEventListener('input', renderTable);
+
+document.getElementById('team-cards-toggle').addEventListener('click', () => {
+  const body    = document.getElementById('team-cards-body');
+  const chevron = document.getElementById('team-cards-chevron');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  chevron.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+});
 
 initDashboardAuth(async ({ lwId: id, p }) => {
   if (!p.isTeamOwner) {

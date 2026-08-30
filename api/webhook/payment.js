@@ -1,5 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore, Timestamp }       from 'firebase-admin/firestore';
+import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getAuth }                        from 'firebase-admin/auth';
 import PDFDocument                        from 'pdfkit';
 import {
@@ -7,6 +7,7 @@ import {
   notifyClientPaymentSuccess,
   notifyClientPaymentFailed,
   notifyAdminPaymentFailed,
+  notifyClientCredentials,
 } from '../../lib/brevo.js';
 
 if (!getApps().length) {
@@ -185,6 +186,38 @@ export default async function handler(req, res) {
     if (ok && pay.orderId) {
       const ord   = await db.collection('orders').doc(pay.orderId).get();
       const oData = ord.data();
+
+      // ── Carte employé supplémentaire (équipe B2B) ────────────────────────────
+      if (oData.orderContext === 'extra_team_card' && oData.parentChefId) {
+        try {
+          const chefRef = db.collection('profiles').doc(oData.parentChefId);
+          const chefDoc = await chefRef.get();
+          const chef = chefDoc.exists ? chefDoc.data() : {};
+
+          let subId = genId();
+          const exSub = await db.collection('profiles').where('leadwaseId', '==', subId).get();
+          if (!exSub.empty) subId = genId();
+          const subPwd = genPwd();
+
+          await db.collection('profiles').doc(subId).set({
+            leadwaseId: subId, firstName: '', lastName: '', company: chef.company || '',
+            phone: '', email: '', plan: chef.plan || 'free',
+            parentLeadwaseId: oData.parentChefId, teamOrderId: chef.teamOrderId || '', createdAt: new Date(),
+          });
+          await db.collection('credentials').doc(subId).set({ leadwaseId: subId, passwordHash: subPwd, createdAt: new Date() });
+          await chefRef.update({ teamMembers: FieldValue.arrayUnion(subId) });
+          await ord.ref.update({ status: 'paid', leadwaseId: subId, paidAt: new Date() });
+
+          if (chef.email) {
+            try {
+              await notifyClientCredentials({ firstName: chef.firstName || '', email: chef.email, leadwaseId: subId, password: subPwd });
+            } catch (e) { console.error('[extra_team_card] email échoué:', e.message); }
+          }
+        } catch (e) {
+          console.error('[extra_team_card] provisioning échoué:', e);
+        }
+        return res.status(200).json({ success: true });
+      }
 
       let lwId = genId();
       const ex = await db.collection('profiles').where('leadwaseId','==',lwId).get();
