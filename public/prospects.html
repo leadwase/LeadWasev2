@@ -117,16 +117,24 @@
             </div>
             <div class="pros-search-row">
               <div class="pros-search"><input id="search-input" type="text" placeholder="Rechercher..."></div>
+              <select class="pros-filter-btn" id="filter-status" style="padding-right:8px">
+                <option value="">Tous les statuts</option>
+                <option value="nouveau">🆕 Nouveau</option>
+                <option value="contacte">📞 Contacté</option>
+                <option value="qualifie">✅ Qualifié</option>
+                <option value="converti">💰 Converti</option>
+                <option value="perdu">❌ Perdu</option>
+              </select>
               <button class="pros-filter-btn active" id="filter-all" data-filter="all">Tous</button>
               <button class="pros-filter-btn" id="filter-today" data-filter="today">Aujourd'hui</button>
             </div>
           </div>
           <table class="pros-table">
             <thead>
-              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Source</th><th>Date</th><th>Actions</th></tr>
+              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Statut</th><th>Source</th><th>Date</th><th>Actions</th></tr>
             </thead>
             <tbody id="pros-tbody">
-              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+              <tr class="pros-empty"><td colspan="7">Chargement...</td></tr>
             </tbody>
           </table>
         </div>
@@ -137,7 +145,7 @@
 </div>
 
 <script type="module">
-import { initDashboardAuth, toast, confirmDialog } from './js/dashboard-shared.js';
+import { initDashboardAuth, toast, confirmDialog, promptDialog } from './js/dashboard-shared.js';
 import { auth } from './js/dashboard-shared.js';
 
 let lwId = null, allProspects = [], currentFilter = 'all';
@@ -201,12 +209,17 @@ function renderStats() {
   document.getElementById('info-updated').textContent     = allProspects[0] ? fmtDate(allProspects[0].createdAt) : '–';
 }
 
+const STATUS_LABELS = { nouveau: '🆕 Nouveau', contacte: '📞 Contacté', qualifie: '✅ Qualifié', converti: '💰 Converti', perdu: '❌ Perdu' };
+const STATUS_COLORS  = { nouveau: '#6ea8ff', contacte: '#e8a13a', qualifie: '#5fbf6d', converti: '#1a7a3c', perdu: '#c0392b' };
+
 function renderTable() {
   const tbody  = document.getElementById('pros-tbody');
   const search = document.getElementById('search-input').value.trim().toLowerCase();
+  const statusFilter = document.getElementById('filter-status').value;
 
   let rows = allProspects;
   if (currentFilter === 'today') rows = rows.filter(p => isToday(p.createdAt));
+  if (statusFilter) rows = rows.filter(p => (p.status || 'nouveau') === statusFilter);
   if (search) {
     rows = rows.filter(p =>
       (p.name || '').toLowerCase().includes(search) ||
@@ -216,11 +229,13 @@ function renderTable() {
   }
 
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="7">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
     return;
   }
 
-  tbody.innerHTML = rows.map(p => `
+  tbody.innerHTML = rows.map(p => {
+    const status = p.status || 'nouveau';
+    return `
     <tr>
       <td>
         <div class="pros-name-cell">
@@ -232,19 +247,52 @@ function renderTable() {
         </div>
       </td>
       <td>${p.phone || '—'}</td>
-      <td style="max-width:260px">${p.object || '—'}</td>
+      <td style="max-width:220px">${p.object || '—'}${p.notes ? `<div style="font-size:12px;color:var(--gray4);margin-top:3px" title="${p.notes.replace(/"/g,'&quot;')}">📝 ${p.notes.length > 40 ? p.notes.slice(0,40)+'…' : p.notes}</div>` : ''}</td>
+      <td>
+        <select class="status-select" style="border:1px solid ${STATUS_COLORS[status]};color:${STATUS_COLORS[status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateProspectStatus('${p.id}', this.value)">
+          ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===status?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </td>
       <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC Card</span>' : '<span class="pros-badge lien">🔗 Lien direct</span>'}</td>
       <td style="color:var(--gray4);font-size:14px">${fmtDate(p.createdAt)}</td>
       <td>
         <div class="pros-act">
           ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
           ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
+          <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
         </div>
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 }
+
+window.updateProspectStatus = async (id, status) => {
+  try {
+    const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, status }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const p = allProspects.find(x => x.id === id);
+    if (p) p.status = status;
+    toast('Statut mis à jour', 'success');
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'error');
+    renderTable();
+  }
+};
+
+window.editProspectNote = async (id, currentNote) => {
+  const note = await promptDialog('Note sur ce prospect :', { defaultValue: currentNote, okLabel: 'Enregistrer' });
+  if (note === null) return;
+  try {
+    const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, notes: note }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const p = allProspects.find(x => x.id === id);
+    if (p) p.notes = note;
+    renderTable();
+    toast('Note enregistrée', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
 
 window.deleteProspect = async (id) => {
   if (!(await confirmDialog('Supprimer ce prospect de votre annuaire ?', { okLabel: 'Supprimer', danger: true }))) return;
@@ -275,9 +323,10 @@ document.getElementById('clear-btn').onclick = async () => {
 
 function exportCsv() {
   if (!allProspects.length) { toast('Aucun prospect à exporter', 'error'); return; }
-  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Source', 'Date'];
+  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Statut', 'Notes', 'Source', 'Date'];
   const lines  = allProspects.map(p => [
     p.name || '', p.phone || '', p.email || '', (p.object || '').replace(/\n/g, ' '),
+    STATUS_LABELS[p.status || 'nouveau'] || p.status || '', (p.notes || '').replace(/\n/g, ' '),
     p.source === 'nfc' ? 'NFC Card' : 'Lien direct', fmtDate(p.createdAt),
   ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
   const csv  = [header.join(','), ...lines].join('\n');
@@ -292,6 +341,7 @@ document.getElementById('export-csv-btn').onclick   = exportCsv;
 document.getElementById('export-csv-btn-2').onclick = exportCsv;
 
 document.getElementById('search-input').addEventListener('input', renderTable);
+document.getElementById('filter-status').addEventListener('change', renderTable);
 document.getElementById('filter-all').onclick = () => {
   currentFilter = 'all';
   document.getElementById('filter-all').classList.add('active');

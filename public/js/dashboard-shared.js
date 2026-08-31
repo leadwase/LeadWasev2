@@ -38,6 +38,7 @@ function ensureConfirmModal() {
   el.innerHTML = `
     <div class="lw-confirm-box">
       <div class="lw-confirm-msg"></div>
+      <div class="lw-confirm-field" style="display:none"><textarea class="lw-confirm-input" rows="3"></textarea></div>
       <div class="lw-confirm-actions">
         <button class="lw-confirm-cancel">Annuler</button>
         <button class="lw-confirm-ok">Confirmer</button>
@@ -50,6 +51,7 @@ function ensureConfirmModal() {
 export function confirmDialog(message, { okLabel = 'Confirmer', danger = false } = {}) {
   const el = ensureConfirmModal();
   el.querySelector('.lw-confirm-msg').textContent = message;
+  el.querySelector('.lw-confirm-field').style.display = 'none';
   const okBtn = el.querySelector('.lw-confirm-ok');
   const cancelBtn = el.querySelector('.lw-confirm-cancel');
   okBtn.textContent = okLabel;
@@ -60,6 +62,26 @@ export function confirmDialog(message, { okLabel = 'Confirmer', danger = false }
     okBtn.onclick = () => cleanup(true);
     cancelBtn.onclick = () => cleanup(false);
     el.onclick = (e) => { if (e.target === el) cleanup(false); };
+  });
+}
+export function promptDialog(message, { defaultValue = '', okLabel = 'Enregistrer' } = {}) {
+  const el = ensureConfirmModal();
+  el.querySelector('.lw-confirm-msg').textContent = message;
+  const field = el.querySelector('.lw-confirm-field');
+  const input = el.querySelector('.lw-confirm-input');
+  field.style.display = 'block';
+  input.value = defaultValue;
+  const okBtn = el.querySelector('.lw-confirm-ok');
+  const cancelBtn = el.querySelector('.lw-confirm-cancel');
+  okBtn.textContent = okLabel;
+  okBtn.classList.remove('danger');
+  el.classList.add('open');
+  setTimeout(() => input.focus(), 50);
+  return new Promise((resolve) => {
+    const cleanup = (result) => { el.classList.remove('open'); resolve(result); };
+    okBtn.onclick = () => cleanup(input.value);
+    cancelBtn.onclick = () => cleanup(null);
+    el.onclick = (e) => { if (e.target === el) cleanup(null); };
   });
 }
 

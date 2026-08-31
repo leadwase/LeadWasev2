@@ -74,6 +74,8 @@ async function captureLead(req, res, leadwaseId) {
     email:     email  ? String(email).trim().slice(0, 120) : '',
     object:    object ? String(object).trim().slice(0, 300) : '',
     source:    source === 'nfc' ? 'nfc' : 'lien_direct',
+    status:    'nouveau',
+    notes:     '',
     createdAt: new Date(),
   });
   res.json({ success: true });
@@ -107,6 +109,8 @@ async function submitContactForm(req, res, leadwaseId) {
     name, phone, email, object,
     source:    source === 'nfc' ? 'nfc' : 'lien_direct',
     viaForm:   true,
+    status:    'nouveau',
+    notes:     '',
     createdAt: new Date(),
   });
 
@@ -139,6 +143,35 @@ async function listProspects(req, res, leadwaseId) {
     .get();
   const prospects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   res.json({ success: true, prospects });
+}
+
+const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'converti', 'perdu'];
+
+// POST /api/profile/[id]?action=update-prospect { prospectId, status?, notes? }
+// Autorisé pour le propriétaire du prospect (plan Business) OU le chef d'équipe
+// pour n'importe quel prospect capté par une carte de son équipe.
+async function updateProspect(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { prospectId, status, notes } = req.body || {};
+  if (!prospectId) return res.status(400).json({ success: false, error: 'prospectId requis' });
+  if (status !== undefined && !PROSPECT_STATUSES.includes(status)) {
+    return res.status(400).json({ success: false, error: 'Statut invalide' });
+  }
+
+  const ref = db.collection('prospects').doc(prospectId);
+  const doc = await ref.get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Prospect introuvable' });
+  const ownerId = doc.data().ownerId;
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(ownerId)) throw new Error('Accès refusé');
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const update = { updatedAt: new Date() };
+  if (status !== undefined) update.status = status;
+  if (notes  !== undefined) update.notes  = String(notes).slice(0, 1000);
+  await ref.update(update);
+  res.json({ success: true });
 }
 
 // DELETE /api/profile/[id]?action=prospects&prospectId=xxx — authentifié, plan Business uniquement.
@@ -454,6 +487,10 @@ export default async function handler(req, res) {
     }
     if (action === 'clear-prospects' && req.method === 'POST') {
       return clearProspects(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'update-prospect' && req.method === 'POST') {
+      return updateProspect(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'google-reviews' && req.method === 'GET') {

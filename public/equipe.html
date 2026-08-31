@@ -178,14 +178,22 @@
             </div>
             <div class="pros-search-row">
               <div class="pros-search"><input id="team-prospects-search" type="text" placeholder="Rechercher..."></div>
+              <select class="pros-filter-btn" id="team-filter-status" style="padding-right:8px">
+                <option value="">Tous les statuts</option>
+                <option value="nouveau">🆕 Nouveau</option>
+                <option value="contacte">📞 Contacté</option>
+                <option value="qualifie">✅ Qualifié</option>
+                <option value="converti">💰 Converti</option>
+                <option value="perdu">❌ Perdu</option>
+              </select>
             </div>
           </div>
           <table class="pros-table">
             <thead>
-              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Capté par</th><th>Source</th><th>Date</th></tr>
+              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Statut</th><th>Capté par</th><th>Source</th><th>Date</th></tr>
             </thead>
             <tbody id="team-prospects-tbody">
-              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+              <tr class="pros-empty"><td colspan="7">Chargement...</td></tr>
             </tbody>
           </table>
         </div>
@@ -398,6 +406,8 @@ async function loadTeamAnalytics() {
 
 // ── Prospects agrégés de l'équipe ─────────────────────────────────────────────
 let allTeamProspects = [];
+const STATUS_LABELS = { nouveau: '🆕 Nouveau', contacte: '📞 Contacté', qualifie: '✅ Qualifié', converti: '💰 Converti', perdu: '❌ Perdu' };
+const STATUS_COLORS  = { nouveau: '#6ea8ff', contacte: '#e8a13a', qualifie: '#5fbf6d', converti: '#1a7a3c', perdu: '#c0392b' };
 
 function fmtProspectDate(v) {
   if (!v) return '–';
@@ -408,7 +418,9 @@ function fmtProspectDate(v) {
 function renderTeamProspects() {
   const tbody  = document.getElementById('team-prospects-tbody');
   const search = document.getElementById('team-prospects-search').value.trim().toLowerCase();
+  const statusFilter = document.getElementById('team-filter-status').value;
   let rows = allTeamProspects;
+  if (statusFilter) rows = rows.filter(p => (p.status || 'nouveau') === statusFilter);
   if (search) {
     rows = rows.filter(p =>
       (p.name || '').toLowerCase().includes(search) ||
@@ -417,20 +429,41 @@ function renderTeamProspects() {
       (p.cardOwnerName || '').toLowerCase().includes(search));
   }
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun prospect pour le moment.</td></tr>';
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="7">Aucun prospect pour le moment.</td></tr>';
     return;
   }
-  tbody.innerHTML = rows.map(p => `
+  tbody.innerHTML = rows.map(p => {
+    const status = p.status || 'nouveau';
+    return `
     <tr>
       <td><div class="pros-name">${p.name || '—'}</div><div class="pros-email">${p.email || '—'}</div></td>
       <td>${p.phone || '—'}</td>
-      <td style="max-width:220px">${p.object || '—'}</td>
+      <td style="max-width:200px">${p.object || '—'}</td>
+      <td>
+        <select style="border:1px solid ${STATUS_COLORS[status]};color:${STATUS_COLORS[status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateTeamProspectStatus('${p.id}', this.value)">
+          ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===status?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </td>
       <td><span class="pros-badge lien">${p.cardOwnerName}</span></td>
       <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC</span>' : '<span class="pros-badge lien">🔗 Lien</span>'}</td>
       <td style="color:var(--gray4);font-size:13px">${fmtProspectDate(p.createdAt)}</td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 }
+
+window.updateTeamProspectStatus = async (id, status) => {
+  try {
+    const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, status }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const p = allTeamProspects.find(x => x.id === id);
+    if (p) p.status = status;
+    toast('Statut mis à jour', 'success');
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'error');
+    renderTeamProspects();
+  }
+};
 
 async function loadTeamProspects() {
   try {
@@ -441,17 +474,19 @@ async function loadTeamProspects() {
     renderTeamProspects();
   } catch (e) {
     document.getElementById('team-prospects-tbody').innerHTML =
-      `<tr class="pros-empty"><td colspan="6" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
+      `<tr class="pros-empty"><td colspan="7" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
   }
 }
 
 document.getElementById('team-prospects-search').addEventListener('input', renderTeamProspects);
+document.getElementById('team-filter-status').addEventListener('change', renderTeamProspects);
 
 document.getElementById('export-team-csv-btn').addEventListener('click', () => {
   if (!allTeamProspects.length) { toast('Aucun prospect à exporter', 'error'); return; }
-  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Capté par', 'Source', 'Date'];
+  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Statut', 'Capté par', 'Source', 'Date'];
   const lines = allTeamProspects.map(p => [
     p.name || '', p.phone || '', p.email || '', (p.object || '').replace(/\n/g, ' '),
+    STATUS_LABELS[p.status || 'nouveau'] || p.status || '',
     p.cardOwnerName || '', p.source === 'nfc' ? 'NFC Card' : 'Lien direct', fmtProspectDate(p.createdAt),
   ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
   const csv  = [header.join(','), ...lines].join('\n');
