@@ -127,9 +127,12 @@
               </select>
               <button class="pros-filter-btn active" id="filter-all" data-filter="all">Tous</button>
               <button class="pros-filter-btn" id="filter-today" data-filter="today">Aujourd'hui</button>
+              <span style="width:1px;background:var(--gray5);align-self:stretch;margin:0 4px"></span>
+              <button class="pros-filter-btn active" id="view-list-btn">☰ Liste</button>
+              <button class="pros-filter-btn" id="view-kanban-btn">▤ Kanban</button>
             </div>
           </div>
-          <table class="pros-table">
+          <table class="pros-table" id="pros-list-view">
             <thead>
               <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Statut</th><th>Source</th><th>Date</th><th>Actions</th></tr>
             </thead>
@@ -137,6 +140,7 @@
               <tr class="pros-empty"><td colspan="7">Chargement...</td></tr>
             </tbody>
           </table>
+          <div id="pros-kanban-view" class="kanban-board" style="display:none"></div>
         </div>
 
       </div>
@@ -211,12 +215,11 @@ function renderStats() {
 
 const STATUS_LABELS = { nouveau: '🆕 Nouveau', contacte: '📞 Contacté', qualifie: '✅ Qualifié', converti: '💰 Converti', perdu: '❌ Perdu' };
 const STATUS_COLORS  = { nouveau: '#6ea8ff', contacte: '#e8a13a', qualifie: '#5fbf6d', converti: '#1a7a3c', perdu: '#c0392b' };
+let currentView = 'list';
 
-function renderTable() {
-  const tbody  = document.getElementById('pros-tbody');
+function getFilteredProspects() {
   const search = document.getElementById('search-input').value.trim().toLowerCase();
   const statusFilter = document.getElementById('filter-status').value;
-
   let rows = allProspects;
   if (currentFilter === 'today') rows = rows.filter(p => isToday(p.createdAt));
   if (statusFilter) rows = rows.filter(p => (p.status || 'nouveau') === statusFilter);
@@ -227,6 +230,67 @@ function renderTable() {
       (p.phone || '').toLowerCase().includes(search) ||
       (p.object || '').toLowerCase().includes(search));
   }
+  return rows;
+}
+
+function renderKanban() {
+  const board = document.getElementById('pros-kanban-view');
+  const rows  = getFilteredProspects();
+  board.innerHTML = Object.entries(STATUS_LABELS).map(([status, label]) => {
+    const cards = rows.filter(p => (p.status || 'nouveau') === status);
+    return `
+      <div class="kanban-col" data-status="${status}" style="border-top:3px solid ${STATUS_COLORS[status]}">
+        <div class="kanban-col-head">${label} <span class="kanban-col-count">${cards.length}</span></div>
+        <div class="kanban-col-body" data-status="${status}">
+          ${cards.map(p => `
+            <div class="kanban-card" draggable="true" data-id="${p.id}">
+              <div class="kanban-card-name">${p.name || '—'}</div>
+              <div class="kanban-card-meta">${p.phone || p.email || ''}</div>
+              ${p.object ? `<div class="kanban-card-obj">${p.object.length > 60 ? p.object.slice(0,60)+'…' : p.object}</div>` : ''}
+              <div class="kanban-card-date">${fmtDate(p.createdAt)}</div>
+            </div>
+          `).join('') || '<div class="kanban-empty">Aucun prospect</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  board.querySelectorAll('.kanban-card').forEach(card => {
+    card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', card.dataset.id); card.classList.add('dragging'); });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+  board.querySelectorAll('.kanban-col-body').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const newStatus = col.dataset.status;
+      const p = allProspects.find(x => x.id === id);
+      if (p && p.status !== newStatus) {
+        p.status = newStatus;
+        updateProspectStatus(id, newStatus);
+        renderKanban();
+      }
+    });
+  });
+}
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('pros-list-view').style.display   = view === 'list' ? '' : 'none';
+  document.getElementById('pros-kanban-view').style.display  = view === 'kanban' ? 'flex' : 'none';
+  document.getElementById('view-list-btn').classList.toggle('active', view === 'list');
+  document.getElementById('view-kanban-btn').classList.toggle('active', view === 'kanban');
+  if (view === 'kanban') renderKanban(); else renderTable();
+}
+document.getElementById('view-list-btn').addEventListener('click', () => setView('list'));
+document.getElementById('view-kanban-btn').addEventListener('click', () => setView('kanban'));
+
+function renderTable() {
+  const tbody  = document.getElementById('pros-tbody');
+  const rows   = getFilteredProspects();
 
   if (!rows.length) {
     tbody.innerHTML = '<tr class="pros-empty"><td colspan="7">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
@@ -340,19 +404,21 @@ function exportCsv() {
 document.getElementById('export-csv-btn').onclick   = exportCsv;
 document.getElementById('export-csv-btn-2').onclick = exportCsv;
 
-document.getElementById('search-input').addEventListener('input', renderTable);
-document.getElementById('filter-status').addEventListener('change', renderTable);
+function renderCurrentView() { currentView === 'kanban' ? renderKanban() : renderTable(); }
+
+document.getElementById('search-input').addEventListener('input', renderCurrentView);
+document.getElementById('filter-status').addEventListener('change', renderCurrentView);
 document.getElementById('filter-all').onclick = () => {
   currentFilter = 'all';
   document.getElementById('filter-all').classList.add('active');
   document.getElementById('filter-today').classList.remove('active');
-  renderTable();
+  renderCurrentView();
 };
 document.getElementById('filter-today').onclick = () => {
   currentFilter = 'today';
   document.getElementById('filter-today').classList.add('active');
   document.getElementById('filter-all').classList.remove('active');
-  renderTable();
+  renderCurrentView();
 };
 
 initDashboardAuth(async ({ lwId: id, isBusiness }) => {
