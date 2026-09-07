@@ -150,6 +150,92 @@ const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'converti', 'perdu
 // POST /api/profile/[id]?action=update-prospect { prospectId, status?, notes? }
 // Autorisé pour le propriétaire du prospect (plan Business) OU le chef d'équipe
 // pour n'importe quel prospect capté par une carte de son équipe.
+// POST /api/profile/[id]?action=create-task { title, dueDate?, prospectId? }
+async function createTask(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const { title, dueDate, prospectId, prospectName } = req.body || {};
+  if (!title || !String(title).trim()) return res.status(400).json({ success: false, error: 'Titre requis' });
+
+  await db.collection('tasks').add({
+    ownerId:      leadwaseId,
+    title:        String(title).trim().slice(0, 200),
+    dueDate:      dueDate || null,
+    prospectId:   prospectId || null,
+    prospectName: prospectName || '',
+    done:         false,
+    createdAt:    new Date(),
+  });
+  res.json({ success: true });
+}
+
+// GET /api/profile/[id]?action=list-tasks — tâches du compte, et de toute l'équipe si chef.
+async function listTasks(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const ownerIds = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  const nameMap = {};
+  if (profile.isTeamOwner) {
+    const docs = await Promise.all(ownerIds.map(id => db.collection('profiles').doc(id).get()));
+    docs.forEach(d => { if (d.exists) nameMap[d.id] = d.data().firstName || d.id; });
+  }
+
+  const lists = await Promise.all(ownerIds.map(id =>
+    db.collection('tasks').where('ownerId', '==', id).orderBy('createdAt', 'desc').limit(300).get()
+  ));
+  let tasks = [];
+  lists.forEach((snap, i) => {
+    snap.docs.forEach(doc => tasks.push({ id: doc.id, ...doc.data(), ownerName: nameMap[ownerIds[i]] || '' }));
+  });
+  tasks.sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    const da = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+    const db_ = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+    return da - db_;
+  });
+  res.json({ success: true, tasks: tasks.slice(0, 300) });
+}
+
+// POST /api/profile/[id]?action=update-task { taskId, done?, title?, dueDate? }
+async function updateTask(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { taskId, done, title, dueDate } = req.body || {};
+  if (!taskId) return res.status(400).json({ success: false, error: 'taskId requis' });
+
+  const ref = db.collection('tasks').doc(taskId);
+  const doc = await ref.get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Tâche introuvable' });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  const update = {};
+  if (done !== undefined) update.done = !!done;
+  if (title !== undefined) update.title = String(title).trim().slice(0, 200);
+  if (dueDate !== undefined) update.dueDate = dueDate || null;
+  await ref.update(update);
+  res.json({ success: true });
+}
+
+// POST /api/profile/[id]?action=delete-task { taskId }
+async function deleteTask(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { taskId } = req.body || {};
+  if (!taskId) return res.status(400).json({ success: false, error: 'taskId requis' });
+
+  const ref = db.collection('tasks').doc(taskId);
+  const doc = await ref.get();
+  if (!doc.exists) return res.json({ success: true });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  await ref.delete();
+  res.json({ success: true });
+}
+
 async function updateProspect(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   const { prospectId, status, notes } = req.body || {};
@@ -491,6 +577,22 @@ export default async function handler(req, res) {
     }
     if (action === 'update-prospect' && req.method === 'POST') {
       return updateProspect(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'create-task' && req.method === 'POST') {
+      return createTask(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'list-tasks' && req.method === 'GET') {
+      return listTasks(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'update-task' && req.method === 'POST') {
+      return updateTask(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'delete-task' && req.method === 'POST') {
+      return deleteTask(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'google-reviews' && req.method === 'GET') {

@@ -113,6 +113,21 @@
 .kanban-card-date { font-size: 11px; color: var(--gray4); margin-top: 6px; }
 .kanban-empty { font-size: 12px; color: var(--gray4); text-align: center; padding: 20px 0; }
 
+/* ── Tâches & rappels ── */
+.tasks-list { padding: 6px 0; }
+.task-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 24px; border-bottom: 1px solid var(--gray5); }
+.task-row:last-child { border-bottom: none; }
+.task-row.task-done { opacity: .5; }
+.task-row.task-done .task-title { text-decoration: line-through; }
+.task-check { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-size: 14px; font-weight: 600; color: var(--black); }
+.task-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.task-due { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 3px; background: var(--gray6); color: var(--gray3); }
+.task-due-overdue { background: #fdecec; color: #c0392b; }
+.task-due-today   { background: #fff4e0; color: #d97706; }
+.task-due-soon    { background: #e8f0fe; color: #1a56c4; }
+
 
 /* ── Accès refusé (réservé Business) ── */
 #access-denied {

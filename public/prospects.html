@@ -143,9 +143,49 @@
           <div id="pros-kanban-view" class="kanban-board" style="display:none"></div>
         </div>
 
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Tâches &amp; rappels</div>
+            <div class="pros-sub">Relances, appels et rendez-vous à ne pas oublier</div>
+          </div>
+          <div class="pros-actions">
+            <button class="pros-btn primary" id="add-task-btn">+ Nouvelle tâche</button>
+          </div>
+        </div>
+        <div class="pros-card">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">À faire</div>
+              <div class="pros-card-sub">Triées par échéance, les plus urgentes en premier</div>
+            </div>
+          </div>
+          <div id="tasks-list" class="tasks-list">
+            <div class="pros-empty" style="padding:24px;text-align:center;color:var(--gray4)">Chargement...</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
+</div>
+
+<div class="lw-confirm-overlay" id="task-overlay">
+  <div class="lw-confirm-box">
+    <div class="lw-confirm-msg" style="font-weight:700;margin-bottom:14px" id="task-modal-title">Nouvelle tâche</div>
+    <div class="lw-confirm-field" style="display:block">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Titre</label>
+      <input type="text" id="task-title" class="lw-confirm-input" placeholder="Ex : Rappeler pour devis">
+    </div>
+    <div class="lw-confirm-field" style="display:block">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Échéance (optionnel)</label>
+      <input type="date" id="task-due" class="lw-confirm-input">
+    </div>
+    <div id="task-prospect-hint" style="font-size:13px;color:var(--gray4);margin-bottom:14px"></div>
+    <div class="lw-confirm-actions">
+      <button class="lw-confirm-cancel" id="task-cancel-btn">Annuler</button>
+      <button class="lw-confirm-ok" id="task-save-btn">Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -324,6 +364,7 @@ function renderTable() {
           ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
           ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
           <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
+          <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📅</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
         </div>
       </td>
@@ -440,6 +481,115 @@ initDashboardAuth(async ({ lwId: id, isBusiness }) => {
   }
   renderStats();
   renderTable();
+  loadTasks();
+});
+
+// ── Tâches & rappels ──────────────────────────────────────────────────────────
+let allTasks = [];
+let editingTaskId = null;
+
+function fmtTaskDue(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diffDays = Math.round((d - today) / 86400000);
+  const label = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  if (diffDays < 0)  return { label, tone: 'overdue', text: `${label} (en retard)` };
+  if (diffDays === 0) return { label, tone: 'today', text: `${label} (aujourd'hui)` };
+  if (diffDays === 1) return { label, tone: 'soon', text: `${label} (demain)` };
+  return { label, tone: 'future', text: label };
+}
+
+function renderTasks() {
+  const list = document.getElementById('tasks-list');
+  if (!allTasks.length) {
+    list.innerHTML = '<div class="pros-empty" style="padding:24px;text-align:center;color:var(--gray4)">Aucune tâche pour le moment.</div>';
+    return;
+  }
+  list.innerHTML = allTasks.map(t => {
+    const due = fmtTaskDue(t.dueDate);
+    return `
+      <div class="task-row ${t.done ? 'task-done' : ''}">
+        <input type="checkbox" class="task-check" ${t.done ? 'checked' : ''} onchange="toggleTask('${t.id}', this.checked)">
+        <div class="task-body">
+          <div class="task-title">${t.title}</div>
+          <div class="task-meta">
+            ${t.prospectName ? `<span class="pros-badge lien">${t.prospectName}</span>` : ''}
+            ${t.ownerName ? `<span class="pros-badge lien">${t.ownerName}</span>` : ''}
+            ${due ? `<span class="task-due task-due-${due.tone}">📅 ${due.text}</span>` : ''}
+          </div>
+        </div>
+        <button class="pros-act-btn del" title="Supprimer" onclick="removeTask('${t.id}')">🗑</button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadTasks() {
+  try {
+    const d = await api('list-tasks');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allTasks = d.tasks || [];
+  } catch (e) {
+    document.getElementById('tasks-list').innerHTML =
+      `<div class="pros-empty" style="padding:24px;text-align:center;color:#c0392b">Erreur : ${e.message}</div>`;
+    return;
+  }
+  renderTasks();
+}
+
+window.toggleTask = async (id, done) => {
+  try {
+    const d = await api('update-task', { method: 'POST', body: JSON.stringify({ taskId: id, done }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const t = allTasks.find(x => x.id === id);
+    if (t) t.done = done;
+    renderTasks();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+window.removeTask = async (id) => {
+  const ok = await confirmDialog('Supprimer cette tâche ?', { okLabel: 'Supprimer', danger: true });
+  if (!ok) return;
+  try {
+    const d = await api('delete-task', { method: 'POST', body: JSON.stringify({ taskId: id }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allTasks = allTasks.filter(t => t.id !== id);
+    renderTasks();
+    toast('Tâche supprimée', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+function openTaskModal(prospectId, prospectName) {
+  editingTaskId = null;
+  document.getElementById('task-title').value = '';
+  document.getElementById('task-due').value = '';
+  document.getElementById('task-prospect-hint').textContent = prospectName ? `Liée au prospect : ${prospectName}` : '';
+  document.getElementById('task-overlay').dataset.prospectId = prospectId || '';
+  document.getElementById('task-overlay').dataset.prospectName = prospectName || '';
+  document.getElementById('task-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('task-title').focus(), 50);
+}
+window.quickAddTask = (prospectId, prospectName) => openTaskModal(prospectId, prospectName);
+document.getElementById('add-task-btn').addEventListener('click', () => openTaskModal());
+document.getElementById('task-cancel-btn').addEventListener('click', () => document.getElementById('task-overlay').classList.remove('open'));
+document.getElementById('task-overlay').addEventListener('click', e => { if (e.target.id === 'task-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('task-save-btn').addEventListener('click', async () => {
+  const title = document.getElementById('task-title').value.trim();
+  const dueDate = document.getElementById('task-due').value || null;
+  if (!title) { toast('Le titre est requis', 'error'); return; }
+  const overlay = document.getElementById('task-overlay');
+  try {
+    const d = await api('create-task', {
+      method: 'POST',
+      body: JSON.stringify({ title, dueDate, prospectId: overlay.dataset.prospectId || null, prospectName: overlay.dataset.prospectName || '' }),
+    });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    overlay.classList.remove('open');
+    toast('Tâche ajoutée', 'success');
+    loadTasks();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 });
 
 document.querySelectorAll('.sidebar-item').forEach(a =>
