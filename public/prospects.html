@@ -188,6 +188,22 @@
   </div>
 </div>
 
+<div class="lw-confirm-overlay" id="history-overlay">
+  <div class="lw-confirm-box" style="max-width:440px">
+    <div class="lw-confirm-msg" style="font-weight:700;margin-bottom:2px" id="history-title">Historique</div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:14px" id="history-subtitle"></div>
+    <div id="history-list" style="max-height:280px;overflow-y:auto;margin-bottom:16px"></div>
+    <div class="lw-confirm-field" style="display:block">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Ajouter une interaction</label>
+      <input type="text" id="history-input" class="lw-confirm-input" placeholder="Ex : Appel effectué, pas de réponse">
+    </div>
+    <div class="lw-confirm-actions">
+      <button class="lw-confirm-cancel" id="history-close-btn">Fermer</button>
+      <button class="lw-confirm-ok" id="history-add-btn">Ajouter</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initDashboardAuth, toast, confirmDialog, promptDialog } from './js/dashboard-shared.js';
 import { auth } from './js/dashboard-shared.js';
@@ -365,6 +381,7 @@ function renderTable() {
           ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
           <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
           <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📅</button>
+          <button class="pros-act-btn" title="Historique" onclick="openHistory('${p.id}')">🕐</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
         </div>
       </td>
@@ -589,6 +606,58 @@ document.getElementById('task-save-btn').addEventListener('click', async () => {
     overlay.classList.remove('open');
     toast('Tâche ajoutée', 'success');
     loadTasks();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+});
+
+// ── Historique de communication ───────────────────────────────────────────────
+let historyProspectId = null;
+const ACTIVITY_ICONS = { system: '⚡', status: '🔄', note: '📝', interaction: '💬' };
+
+function renderHistory(activity) {
+  const list = document.getElementById('history-list');
+  if (!activity.length) {
+    list.innerHTML = '<div style="padding:16px 0;text-align:center;color:var(--gray4);font-size:13px">Aucun historique pour le moment.</div>';
+    return;
+  }
+  list.innerHTML = activity.map(a => `
+    <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray6)">
+      <span style="flex-shrink:0">${ACTIVITY_ICONS[a.type] || '•'}</span>
+      <div>
+        <div style="font-size:13px;color:var(--black)">${a.text}</div>
+        <div style="font-size:11px;color:var(--gray4);margin-top:2px">${fmtDate(a.createdAt)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.openHistory = async (prospectId) => {
+  historyProspectId = prospectId;
+  const p = allProspects.find(x => x.id === prospectId);
+  document.getElementById('history-title').textContent = 'Historique — ' + (p?.name || 'Prospect');
+  document.getElementById('history-subtitle').textContent = p?.email || p?.phone || '';
+  document.getElementById('history-list').innerHTML = '<div style="padding:16px 0;text-align:center;color:var(--gray4);font-size:13px">Chargement...</div>';
+  document.getElementById('history-input').value = '';
+  document.getElementById('history-overlay').classList.add('open');
+  try {
+    const d = await api('prospect-activity', { qs: '&prospectId=' + prospectId });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    renderHistory(d.activity || []);
+  } catch (e) {
+    document.getElementById('history-list').innerHTML = `<div style="padding:16px 0;color:#c0392b;font-size:13px">Erreur : ${e.message}</div>`;
+  }
+};
+
+document.getElementById('history-close-btn').addEventListener('click', () => document.getElementById('history-overlay').classList.remove('open'));
+document.getElementById('history-overlay').addEventListener('click', e => { if (e.target.id === 'history-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('history-add-btn').addEventListener('click', async () => {
+  const text = document.getElementById('history-input').value.trim();
+  if (!text) { toast('Écrivez une note avant de valider', 'error'); return; }
+  try {
+    const d = await api('log-activity', { method: 'POST', body: JSON.stringify({ prospectId: historyProspectId, text }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    document.getElementById('history-input').value = '';
+    window.openHistory(historyProspectId);
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 });
 

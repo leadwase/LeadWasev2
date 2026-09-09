@@ -67,7 +67,7 @@ async function captureLead(req, res, leadwaseId) {
   if (!name || (!phone && !email)) {
     return res.status(400).json({ success: false, error: 'Nom et (téléphone ou email) requis' });
   }
-  await db.collection('prospects').add({
+  const ref = await db.collection('prospects').add({
     ownerId:   leadwaseId,
     name:      String(name).trim().slice(0, 120),
     phone:     phone  ? String(phone).trim().slice(0, 40)  : '',
@@ -78,6 +78,7 @@ async function captureLead(req, res, leadwaseId) {
     notes:     '',
     createdAt: new Date(),
   });
+  await logActivity(ref.id, 'system', `Prospect capté via ${source === 'nfc' ? 'carte NFC' : 'lien direct'} (bouton Échanger)`);
   res.json({ success: true });
 }
 
@@ -104,7 +105,7 @@ async function submitContactForm(req, res, leadwaseId) {
   const email = findByKeyword(['email', 'mail']);
   const object = entries.map(([label, val]) => `${label} : ${val}`).join(' — ').slice(0, 500);
 
-  await db.collection('prospects').add({
+  const ref = await db.collection('prospects').add({
     ownerId:   leadwaseId,
     name, phone, email, object,
     source:    source === 'nfc' ? 'nfc' : 'lien_direct',
@@ -113,6 +114,7 @@ async function submitContactForm(req, res, leadwaseId) {
     notes:     '',
     createdAt: new Date(),
   });
+  await logActivity(ref.id, 'system', 'Prospect capté via le formulaire de contact');
 
   if (p.email) {
     try {
@@ -236,6 +238,16 @@ async function deleteTask(req, res, leadwaseId) {
   res.json({ success: true });
 }
 
+const STATUS_LABELS_FR = { nouveau: 'Nouveau', contacte: 'Contacté', qualifie: 'Qualifié', converti: 'Converti', perdu: 'Perdu' };
+
+async function logActivity(prospectId, type, text) {
+  try {
+    await db.collection('prospects').doc(prospectId).collection('activity').add({
+      type, text: String(text).slice(0, 500), createdAt: new Date(),
+    });
+  } catch (e) { console.error('[logActivity]', e.message); }
+}
+
 async function updateProspect(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   const { prospectId, status, notes } = req.body || {};
@@ -247,17 +259,63 @@ async function updateProspect(req, res, leadwaseId) {
   const ref = db.collection('prospects').doc(prospectId);
   const doc = await ref.get();
   if (!doc.exists) return res.status(404).json({ success: false, error: 'Prospect introuvable' });
-  const ownerId = doc.data().ownerId;
+  const existing = doc.data();
 
   const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
-  if (!allowedOwners.includes(ownerId)) throw new Error('Accès refusé');
+  if (!allowedOwners.includes(existing.ownerId)) throw new Error('Accès refusé');
   if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
 
   const update = { updatedAt: new Date() };
   if (status !== undefined) update.status = status;
   if (notes  !== undefined) update.notes  = String(notes).slice(0, 1000);
   await ref.update(update);
+
+  if (status !== undefined && status !== existing.status) {
+    await logActivity(prospectId, 'status', `Statut changé : ${STATUS_LABELS_FR[existing.status] || 'Nouveau'} → ${STATUS_LABELS_FR[status]}`);
+  }
+  if (notes !== undefined && notes !== existing.notes) {
+    await logActivity(prospectId, 'note', notes ? `Note mise à jour : ${notes}` : 'Note supprimée');
+  }
+
   res.json({ success: true });
+}
+
+// POST /api/profile/[id]?action=log-activity { prospectId, text }
+// Journal manuel d'interaction (ex: "Appel effectué", "Email de suivi envoyé").
+async function logManualActivity(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const { prospectId, text } = req.body || {};
+  if (!prospectId || !text || !String(text).trim()) {
+    return res.status(400).json({ success: false, error: 'prospectId et texte requis' });
+  }
+  const doc = await db.collection('prospects').doc(prospectId).get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Prospect introuvable' });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  await logActivity(prospectId, 'interaction', text);
+  res.json({ success: true });
+}
+
+// GET /api/profile/[id]?action=prospect-activity&prospectId=xxx
+async function getProspectActivity(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { prospectId } = req.query;
+  if (!prospectId) return res.status(400).json({ success: false, error: 'prospectId requis' });
+
+  const doc = await db.collection('prospects').doc(prospectId).get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Prospect introuvable' });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  const snap = await db.collection('prospects').doc(prospectId).collection('activity')
+    .orderBy('createdAt', 'desc').limit(100).get();
+  const activity = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  res.json({ success: true, activity, prospect: { name: doc.data().name, email: doc.data().email, phone: doc.data().phone, createdAt: doc.data().createdAt } });
 }
 
 // DELETE /api/profile/[id]?action=prospects&prospectId=xxx — authentifié, plan Business uniquement.
@@ -577,6 +635,14 @@ export default async function handler(req, res) {
     }
     if (action === 'update-prospect' && req.method === 'POST') {
       return updateProspect(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'log-activity' && req.method === 'POST') {
+      return logManualActivity(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'prospect-activity' && req.method === 'GET') {
+      return getProspectActivity(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'create-task' && req.method === 'POST') {
