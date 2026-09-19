@@ -367,7 +367,7 @@ function renderTable() {
         </div>
       </td>
       <td>${p.phone || '—'}</td>
-      <td style="max-width:220px">${p.object || '—'}${p.notes ? `<div style="font-size:12px;color:var(--gray4);margin-top:3px" title="${p.notes.replace(/"/g,'&quot;')}">📝 ${p.notes.length > 40 ? p.notes.slice(0,40)+'…' : p.notes}</div>` : ''}</td>
+      <td style="max-width:220px">${p.object || '—'}${p.dealValue ? `<div style="font-size:12px;color:var(--green);font-weight:600;margin-top:3px">💰 ${fmtFCFA(p.dealValue)} FCFA</div>` : ''}${p.notes ? `<div style="font-size:12px;color:var(--gray4);margin-top:3px" title="${p.notes.replace(/"/g,'&quot;')}">📝 ${p.notes.length > 40 ? p.notes.slice(0,40)+'…' : p.notes}</div>` : ''}</td>
       <td>
         <select class="status-select" style="border:1px solid ${STATUS_COLORS[status]};color:${STATUS_COLORS[status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateProspectStatus('${p.id}', this.value)">
           ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===status?'selected':''}>${v}</option>`).join('')}
@@ -380,6 +380,7 @@ function renderTable() {
           ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
           ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
           <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
+          <button class="pros-act-btn" title="Montant potentiel" onclick="editDealValue('${p.id}', ${p.dealValue || 0})">💰</button>
           <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📅</button>
           <button class="pros-act-btn" title="Historique" onclick="openHistory('${p.id}')">🕐</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
@@ -416,13 +417,28 @@ window.editProspectNote = async (id, currentNote) => {
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
+window.editDealValue = async (id, currentValue) => {
+  const val = await promptDialog('Montant potentiel de cette opportunité (FCFA) :', { defaultValue: currentValue || '', okLabel: 'Enregistrer' });
+  if (val === null) return;
+  const dealValue = parseInt(val, 10) || 0;
+  try {
+    const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, dealValue }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const p = allProspects.find(x => x.id === id);
+    if (p) p.dealValue = dealValue;
+    renderTable();
+    renderAdvancedStats();
+    toast('Montant enregistré', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
 window.deleteProspect = async (id) => {
   if (!(await confirmDialog('Supprimer ce prospect de votre annuaire ?', { okLabel: 'Supprimer', danger: true }))) return;
   try {
     const d = await api('prospects', { method: 'DELETE', qs: '&prospectId=' + id });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = allProspects.filter(p => p.id !== id);
-    renderStats(); renderTable();
+    renderStats(); renderAdvancedStats(); renderTable();
     toast('Prospect supprimé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
@@ -438,7 +454,7 @@ document.getElementById('clear-btn').onclick = async () => {
     const d = await api('clear-prospects', { method: 'POST', body: '{}' });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = [];
-    renderStats(); renderTable();
+    renderStats(); renderAdvancedStats(); renderTable();
     toast('Annuaire vidé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
