@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import PDFDocument from 'pdfkit';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -153,6 +154,169 @@ const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'converti', 'perdu
 // Autorisé pour le propriétaire du prospect (plan Business) OU le chef d'équipe
 // pour n'importe quel prospect capté par une carte de son équipe.
 // POST /api/profile/[id]?action=create-task { title, dueDate?, prospectId? }
+// ── Devis (objet CRM autonome, indépendant de l'achat d'une carte) ────────────
+
+function generateQuotePDF({ quoteNumber, date, company, items, total, ownerName, ownerCompany }) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const chunks = [];
+    doc.on('data', c => chunks.push(c));
+    doc.on('end', () => resolve(Buffer.concat(chunks).toString('base64')));
+    doc.on('error', reject);
+
+    const pageWidth = doc.page.width - 100;
+    const dateStr = new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    doc.fontSize(22).fillColor('#1a1a2e').font('Helvetica-Bold').text('LEADWASE', 50, 50);
+    doc.fontSize(9).fillColor('#666').font('Helvetica').text(ownerCompany || 'leadwase.com', 50, 76);
+
+    doc.fontSize(22).fillColor('#1a1a2e').font('Helvetica-Bold').text('DEVIS', 0, 50, { align: 'right' });
+    doc.fontSize(9).fillColor('#666').font('Helvetica')
+       .text(`N° ${quoteNumber}`, 0, 76, { align: 'right' })
+       .text(`Date : ${dateStr}`, 0, 90, { align: 'right' });
+
+    doc.moveTo(50, 115).lineTo(545, 115).strokeColor('#e0e0e0').lineWidth(1).stroke();
+
+    doc.fontSize(9).fillColor('#999').font('Helvetica').text('DEVIS POUR', 50, 130);
+    doc.fontSize(11).fillColor('#1a1a2e').font('Helvetica-Bold').text(company || '—', 50, 144);
+
+    const tableTop = 190;
+    doc.rect(50, tableTop, pageWidth, 24).fill('#1a1a2e');
+    doc.fontSize(9).fillColor('#fff').font('Helvetica-Bold');
+    doc.text('DESCRIPTION', 54, tableTop + 8);
+    doc.text('QTÉ', 350, tableTop + 8, { width: 60, align: 'center' });
+    doc.text('P.U.', 420, tableTop + 8, { width: 60, align: 'right' });
+    doc.text('TOTAL', 490, tableTop + 8, { width: 55, align: 'right' });
+
+    let y = tableTop + 24;
+    items.forEach((it, i) => {
+      const rowH = 28;
+      if (i % 2 === 0) doc.rect(50, y, pageWidth, rowH).fill('#f7f7fb');
+      const lineTotal = it.quantity * it.unitPrice;
+      doc.fontSize(10).fillColor('#1a1a2e').font('Helvetica').text(it.description, 54, y + 9, { width: 280 });
+      doc.fontSize(9).fillColor('#555').text(String(it.quantity), 350, y + 10, { width: 60, align: 'center' });
+      doc.text(`${it.unitPrice.toLocaleString('fr-FR')}`, 420, y + 10, { width: 60, align: 'right' });
+      doc.text(`${lineTotal.toLocaleString('fr-FR')}`, 490, y + 10, { width: 55, align: 'right' });
+      y += rowH;
+    });
+
+    const totY = y + 26;
+    doc.moveTo(350, totY).lineTo(545, totY).strokeColor('#ccc').lineWidth(0.5).stroke();
+    doc.rect(350, totY + 6, 195, 26).fill('#1a1a2e');
+    doc.fontSize(11).fillColor('#fff').font('Helvetica-Bold').text('TOTAL', 354, totY + 14, { width: 125, align: 'right' });
+    doc.text(`${total.toLocaleString('fr-FR')} FCFA`, 490, totY + 14, { width: 55, align: 'right' });
+
+    doc.fontSize(9).fillColor('#999').font('Helvetica')
+       .text('Ce devis est valable 30 jours à compter de sa date d\u2019émission.', 50, totY + 60, { align: 'center', width: pageWidth });
+
+    doc.moveTo(50, 760).lineTo(545, 760).strokeColor('#e0e0e0').lineWidth(1).stroke();
+    doc.fontSize(8).fillColor('#aaa').font('Helvetica').text('Leadwase — leadwase.com', 50, 768, { align: 'center', width: pageWidth });
+
+    doc.end();
+  });
+}
+
+// POST /api/profile/[id]?action=create-quote { prospectId?, prospectName?, company?, items: [{description,quantity,unitPrice}] }
+async function createQuote(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const { prospectId, prospectName, company, items } = req.body || {};
+  if (!Array.isArray(items) || !items.length) {
+    return res.status(400).json({ success: false, error: 'Au moins une ligne de devis est requise' });
+  }
+  const cleanItems = items.map(it => ({
+    description: String(it.description || '').trim().slice(0, 200),
+    quantity:    Math.max(1, parseInt(it.quantity, 10) || 1),
+    unitPrice:   Math.max(0, parseInt(it.unitPrice, 10) || 0),
+  })).filter(it => it.description);
+  if (!cleanItems.length) return res.status(400).json({ success: false, error: 'Description de ligne requise' });
+
+  const total = cleanItems.reduce((s, it) => s + it.quantity * it.unitPrice, 0);
+  const quoteNumber = 'DEV-' + Date.now().toString(36).toUpperCase();
+
+  const ref = await db.collection('quotes').add({
+    ownerId: leadwaseId, quoteNumber,
+    prospectId: prospectId || null, prospectName: prospectName || '', company: company || prospectName || '',
+    items: cleanItems, total, status: 'draft', createdAt: new Date(),
+  });
+
+  if (prospectId) await logActivity(prospectId, 'note', `Devis créé (${quoteNumber}) — ${total.toLocaleString('fr-FR')} FCFA`);
+  res.json({ success: true, quoteId: ref.id, quoteNumber });
+}
+
+// GET /api/profile/[id]?action=list-quotes
+async function listQuotes(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+
+  const ownerIds = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  const lists = await Promise.all(ownerIds.map(id =>
+    db.collection('quotes').where('ownerId', '==', id).orderBy('createdAt', 'desc').limit(200).get()
+  ));
+  let quotes = [];
+  lists.forEach(snap => snap.docs.forEach(d => quotes.push({ id: d.id, ...d.data() })));
+  quotes.sort((a, b) => (b.createdAt?._seconds || 0) - (a.createdAt?._seconds || 0));
+  res.json({ success: true, quotes: quotes.slice(0, 200) });
+}
+
+// GET /api/profile/[id]?action=quote-pdf&quoteId=xxx
+async function getQuotePdf(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { quoteId } = req.query;
+  if (!quoteId) return res.status(400).json({ success: false, error: 'quoteId requis' });
+
+  const doc = await db.collection('quotes').doc(quoteId).get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Devis introuvable' });
+  const q = doc.data();
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(q.ownerId)) throw new Error('Accès refusé');
+
+  const pdfBase64 = await generateQuotePDF({
+    quoteNumber: q.quoteNumber, date: q.createdAt?._seconds ? new Date(q.createdAt._seconds * 1000) : new Date(),
+    company: q.company, items: q.items, total: q.total,
+    ownerCompany: profile.company,
+  });
+  res.json({ success: true, pdfBase64, filename: `${q.quoteNumber}.pdf` });
+}
+
+// POST /api/profile/[id]?action=update-quote-status { quoteId, status }
+async function updateQuoteStatus(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { quoteId, status } = req.body || {};
+  if (!['draft', 'sent', 'accepted', 'rejected'].includes(status)) {
+    return res.status(400).json({ success: false, error: 'Statut invalide' });
+  }
+  const ref = db.collection('quotes').doc(quoteId);
+  const doc = await ref.get();
+  if (!doc.exists) return res.status(404).json({ success: false, error: 'Devis introuvable' });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  await ref.update({ status, updatedAt: new Date() });
+  if (doc.data().prospectId) {
+    await logActivity(doc.data().prospectId, 'note', `Devis ${doc.data().quoteNumber} : statut → ${status}`);
+  }
+  res.json({ success: true });
+}
+
+// POST /api/profile/[id]?action=delete-quote { quoteId }
+async function deleteQuote(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  const { quoteId } = req.body || {};
+  const ref = db.collection('quotes').doc(quoteId);
+  const doc = await ref.get();
+  if (!doc.exists) return res.json({ success: true });
+
+  const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+  if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
+
+  await ref.delete();
+  res.json({ success: true });
+}
+
 async function createTask(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
@@ -659,6 +823,26 @@ export default async function handler(req, res) {
     }
     if (action === 'delete-task' && req.method === 'POST') {
       return deleteTask(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'create-quote' && req.method === 'POST') {
+      return createQuote(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'list-quotes' && req.method === 'GET') {
+      return listQuotes(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'quote-pdf' && req.method === 'GET') {
+      return getQuotePdf(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'update-quote-status' && req.method === 'POST') {
+      return updateQuoteStatus(req, res, leadwaseId).catch(e =>
+        res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
+    }
+    if (action === 'delete-quote' && req.method === 'POST') {
+      return deleteQuote(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'google-reviews' && req.method === 'GET') {

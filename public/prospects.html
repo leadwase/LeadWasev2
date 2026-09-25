@@ -164,6 +164,27 @@
           </div>
         </div>
 
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Devis</div>
+            <div class="pros-sub">Créez et suivez vos devis commerciaux</div>
+          </div>
+          <div class="pros-actions">
+            <button class="pros-btn primary" id="add-quote-btn">+ Nouveau devis</button>
+          </div>
+        </div>
+        <div class="pros-card">
+          <div class="pros-card-head"><div><div class="pros-card-title">Tous les devis</div></div></div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>N°</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="quotes-tbody">
+              <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
   </main>
@@ -200,6 +221,24 @@
     <div class="lw-confirm-actions">
       <button class="lw-confirm-cancel" id="history-close-btn">Fermer</button>
       <button class="lw-confirm-ok" id="history-add-btn">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<div class="lw-confirm-overlay" id="quote-overlay">
+  <div class="lw-confirm-box" style="max-width:540px">
+    <div class="lw-confirm-msg" style="font-weight:700;margin-bottom:4px">Nouveau devis</div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:14px" id="quote-prospect-hint"></div>
+    <div class="lw-confirm-field" style="display:block">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Client / Entreprise</label>
+      <input type="text" id="quote-company" class="lw-confirm-input" placeholder="Nom du client">
+    </div>
+    <div id="quote-items" style="margin-bottom:8px"></div>
+    <button type="button" class="pros-btn" id="quote-add-item-btn" style="margin-bottom:16px">+ Ajouter une ligne</button>
+    <div style="text-align:right;font-size:16px;font-weight:700;color:var(--black);margin-bottom:16px">Total : <span id="quote-total">0</span> FCFA</div>
+    <div class="lw-confirm-actions">
+      <button class="lw-confirm-cancel" id="quote-cancel-btn">Annuler</button>
+      <button class="lw-confirm-ok" id="quote-save-btn">Créer le devis</button>
     </div>
   </div>
 </div>
@@ -381,6 +420,7 @@ function renderTable() {
           ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
           <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
           <button class="pros-act-btn" title="Montant potentiel" onclick="editDealValue('${p.id}', ${p.dealValue || 0})">💰</button>
+          <button class="pros-act-btn" title="Créer un devis" onclick="quickAddQuote('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📄</button>
           <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📅</button>
           <button class="pros-act-btn" title="Historique" onclick="openHistory('${p.id}')">🕐</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
@@ -438,7 +478,7 @@ window.deleteProspect = async (id) => {
     const d = await api('prospects', { method: 'DELETE', qs: '&prospectId=' + id });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = allProspects.filter(p => p.id !== id);
-    renderStats(); renderAdvancedStats(); renderTable();
+    renderStats(); renderAdvancedStats(); renderTable(); loadQuotes();
     toast('Prospect supprimé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
@@ -454,7 +494,7 @@ document.getElementById('clear-btn').onclick = async () => {
     const d = await api('clear-prospects', { method: 'POST', body: '{}' });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = [];
-    renderStats(); renderAdvancedStats(); renderTable();
+    renderStats(); renderAdvancedStats(); renderTable(); loadQuotes();
     toast('Annuaire vidé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
@@ -513,8 +553,10 @@ initDashboardAuth(async ({ lwId: id, isBusiness }) => {
     allProspects = [];
   }
   renderStats();
+  renderAdvancedStats();
   renderTable();
   loadTasks();
+  loadQuotes();
 });
 
 // ── Tâches & rappels ──────────────────────────────────────────────────────────
@@ -676,6 +718,151 @@ document.getElementById('history-add-btn').addEventListener('click', async () =>
     window.openHistory(historyProspectId);
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 });
+
+// ── Devis ──────────────────────────────────────────────────────────────────────
+let allQuotes = [];
+let quoteItemId = 0;
+const QUOTE_STATUS_LABELS = { draft: '📝 Brouillon', sent: '📤 Envoyé', accepted: '✅ Accepté', rejected: '❌ Refusé' };
+const QUOTE_STATUS_COLORS = { draft: '#8e8e93', sent: '#6ea8ff', accepted: '#1a7a3c', rejected: '#c0392b' };
+
+function addQuoteItemRow(description = '', quantity = 1, unitPrice = '') {
+  const id = 'qi' + (quoteItemId++);
+  const row = document.createElement('div');
+  row.className = 'quote-item-row';
+  row.dataset.id = id;
+  row.innerHTML = `
+    <input type="text" class="qi-desc" placeholder="Description" value="${description.replace(/"/g,'&quot;')}">
+    <input type="number" class="qi-qty" placeholder="Qté" min="1" value="${quantity}">
+    <input type="number" class="qi-price" placeholder="Prix unitaire" min="0" value="${unitPrice}">
+    <button type="button" class="quote-item-remove" onclick="this.closest('.quote-item-row').remove(); updateQuoteTotal()">✕</button>
+  `;
+  document.getElementById('quote-items').appendChild(row);
+  row.querySelectorAll('.qi-qty, .qi-price').forEach(inp => inp.addEventListener('input', updateQuoteTotal));
+}
+window.updateQuoteTotal = () => {
+  let total = 0;
+  document.querySelectorAll('.quote-item-row').forEach(row => {
+    const qty = parseInt(row.querySelector('.qi-qty').value, 10) || 0;
+    const price = parseInt(row.querySelector('.qi-price').value, 10) || 0;
+    total += qty * price;
+  });
+  document.getElementById('quote-total').textContent = total.toLocaleString('fr-FR');
+};
+
+function openQuoteModal(prospectId, prospectName) {
+  document.getElementById('quote-items').innerHTML = '';
+  document.getElementById('quote-company').value = prospectName || '';
+  document.getElementById('quote-prospect-hint').textContent = prospectName ? `Devis pour : ${prospectName}` : '';
+  document.getElementById('quote-overlay').dataset.prospectId = prospectId || '';
+  addQuoteItemRow();
+  updateQuoteTotal();
+  document.getElementById('quote-overlay').classList.add('open');
+}
+window.quickAddQuote = (prospectId, prospectName) => openQuoteModal(prospectId, prospectName);
+document.getElementById('add-quote-btn').addEventListener('click', () => openQuoteModal());
+document.getElementById('quote-add-item-btn').addEventListener('click', () => addQuoteItemRow());
+document.getElementById('quote-cancel-btn').addEventListener('click', () => document.getElementById('quote-overlay').classList.remove('open'));
+document.getElementById('quote-overlay').addEventListener('click', e => { if (e.target.id === 'quote-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('quote-save-btn').addEventListener('click', async () => {
+  const company = document.getElementById('quote-company').value.trim();
+  const items = Array.from(document.querySelectorAll('.quote-item-row')).map(row => ({
+    description: row.querySelector('.qi-desc').value.trim(),
+    quantity: parseInt(row.querySelector('.qi-qty').value, 10) || 1,
+    unitPrice: parseInt(row.querySelector('.qi-price').value, 10) || 0,
+  })).filter(it => it.description);
+  if (!company) { toast('Le nom du client est requis', 'error'); return; }
+  if (!items.length) { toast('Ajoutez au moins une ligne', 'error'); return; }
+  const overlay = document.getElementById('quote-overlay');
+  try {
+    const d = await api('create-quote', {
+      method: 'POST',
+      body: JSON.stringify({ prospectId: overlay.dataset.prospectId || null, prospectName: company, company, items }),
+    });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    overlay.classList.remove('open');
+    toast('Devis créé', 'success');
+    loadQuotes();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+});
+
+function renderQuotes() {
+  const tbody = document.getElementById('quotes-tbody');
+  if (!allQuotes.length) {
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="6">Aucun devis pour le moment.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allQuotes.map(q => `
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${q.quoteNumber}</td>
+      <td class="pros-name">${q.company || q.prospectName || '—'}</td>
+      <td style="font-weight:700">${(q.total || 0).toLocaleString('fr-FR')} FCFA</td>
+      <td>
+        <select style="border:1px solid ${QUOTE_STATUS_COLORS[q.status]};color:${QUOTE_STATUS_COLORS[q.status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateQuoteStatus('${q.id}', this.value)">
+          ${Object.entries(QUOTE_STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===q.status?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </td>
+      <td style="color:var(--gray4);font-size:13px">${fmtDate(q.createdAt)}</td>
+      <td>
+        <div class="pros-act">
+          <button class="pros-act-btn" title="Télécharger PDF" onclick="downloadQuotePdf('${q.id}')">📄</button>
+          <button class="pros-act-btn del" title="Supprimer" onclick="removeQuote('${q.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function loadQuotes() {
+  try {
+    const d = await api('list-quotes');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allQuotes = d.quotes || [];
+  } catch (e) {
+    document.getElementById('quotes-tbody').innerHTML =
+      `<tr class="pros-empty"><td colspan="6" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
+    return;
+  }
+  renderQuotes();
+}
+
+window.updateQuoteStatus = async (id, status) => {
+  try {
+    const d = await api('update-quote-status', { method: 'POST', body: JSON.stringify({ quoteId: id, status }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const q = allQuotes.find(x => x.id === id);
+    if (q) q.status = status;
+    toast('Statut du devis mis à jour', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); renderQuotes(); }
+};
+
+window.removeQuote = async (id) => {
+  const ok = await confirmDialog('Supprimer ce devis ?', { okLabel: 'Supprimer', danger: true });
+  if (!ok) return;
+  try {
+    const d = await api('delete-quote', { method: 'POST', body: JSON.stringify({ quoteId: id }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    allQuotes = allQuotes.filter(q => q.id !== id);
+    renderQuotes();
+    toast('Devis supprimé', 'success');
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+window.downloadQuotePdf = async (id) => {
+  try {
+    const d = await api('quote-pdf', { qs: '&quoteId=' + id });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const byteChars = atob(d.pdfBase64);
+    const bytes = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = d.filename || 'devis.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
 
 document.querySelectorAll('.sidebar-item').forEach(a =>
   a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));
