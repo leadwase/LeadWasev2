@@ -412,6 +412,27 @@ function initials(name) {
 function esc(v) {
   return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+// Lien WhatsApp (click-to-chat, aucune clé API). Numéro sans indicatif → Bénin (+229) par défaut.
+function waLink(p) {
+  let d = String(p.phone || '').trim();
+  const intl = d.startsWith('+') || d.startsWith('00');
+  d = d.replace(/\D/g, '');
+  if (d.startsWith('00')) d = d.slice(2);
+  if (!d) return '';
+  if (!intl && (d.length === 8 || (d.length === 10 && d.startsWith('01')))) d = '229' + d;
+  if (d.length < 8 || d.length > 15) return '';
+  return `https://wa.me/${d}?text=${encodeURIComponent('Bonjour ' + (p.name || '') + ',')}`;
+}
+// Lien « Ajouter à Google Agenda » (événement sur la journée d'échéance, aucune clé API).
+function calendarLink(t) {
+  if (!t.dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(t.dueDate)) return '';
+  const start = t.dueDate.replace(/-/g, '');
+  const end = new Date(t.dueDate + 'T00:00:00Z'); end.setUTCDate(end.getUTCDate() + 1);
+  const endStr = end.toISOString().slice(0, 10).replace(/-/g, '');
+  const text = encodeURIComponent(t.title || 'Relance');
+  const details = encodeURIComponent(t.prospectName ? 'Prospect : ' + t.prospectName : 'LeadWase');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${endStr}&details=${details}`;
+}
 function fmtFCFA(n) { return (Number(n) || 0).toLocaleString('fr-FR'); }
 function toDate(v) {
   if (!v) return null;
@@ -610,6 +631,7 @@ function renderTable() {
       <td>
         <div class="pros-act">
           ${p.phone ? `<a class="pros-act-btn" href="tel:${esc(p.phone)}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
+          ${waLink(p) ? `<a class="pros-act-btn" href="${esc(waLink(p))}" target="_blank" rel="noopener" title="Écrire sur WhatsApp">📲</a>` : ''}
           ${p.email ? `<a class="pros-act-btn" href="mailto:${esc(p.email)}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
           <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}')">📝</button>
           <button class="pros-act-btn" title="Montant potentiel" onclick="editDealValue('${p.id}')">💰</button>
@@ -888,6 +910,7 @@ function renderTasks() {
             ${due ? `<span class="task-due task-due-${due.tone}">📅 ${due.text}</span>` : ''}
           </div>
         </div>
+        ${calendarLink(t) ? `<a class="pros-act-btn" href="${esc(calendarLink(t))}" target="_blank" rel="noopener" title="Ajouter à Google Agenda">🗓</a>` : ''}
         <button class="pros-act-btn del" title="Supprimer" onclick="removeTask('${t.id}')">🗑</button>
       </div>
     `;
