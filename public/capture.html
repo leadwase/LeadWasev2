@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Prendre contact — LeadWase</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  :root { --black:#0A0A0A; --gray3:#888; --gray4:#BBB; --gray5:#E8E8E8; --green:#1A7A3C; --green2:#22A050; --off:#F9F9F7; --serif:'Times New Roman',Times,serif; }
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--serif); background:var(--off); color:var(--black); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .wrap { width:100%; max-width:440px; background:#fff; border:1px solid var(--gray5); border-radius:4px; padding:32px 28px; box-shadow:0 10px 40px rgba(0,0,0,.06); }
+  .brand { font-size:20px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; margin-bottom:22px; }
+  .brand em { color:var(--green); font-style:normal; }
+  h1 { font-size:24px; margin-bottom:6px; }
+  .sub { font-size:15px; color:var(--gray3); margin-bottom:22px; line-height:1.5; }
+  label { display:block; font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:#888; margin:14px 0 5px; }
+  input[type=text], input[type=tel], input[type=email], textarea {
+    width:100%; padding:11px 12px; border:1px solid var(--gray5); border-radius:3px; font-family:var(--serif); font-size:16px; color:var(--black); outline:none; resize:vertical;
+  }
+  input:focus, textarea:focus { border-color:var(--green); }
+  .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .err { color:#c0392b; font-size:14px; min-height:20px; margin-top:12px; }
+  button { width:100%; margin-top:6px; padding:14px; background:var(--green); color:#fff; border:none; border-radius:3px; font-family:var(--serif); font-size:16px; font-weight:bold; cursor:pointer; }
+  button:hover { background:var(--green2); }
+  button:disabled { opacity:.6; cursor:default; }
+  .legal { font-size:12px; color:var(--gray3); margin-top:14px; line-height:1.5; text-align:center; }
+  .legal a { color:var(--gray3); text-decoration:underline; }
+  .state { text-align:center; padding:12px 0; }
+  .state .icon { font-size:44px; margin-bottom:10px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lead<em>Wase</em></div>
+
+  <div id="loading" class="state"><p class="sub">Chargement…</p></div>
+
+  <div id="invalid" class="state" hidden>
+    <div class="icon">🔗</div>
+    <h1>Lien invalide</h1>
+    <p class="sub">Ce formulaire n'existe pas ou n'est plus disponible.</p>
+  </div>
+
+  <div id="done" class="state" hidden>
+    <div class="icon">✅</div>
+    <h1>Merci !</h1>
+    <p class="sub" id="done-text">Vos coordonnées ont bien été transmises. Vous serez recontacté très prochainement.</p>
+  </div>
+
+  <form id="form" novalidate hidden>
+    <h1 id="title">Prendre contact</h1>
+    <p class="sub" id="sub"></p>
+
+    <label for="f-name">Nom *</label>
+    <input type="text" id="f-name" maxlength="120" autocomplete="name" required>
+
+    <label for="f-phone">Téléphone</label>
+    <input type="tel" id="f-phone" maxlength="40" autocomplete="tel">
+
+    <label for="f-email">Email</label>
+    <input type="email" id="f-email" maxlength="120" autocomplete="email">
+
+    <label for="f-object">Votre message</label>
+    <textarea id="f-object" rows="4" maxlength="300" placeholder="Comment pouvons-nous vous aider ?"></textarea>
+
+    <!-- Champ piège anti-robots : doit rester vide -->
+    <div class="hp" aria-hidden="true"><label>Site web<input type="text" id="f-website" tabindex="-1" autocomplete="off"></label></div>
+
+    <div class="err" id="err" role="alert"></div>
+    <button type="submit" id="btn">Envoyer mes coordonnées</button>
+    <p class="legal">Vos coordonnées sont transmises uniquement à <span id="legal-name">ce professionnel</span>. Voir la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
+  </form>
+</div>
+
+<script>
+(function () {
+  const id = (new URLSearchParams(location.search).get('id') || '').trim().toUpperCase();
+  const $ = (x) => document.getElementById(x);
+  const show = (name) => ['loading', 'invalid', 'done', 'form'].forEach(k => { $(k).hidden = (k !== name); });
+
+  if (!/^[A-Z0-9-]{3,40}$/.test(id)) { show('invalid'); return; }
+
+  fetch('/api/profile/' + encodeURIComponent(id))
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d || !d.success || !d.profile) { show('invalid'); return; }
+      const p = d.profile;
+      const fullName = [p.firstName, p.lastName].filter(Boolean).join(' ');
+      if (fullName) { $('title').textContent = 'Contacter ' + fullName; $('legal-name').textContent = fullName; }
+      $('sub').textContent = p.company ? p.company : 'Laissez vos coordonnées, vous serez recontacté rapidement.';
+      document.title = (fullName ? fullName + ' — ' : '') + 'Prendre contact';
+      show('form');
+    })
+    .catch(() => show('invalid'));
+
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('err'); err.textContent = '';
+    const name = $('f-name').value.trim();
+    const phone = $('f-phone').value.trim();
+    const email = $('f-email').value.trim();
+    const object = $('f-object').value.trim();
+    if (!name) { err.textContent = 'Merci d\u2019indiquer votre nom.'; return; }
+    if (!phone && !email) { err.textContent = 'Merci d\u2019indiquer un téléphone ou un email.'; return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Adresse email invalide.'; return; }
+    const btn = $('btn'); btn.disabled = true; btn.textContent = 'Envoi…';
+    try {
+      const res = await fetch('/api/profile/' + encodeURIComponent(id) + '?action=capture-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, object, source: 'formulaire', website: $('f-website').value }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!d.success) throw new Error(d.error || 'Une erreur est survenue, merci de réessayer.');
+      show('done');
+    } catch (ex) {
+      err.textContent = ex.message;
+      btn.disabled = false; btn.textContent = 'Envoyer mes coordonnées';
+    }
+  });
+})();
+</script>
+</body>
+</html>

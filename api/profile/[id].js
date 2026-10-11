@@ -2,6 +2,7 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import PDFDocument from 'pdfkit';
+import crypto from 'crypto';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -64,22 +65,29 @@ async function verifyOwner(req, leadwaseId) {
 // "Échanger" de la page profil publique. N'importe quel visiteur peut soumettre
 // ses coordonnées ; aucune authentification requise (comme un formulaire de contact).
 async function captureLead(req, res, leadwaseId) {
-  const { name, phone, email, object, source } = req.body || {};
+  const { name, phone, email, object, source, website } = req.body || {};
+  // Champ piège (honeypot) : invisible pour un humain, rempli par les robots → on ignore en silence.
+  if (website) return res.json({ success: true });
   if (!name || (!phone && !email)) {
     return res.status(400).json({ success: false, error: 'Nom et (téléphone ou email) requis' });
   }
+  const profileSnap = await db.collection('profiles').doc(leadwaseId).get();
+  if (!profileSnap.exists) return res.status(404).json({ success: false, error: 'Profil introuvable' });
+  const leadSource = source === 'nfc' ? 'nfc' : source === 'formulaire' ? 'formulaire' : 'lien_direct';
   const ref = await db.collection('prospects').add({
     ownerId:   leadwaseId,
     name:      String(name).trim().slice(0, 120),
     phone:     phone  ? String(phone).trim().slice(0, 40)  : '',
     email:     email  ? String(email).trim().slice(0, 120) : '',
     object:    object ? String(object).trim().slice(0, 300) : '',
-    source:    source === 'nfc' ? 'nfc' : 'lien_direct',
+    source:    leadSource,
     status:    'nouveau',
     notes:     '',
     createdAt: new Date(),
   });
-  await logActivity(ref.id, 'system', `Prospect capté via ${source === 'nfc' ? 'carte NFC' : 'lien direct'} (bouton Échanger)`);
+  await logActivity(ref.id, 'system', leadSource === 'formulaire'
+    ? 'Prospect capté via le formulaire de capture'
+    : `Prospect capté via ${leadSource === 'nfc' ? 'carte NFC' : 'lien direct'} (bouton Échanger)`);
   res.json({ success: true });
 }
 
@@ -144,7 +152,7 @@ async function listProspects(req, res, leadwaseId) {
     .orderBy('createdAt', 'desc')
     .limit(500)
     .get();
-  const prospects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const prospects = snap.docs.map(d => { const { unsubToken, ...rest } = d.data(); return { id: d.id, ...rest }; });
   res.json({ success: true, prospects });
 }
 
@@ -295,9 +303,26 @@ async function updateQuoteStatus(req, res, leadwaseId) {
   const allowedOwners = [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
   if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
 
-  await ref.update({ status, updatedAt: new Date() });
-  if (doc.data().prospectId) {
-    await logActivity(doc.data().prospectId, 'note', `Devis ${doc.data().quoteNumber} : statut → ${status}`);
+  const q = doc.data();
+  const statusChanged = q.status !== status;
+  const quoteUpdate = { status, updatedAt: new Date() };
+  if (status === 'accepted' && statusChanged) quoteUpdate.acceptedAt = new Date();
+  await ref.update(quoteUpdate);
+  if (q.prospectId) {
+    await logActivity(q.prospectId, 'note', `Devis ${q.quoteNumber} : statut → ${status}`);
+    if (statusChanged && (status === 'sent' || status === 'accepted')) {
+      const pRef = db.collection('prospects').doc(q.prospectId);
+      const pDoc = await pRef.get();
+      if (pDoc.exists && pDoc.data().ownerId === q.ownerId) {
+        const p = pDoc.data();
+        if (status === 'sent') {
+          await autoAdvanceStatus(pRef, p, 'contacte', `devis ${q.quoteNumber} envoyé`);
+        } else {
+          const next = await autoAdvanceStatus(pRef, p, 'converti', `devis ${q.quoteNumber} accepté`);
+          if (next && !p.dealValue) await pRef.update({ dealValue: q.total || 0 });
+        }
+      }
+    }
   }
   res.json({ success: true });
 }
@@ -414,7 +439,7 @@ async function logActivity(prospectId, type, text) {
 
 async function updateProspect(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
-  const { prospectId, status, notes } = req.body || {};
+  const { prospectId, status, notes, dealValue } = req.body || {};
   if (!prospectId) return res.status(400).json({ success: false, error: 'prospectId requis' });
   if (status !== undefined && !PROSPECT_STATUSES.includes(status)) {
     return res.status(400).json({ success: false, error: 'Statut invalide' });
@@ -430,8 +455,16 @@ async function updateProspect(req, res, leadwaseId) {
   if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
 
   const update = { updatedAt: new Date() };
-  if (status !== undefined) update.status = status;
+  if (status !== undefined) {
+    update.status = status;
+    if (status === 'converti' && existing.status !== 'converti') update.convertedAt = new Date();
+    if (status !== 'converti' && existing.status === 'converti') update.convertedAt = null;
+  }
   if (notes  !== undefined) update.notes  = String(notes).slice(0, 1000);
+  if (dealValue !== undefined) {
+    const v = parseInt(dealValue, 10);
+    update.dealValue = Number.isFinite(v) ? Math.min(Math.max(v, 0), 1e12) : 0;
+  }
   await ref.update(update);
 
   if (status !== undefined && status !== existing.status) {
@@ -461,6 +494,7 @@ async function logManualActivity(req, res, leadwaseId) {
   if (!allowedOwners.includes(doc.data().ownerId)) throw new Error('Accès refusé');
 
   await logActivity(prospectId, 'interaction', text);
+  await autoAdvanceStatus(db.collection('prospects').doc(prospectId), doc.data(), 'contacte', 'interaction enregistrée');
   res.json({ success: true });
 }
 
@@ -493,7 +527,7 @@ async function deleteProspect(req, res, leadwaseId) {
   if (!doc.exists || doc.data().ownerId !== leadwaseId) {
     return res.status(404).json({ success: false, error: 'Prospect introuvable' });
   }
-  await ref.delete();
+  await db.recursiveDelete(ref);
   res.json({ success: true });
 }
 
@@ -502,9 +536,9 @@ async function clearProspects(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   if (profile.plan !== 'business') throw new Error('Accès refusé');
   const snap = await db.collection('prospects').where('ownerId', '==', leadwaseId).get();
-  const batch = db.batch();
-  snap.docs.forEach(d => batch.delete(d.ref));
-  await batch.commit();
+  for (let i = 0; i < snap.docs.length; i += 20) {
+    await Promise.all(snap.docs.slice(i, i + 20).map(d => db.recursiveDelete(d.ref)));
+  }
   res.json({ success: true, deleted: snap.size });
 }
 
@@ -616,7 +650,7 @@ async function getTeamProspects(req, res, leadwaseId) {
   prospectLists.forEach((snap, i) => {
     const ownerId = memberIds[i];
     snap.docs.forEach(doc => prospects.push({
-      id: doc.id, ...doc.data(),
+      id: doc.id, ...(({ unsubToken, ...rest }) => rest)(doc.data()),
       cardOwnerId: ownerId, cardOwnerName: nameMap[ownerId] || ownerId,
     }));
   });
@@ -765,6 +799,491 @@ async function regenerateTeamMemberPassword(req, res, leadwaseId) {
   res.json({ success: true, password: newPwd });
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// CRM — helpers communs, documents, marketing (campagnes email), automatisations
+// ═════════════════════════════════════════════════════════════════════════════
+
+const SITE_URL = () => process.env.SITE_URL || 'https://leadwase.com';
+
+function tsMillis(v) {
+  if (!v) return 0;
+  if (typeof v.toMillis === 'function') return v.toMillis();
+  if (v._seconds) return v._seconds * 1000;
+  const t = new Date(v).getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
+
+function allowedOwnersOf(profile, leadwaseId) {
+  return [leadwaseId, ...(profile.isTeamOwner && Array.isArray(profile.teamMembers) ? profile.teamMembers : [])];
+}
+
+function requireCrm(profile) {
+  if (profile.plan !== 'business' && !profile.isTeamOwner) throw new Error('Accès refusé');
+}
+
+const FIRESTORE_ID_RE = /^[A-Za-z0-9]{1,40}$/;
+
+// Charge un prospect et vérifie que l'utilisateur connecté a le droit d'y toucher.
+// Retourne { ref, data } ou { error: { code, message } } (404/400), ou lève 'Accès refusé'.
+async function loadOwnedProspect(profile, leadwaseId, prospectId) {
+  if (!prospectId || !FIRESTORE_ID_RE.test(String(prospectId))) {
+    return { error: { code: 400, message: 'prospectId requis' } };
+  }
+  const ref = db.collection('prospects').doc(String(prospectId));
+  const doc = await ref.get();
+  if (!doc.exists) return { error: { code: 404, message: 'Prospect introuvable' } };
+  if (!allowedOwnersOf(profile, leadwaseId).includes(doc.data().ownerId)) throw new Error('Accès refusé');
+  return { ref, data: doc.data() };
+}
+
+function sendError(res, error) {
+  return res.status(error.code).json({ success: false, error: error.message });
+}
+
+// Réponse d'erreur homogène pour les routes CRM récentes.
+function fail(res, e) {
+  const m = e?.message || 'Erreur';
+  const code = m === 'Accès refusé' ? 403
+    : (m === 'Non autorisé' || m.startsWith('Session invalide')) ? 401 : 500;
+  if (code === 500) console.error('[crm]', e);
+  return res.status(code).json({ success: false, error: m });
+}
+
+// ── Réglages CRM par propriétaire (collection crmSettings, jamais exposée publiquement) ──
+const DEFAULT_CRM_SETTINGS = {
+  autoStatus:       true,
+  followUpEnabled:  false,
+  followUpDays:     3,
+  notifyOwner:      true,
+  autoEmail:        false,
+  autoEmailSubject: 'Suite à notre échange',
+  autoEmailMessage: "Bonjour {{nom}},\n\nJe me permets de revenir vers vous suite à notre échange. Avez-vous eu le temps d'y réfléchir ? Je reste à votre disposition pour toute question.\n\nCordialement",
+};
+
+async function getCrmSettings(ownerId) {
+  const d = await db.collection('crmSettings').doc(ownerId).get();
+  return { ...DEFAULT_CRM_SETTINGS, ...(d.exists ? d.data() : {}) };
+}
+
+// Fait avancer automatiquement le statut d'un prospect suite à une action commerciale.
+//  - 'contacte' : seulement si le prospect est encore 'nouveau'
+//  - 'converti' : depuis n'importe quel statut sauf déjà 'converti'
+// Retourne le nouveau statut, ou null si rien n'a changé.
+async function autoAdvanceStatus(prospectRef, prospect, target, reason, settingsOverride) {
+  try {
+    const settings = settingsOverride || await getCrmSettings(prospect.ownerId);
+    if (!settings.autoStatus) return null;
+    const current = prospect.status || 'nouveau';
+    let next = null;
+    if (target === 'contacte' && current === 'nouveau') next = 'contacte';
+    if (target === 'converti' && current !== 'converti') next = 'converti';
+    if (!next) return null;
+    const update = { status: next, updatedAt: new Date() };
+    if (next === 'converti') update.convertedAt = new Date();
+    await prospectRef.update(update);
+    await logActivity(prospectRef.id, 'auto',
+      `Statut changé automatiquement : ${STATUS_LABELS_FR[current] || 'Nouveau'} → ${STATUS_LABELS_FR[next]} (${reason})`);
+    return next;
+  } catch (e) {
+    console.error('[autoAdvanceStatus]', e.message);
+    return null;
+  }
+}
+
+// ── Documents (contrat, devis signé…) joints à une fiche prospect ─────────────
+// Stockage dans Firestore (aucun bucket à configurer) : le fichier est découpé en
+// morceaux base64 de ~700 Ko dans prospects/{id}/documents/{docId}/chunks.
+const DOC_MAX_BYTES       = 2.5 * 1024 * 1024;   // le plafond Vercel est de 4,5 Mo par requête (base64 = +33 %)
+const DOC_CHUNK_CHARS     = 700000;              // < 1 Mio, limite d'un document Firestore
+const DOC_MAX_PER_PROSPECT = 20;
+const DOC_TYPES = {
+  pdf:  'application/pdf',
+  png:  'image/png',
+  jpg:  'image/jpeg',
+  jpeg: 'image/jpeg',
+  doc:  'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls:  'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  txt:  'text/plain',
+  csv:  'text/csv',
+};
+
+function cleanFileName(name) {
+  return String(name || '').replace(/[\\/\0\r\n]/g, '_').trim().slice(0, 120);
+}
+
+// POST ?action=upload-document { prospectId, name, dataBase64 }
+async function uploadDocument(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const { prospectId, name, dataBase64 } = req.body || {};
+  const owned = await loadOwnedProspect(profile, leadwaseId, prospectId);
+  if (owned.error) return sendError(res, owned.error);
+
+  const fileName = cleanFileName(name);
+  const ext = (fileName.split('.').pop() || '').toLowerCase();
+  if (!fileName || !DOC_TYPES[ext]) {
+    return res.status(400).json({ success: false, error: 'Format non accepté (PDF, images, Word, Excel, TXT, CSV)' });
+  }
+  if (typeof dataBase64 !== 'string' || !dataBase64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(dataBase64)) {
+    return res.status(400).json({ success: false, error: 'Fichier invalide' });
+  }
+  const size = Buffer.from(dataBase64, 'base64').length;
+  if (!size) return res.status(400).json({ success: false, error: 'Fichier vide' });
+  if (size > DOC_MAX_BYTES) {
+    return res.status(400).json({ success: false, error: 'Fichier trop volumineux (2,5 Mo maximum)' });
+  }
+
+  const metaCol = owned.ref.collection('documents');
+  const existing = await metaCol.limit(DOC_MAX_PER_PROSPECT).select().get();
+  if (existing.size >= DOC_MAX_PER_PROSPECT) {
+    return res.status(400).json({ success: false, error: `${DOC_MAX_PER_PROSPECT} documents maximum par prospect` });
+  }
+
+  const docRef = metaCol.doc();
+  try {
+    const batch = db.batch();
+    for (let i = 0, n = 0; i < dataBase64.length; i += DOC_CHUNK_CHARS, n++) {
+      batch.set(docRef.collection('chunks').doc(String(n).padStart(4, '0')),
+        { i: n, data: dataBase64.slice(i, i + DOC_CHUNK_CHARS) });
+    }
+    await batch.commit();
+    // La fiche n'est écrite qu'une fois tous les morceaux enregistrés : jamais de fichier incomplet listé.
+    await docRef.set({ name: fileName, mime: DOC_TYPES[ext], size, uploadedBy: leadwaseId, createdAt: new Date() });
+  } catch (e) {
+    await db.recursiveDelete(docRef).catch(() => {});
+    throw e;
+  }
+  await logActivity(owned.ref.id, 'document', `Document ajouté : ${fileName}`);
+  res.json({ success: true, document: { id: docRef.id, name: fileName, mime: DOC_TYPES[ext], size } });
+}
+
+// GET ?action=list-documents&prospectId=xxx
+async function listDocuments(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const owned = await loadOwnedProspect(profile, leadwaseId, req.query.prospectId);
+  if (owned.error) return sendError(res, owned.error);
+  const snap = await owned.ref.collection('documents').orderBy('createdAt', 'desc').limit(DOC_MAX_PER_PROSPECT).get();
+  res.json({ success: true, documents: snap.docs.map(d => ({ id: d.id, ...d.data() })) });
+}
+
+// GET ?action=download-document&prospectId=xxx&documentId=yyy
+async function downloadDocument(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const owned = await loadOwnedProspect(profile, leadwaseId, req.query.prospectId);
+  if (owned.error) return sendError(res, owned.error);
+  const documentId = String(req.query.documentId || '');
+  if (!FIRESTORE_ID_RE.test(documentId)) return res.status(400).json({ success: false, error: 'documentId requis' });
+
+  const docRef = owned.ref.collection('documents').doc(documentId);
+  const meta = await docRef.get();
+  if (!meta.exists) return res.status(404).json({ success: false, error: 'Document introuvable' });
+  const chunks = await docRef.collection('chunks').orderBy('i').get();
+  const dataBase64 = chunks.docs.map(c => c.data().data).join('');
+  res.json({ success: true, name: meta.data().name, mime: meta.data().mime, dataBase64 });
+}
+
+// POST ?action=delete-document { prospectId, documentId }
+async function deleteDocument(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const { prospectId, documentId } = req.body || {};
+  const owned = await loadOwnedProspect(profile, leadwaseId, prospectId);
+  if (owned.error) return sendError(res, owned.error);
+  if (!FIRESTORE_ID_RE.test(String(documentId || ''))) {
+    return res.status(400).json({ success: false, error: 'documentId requis' });
+  }
+  const docRef = owned.ref.collection('documents').doc(String(documentId));
+  const meta = await docRef.get();
+  if (!meta.exists) return res.json({ success: true });
+  const fileName = meta.data().name;
+  await db.recursiveDelete(docRef);
+  await logActivity(owned.ref.id, 'document', `Document supprimé : ${fileName}`);
+  res.json({ success: true });
+}
+
+// ── Marketing : campagnes email vers une sélection de prospects ───────────────
+const CAMPAIGN_MAX_PER_SEND = 50;
+const CAMPAIGN_MAX_PER_DAY  = 200;   // reste sous le plafond d'envoi quotidien du forfait Brevo gratuit
+const EMAIL_RE = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
+
+async function ensureUnsubToken(ref, prospect) {
+  if (prospect.unsubToken) return prospect.unsubToken;
+  const token = crypto.randomBytes(16).toString('hex');
+  await ref.update({ unsubToken: token });
+  prospect.unsubToken = token;
+  return token;
+}
+
+function unsubscribeUrl(ownerId, prospectId, token) {
+  return `${SITE_URL()}/api/profile/${encodeURIComponent(ownerId)}?action=unsubscribe&p=${encodeURIComponent(prospectId)}&t=${token}`;
+}
+
+function personalize(text, prospect) {
+  return String(text).replace(/\{\{\s*nom\s*\}\}/gi, () => prospect.name || '');
+}
+
+function senderLabel(profile) {
+  const raw = profile.firstName
+    ? `${profile.firstName}${profile.company ? ' — ' + profile.company : ''}`
+    : (profile.company || 'LeadWase');
+  return raw.replace(/["<>\r\n]/g, '').slice(0, 60) || 'LeadWase';
+}
+
+// POST ?action=send-campaign { prospectIds: [], subject, message }
+async function sendCampaign(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+
+  const { prospectIds, subject, message } = req.body || {};
+  const cleanSubject = String(subject || '').trim().slice(0, 150);
+  const cleanMessage = String(message || '').trim().slice(0, 5000);
+  if (!cleanSubject || !cleanMessage) {
+    return res.status(400).json({ success: false, error: 'Objet et message requis' });
+  }
+  const ids = Array.isArray(prospectIds)
+    ? [...new Set(prospectIds.map(String).filter(id => FIRESTORE_ID_RE.test(id)))] : [];
+  if (!ids.length) return res.status(400).json({ success: false, error: 'Sélectionnez au moins un prospect' });
+  if (ids.length > CAMPAIGN_MAX_PER_SEND) {
+    return res.status(400).json({ success: false, error: `${CAMPAIGN_MAX_PER_SEND} destinataires maximum par envoi` });
+  }
+  if (!profile.email || !EMAIL_RE.test(profile.email)) {
+    return res.status(400).json({ success: false, error: "Ajoutez une adresse email à votre profil : elle sert d'adresse de réponse pour vos prospects." });
+  }
+
+  const allowed = allowedOwnersOf(profile, leadwaseId);
+  const docs = await db.getAll(...ids.map(id => db.collection('prospects').doc(id)));
+  const skipped = { notFound: 0, noEmail: 0, unsubscribed: 0 };
+  const targets = [];
+  docs.forEach(d => {
+    if (!d.exists || !allowed.includes(d.data().ownerId)) { skipped.notFound++; return; }
+    const p = d.data();
+    if (p.unsubscribed) { skipped.unsubscribed++; return; }
+    if (!p.email || !EMAIL_RE.test(p.email)) { skipped.noEmail++; return; }
+    targets.push({ ref: d.ref, id: d.id, p });
+  });
+  if (!targets.length) {
+    return res.status(400).json({ success: false, error: 'Aucun destinataire valide (email manquant, désabonné ou introuvable)', skipped });
+  }
+
+  const settings = await getCrmSettings(leadwaseId);
+  const today = new Date().toISOString().slice(0, 10);
+  const usedToday = settings.campaignDay === today ? (settings.campaignCount || 0) : 0;
+  if (usedToday + targets.length > CAMPAIGN_MAX_PER_DAY) {
+    return res.status(400).json({ success: false,
+      error: `Limite quotidienne de ${CAMPAIGN_MAX_PER_DAY} emails : il vous en reste ${Math.max(0, CAMPAIGN_MAX_PER_DAY - usedToday)} aujourd'hui.` });
+  }
+
+  const { sendCampaignMail } = await import('../../lib/brevo.js');
+  const senderName = senderLabel(profile);
+  let sent = 0, failed = 0, firstError = '';
+  for (let i = 0; i < targets.length; i += 10) {
+    const results = await Promise.allSettled(targets.slice(i, i + 10).map(async t => {
+      const token = await ensureUnsubToken(t.ref, t.p);
+      await sendCampaignMail({
+        to: t.p.email, subject: cleanSubject, text: personalize(cleanMessage, t.p),
+        senderName, replyTo: profile.email,
+        unsubscribeUrl: unsubscribeUrl(t.p.ownerId, t.id, token),
+      });
+      // L'email est parti : les étapes suivantes ne doivent jamais le faire compter comme un échec.
+      try {
+        await logActivity(t.id, 'email', `Email envoyé : « ${cleanSubject} »`);
+        await autoAdvanceStatus(t.ref, t.p, 'contacte', 'email envoyé', settings);
+      } catch (e) { console.error('[sendCampaign] post-envoi', e.message); }
+    }));
+    results.forEach(r => {
+      if (r.status === 'fulfilled') sent++;
+      else { failed++; if (!firstError) firstError = r.reason?.message || 'Erreur inconnue'; }
+    });
+  }
+
+  await db.collection('crmSettings').doc(leadwaseId).set({ campaignDay: today, campaignCount: usedToday + sent }, { merge: true });
+  await db.collection('campaigns').add({
+    ownerId: leadwaseId, subject: cleanSubject, message: cleanMessage,
+    targeted: targets.length, sent, failed, skipped, createdAt: new Date(),
+  });
+  res.json({ success: true, sent, failed, skipped, error: failed ? firstError : undefined });
+}
+
+// GET ?action=list-campaigns
+async function listCampaigns(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const snap = await db.collection('campaigns').where('ownerId', '==', leadwaseId).limit(100).get();
+  const campaigns = snap.docs
+    .map(d => { const c = d.data(); return { id: d.id, subject: c.subject, targeted: c.targeted, sent: c.sent, failed: c.failed, createdAt: c.createdAt }; })
+    .sort((a, b) => tsMillis(b.createdAt) - tsMillis(a.createdAt))
+    .slice(0, 30);
+  res.json({ success: true, campaigns });
+}
+
+// GET ?action=unsubscribe&p=<prospectId>&t=<token> — public, lien présent dans chaque email.
+async function unsubscribeProspect(req, res, leadwaseId) {
+  const page = (title, body) => `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head><body style="font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f9f9f7"><div style="max-width:420px;padding:32px;text-align:center"><h2 style="color:#0a0a0a">${title}</h2><p style="color:#555;line-height:1.6">${body}</p></div></body></html>`;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+  const p = String(req.query.p || ''), t = String(req.query.t || '');
+  if (!FIRESTORE_ID_RE.test(p) || !/^[a-f0-9]{32}$/.test(t)) {
+    return res.status(400).send(page('Lien invalide', "Ce lien de désabonnement n'est pas valide."));
+  }
+  const ref = db.collection('prospects').doc(p);
+  const doc = await ref.get();
+  const data = doc.exists ? doc.data() : null;
+  const ok = data && data.ownerId === leadwaseId && data.unsubToken &&
+    data.unsubToken.length === t.length &&
+    crypto.timingSafeEqual(Buffer.from(data.unsubToken), Buffer.from(t));
+  if (!ok) return res.status(400).send(page('Lien invalide', "Ce lien de désabonnement n'est pas valide."));
+
+  if (!data.unsubscribed) {
+    await ref.update({ unsubscribed: true, unsubscribedAt: new Date() });
+    await logActivity(p, 'system', 'Le prospect s\u2019est désabonné des emails');
+  }
+  res.status(200).send(page('Désabonnement confirmé', 'Vous ne recevrez plus d\u2019emails de cet expéditeur. Merci.'));
+}
+
+// ── Automatisations ───────────────────────────────────────────────────────────
+const FOLLOWUP_MAX_PER_OWNER = 50;
+
+// GET ?action=get-automations
+async function getAutomations(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const s = await getCrmSettings(leadwaseId);
+  res.json({ success: true, settings: {
+    autoStatus: !!s.autoStatus, followUpEnabled: !!s.followUpEnabled, followUpDays: s.followUpDays,
+    notifyOwner: !!s.notifyOwner, autoEmail: !!s.autoEmail,
+    autoEmailSubject: s.autoEmailSubject, autoEmailMessage: s.autoEmailMessage,
+  }});
+}
+
+// POST ?action=save-automations { autoStatus, followUpEnabled, followUpDays, notifyOwner, autoEmail, autoEmailSubject, autoEmailMessage }
+async function saveAutomations(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const b = req.body || {};
+  const days = parseInt(b.followUpDays, 10);
+  const next = {
+    autoStatus:       !!b.autoStatus,
+    followUpEnabled:  !!b.followUpEnabled,
+    followUpDays:     Math.min(60, Math.max(1, Number.isFinite(days) ? days : DEFAULT_CRM_SETTINGS.followUpDays)),
+    notifyOwner:      !!b.notifyOwner,
+    autoEmail:        !!b.autoEmail,
+    autoEmailSubject: String(b.autoEmailSubject || '').trim().slice(0, 150) || DEFAULT_CRM_SETTINGS.autoEmailSubject,
+    autoEmailMessage: String(b.autoEmailMessage || '').trim().slice(0, 3000) || DEFAULT_CRM_SETTINGS.autoEmailMessage,
+    updatedAt:        new Date(),
+  };
+  if (next.autoEmail && (!profile.email || !EMAIL_RE.test(profile.email))) {
+    return res.status(400).json({ success: false, error: "Ajoutez une adresse email à votre profil avant d'activer l'email de relance automatique (elle sert d'adresse de réponse)." });
+  }
+  await db.collection('crmSettings').doc(leadwaseId).set(next, { merge: true });
+  res.json({ success: true });
+}
+
+// Relance les prospects restés « Nouveau » depuis plus de N jours pour un propriétaire :
+// tâche de relance + (option) email au prospect + (option) email récapitulatif au propriétaire.
+async function processOwnerAutomations(ownerId, settings) {
+  const days = Math.min(60, Math.max(1, parseInt(settings.followUpDays, 10) || 3));
+  const cutoff = Date.now() - days * 86400000;
+  const snap = await db.collection('prospects')
+    .where('ownerId', '==', ownerId).orderBy('createdAt', 'desc').limit(500).get();
+  const due = snap.docs.filter(d => {
+    const p = d.data();
+    const created = tsMillis(p.createdAt);
+    return (p.status || 'nouveau') === 'nouveau' && !p.autoFollowUpAt && created && created <= cutoff;
+  }).slice(0, FOLLOWUP_MAX_PER_OWNER);
+  if (!due.length) return { followUps: 0, emailsSent: 0 };
+
+  const ownerDoc = await db.collection('profiles').doc(ownerId).get();
+  const owner = ownerDoc.exists ? ownerDoc.data() : {};
+  const today = new Date().toISOString().slice(0, 10);
+  const canEmail = settings.autoEmail && owner.email && EMAIL_RE.test(owner.email);
+  let sendCampaignMail = null;
+  if (canEmail) ({ sendCampaignMail } = await import('../../lib/brevo.js'));
+
+  const items = [];
+  let emailsSent = 0;
+  for (const d of due) {
+    const p = d.data();
+    const waitedDays = Math.max(days, Math.floor((Date.now() - tsMillis(p.createdAt)) / 86400000));
+    await db.collection('tasks').add({
+      ownerId, title: `Relancer ${p.name || 'ce prospect'}`.slice(0, 200), dueDate: today,
+      prospectId: d.id, prospectName: p.name || '', done: false, auto: true, createdAt: new Date(),
+    });
+    await d.ref.update({ autoFollowUpAt: new Date() });
+    await logActivity(d.id, 'auto', `Relance automatique : tâche créée (prospect resté « Nouveau » depuis ${waitedDays} jours)`);
+    items.push({ name: p.name || '—', days: waitedDays });
+
+    if (canEmail && p.email && EMAIL_RE.test(p.email) && !p.unsubscribed) {
+      try {
+        const token = await ensureUnsubToken(d.ref, p);
+        await sendCampaignMail({
+          to: p.email, subject: settings.autoEmailSubject, text: personalize(settings.autoEmailMessage, p),
+          senderName: senderLabel(owner), replyTo: owner.email,
+          unsubscribeUrl: unsubscribeUrl(ownerId, d.id, token),
+        });
+        emailsSent++;
+        await logActivity(d.id, 'email', `Email de relance automatique envoyé : « ${settings.autoEmailSubject} »`);
+        await autoAdvanceStatus(d.ref, p, 'contacte', 'relance automatique envoyée', settings);
+      } catch (e) { console.error('[automations] email prospect', e.message); }
+    }
+  }
+
+  if (settings.notifyOwner && owner.email && EMAIL_RE.test(owner.email)) {
+    try {
+      const { notifyOwnerFollowUps } = await import('../../lib/brevo.js');
+      await notifyOwnerFollowUps({ ownerEmail: owner.email, ownerName: owner.firstName || '', items, emailsSent });
+    } catch (e) { console.error('[automations] email propriétaire', e.message); }
+  }
+  return { followUps: items.length, emailsSent };
+}
+
+// GET (cron Vercel, en-tête Authorization: Bearer CRON_SECRET) ou POST (propriétaire connecté,
+// bouton « Lancer maintenant ») ?action=run-automations
+async function runAutomations(req, res, leadwaseId) {
+  const secret = process.env.CRON_SECRET;
+  const authHeader = String(req.headers.authorization || '');
+  const expected = secret ? `Bearer ${secret}` : null;
+  const isCron = expected && authHeader.length === expected.length &&
+    crypto.timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected));
+
+  if (isCron) {
+    const snap = await db.collection('crmSettings').where('followUpEnabled', '==', true).get();
+    let followUps = 0, emailsSent = 0, errors = 0;
+    for (const d of snap.docs) {
+      try {
+        const r = await processOwnerAutomations(d.id, { ...DEFAULT_CRM_SETTINGS, ...d.data() });
+        followUps += r.followUps; emailsSent += r.emailsSent;
+      } catch (e) { errors++; console.error('[automations] propriétaire', d.id, e.message); }
+    }
+    return res.json({ success: true, owners: snap.size, followUps, emailsSent, errors });
+  }
+
+  const { profile } = await verifyOwner(req, leadwaseId);
+  requireCrm(profile);
+  const settings = await getCrmSettings(leadwaseId);
+  if (!settings.followUpEnabled) {
+    return res.status(400).json({ success: false, error: "Activez d'abord la relance automatique (et enregistrez) avant de la lancer." });
+  }
+  const r = await processOwnerAutomations(leadwaseId, settings);
+  res.json({ success: true, ...r });
+}
+
+const CRM_ROUTES = {
+  'POST:upload-document':   uploadDocument,
+  'GET:list-documents':     listDocuments,
+  'GET:download-document':  downloadDocument,
+  'POST:delete-document':   deleteDocument,
+  'POST:send-campaign':     sendCampaign,
+  'GET:list-campaigns':     listCampaigns,
+  'GET:get-automations':    getAutomations,
+  'POST:save-automations':  saveAutomations,
+  'GET:run-automations':    runAutomations,
+  'POST:run-automations':   runAutomations,
+};
+
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
@@ -845,6 +1364,14 @@ export default async function handler(req, res) {
       return deleteQuote(req, res, leadwaseId).catch(e =>
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
+    if (action === 'unsubscribe' && req.method === 'GET') {
+      return unsubscribeProspect(req, res, leadwaseId).catch(e => {
+        console.error('[unsubscribe]', e);
+        res.status(500).send('Erreur, merci de réessayer.');
+      });
+    }
+    const crmRoute = CRM_ROUTES[`${req.method}:${action}`];
+    if (crmRoute) return crmRoute(req, res, leadwaseId).catch(e => fail(res, e));
     if (action === 'google-reviews' && req.method === 'GET') {
       return getGoogleReviews(req, res, leadwaseId).catch(e =>
         res.status(500).json({ success: false, error: e.message }));

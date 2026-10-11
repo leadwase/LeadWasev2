@@ -73,6 +73,7 @@
             <div class="pros-sub">Annuaire des contacts collectés via votre carte NFC</div>
           </div>
           <div class="pros-actions">
+            <button class="pros-btn" id="capture-link-btn" title="Page publique de capture de leads, utilisable hors carte NFC">🔗 Lien de capture</button>
             <button class="pros-btn" id="export-csv-btn">📤 Exporter CSV</button>
             <a class="pros-btn primary" id="view-profile-btn" href="#" target="_blank" rel="noopener">🪪 Voir mon profil</a>
           </div>
@@ -98,6 +99,42 @@
             <div class="pros-stat-top"><span class="pros-stat-label">Taux de complétion</span><span class="pros-stat-icon">📊</span></div>
             <div class="pros-stat-val" id="stat-completion">–</div>
             <div class="pros-stat-sub muted">Champs remplis</div>
+          </div>
+        </div>
+
+        <div class="pros-stats" id="adv-stats">
+          <div class="pros-stat c-blue">
+            <div class="pros-stat-top"><span class="pros-stat-label">Pipeline ouvert</span><span class="pros-stat-icon">📈</span></div>
+            <div class="pros-stat-val sm" id="adv-pipeline">–</div>
+            <div class="pros-stat-sub">Montants potentiels en cours</div>
+          </div>
+          <div class="pros-stat c-orange">
+            <div class="pros-stat-top"><span class="pros-stat-label">Prévision pondérée</span><span class="pros-stat-icon">🎯</span></div>
+            <div class="pros-stat-val sm" id="adv-forecast">–</div>
+            <div class="pros-stat-sub">Nouveau 10 % · Contacté 25 % · Qualifié 60 %</div>
+          </div>
+          <div class="pros-stat c-green">
+            <div class="pros-stat-top"><span class="pros-stat-label">CA réel</span><span class="pros-stat-icon">💰</span></div>
+            <div class="pros-stat-val sm" id="adv-revenue">–</div>
+            <div class="pros-stat-sub">Devis acceptés + prospects convertis</div>
+          </div>
+          <div class="pros-stat c-purple">
+            <div class="pros-stat-top"><span class="pros-stat-label">Taux de conversion</span><span class="pros-stat-icon">🏆</span></div>
+            <div class="pros-stat-val" id="adv-conv">–</div>
+            <div class="pros-stat-sub" id="adv-conv-sub">&nbsp;</div>
+          </div>
+        </div>
+
+        <div class="pros-card" style="margin-bottom:20px">
+          <div class="pros-card-head">
+            <div>
+              <div class="pros-card-title">Pipeline &amp; évolution</div>
+              <div class="pros-card-sub">Répartition par statut et activité des 6 derniers mois</div>
+            </div>
+          </div>
+          <div class="adv-grid">
+            <div id="adv-status-bars"></div>
+            <div id="adv-monthly" class="adv-monthly-wrap"></div>
           </div>
         </div>
 
@@ -132,12 +169,30 @@
               <button class="pros-filter-btn" id="view-kanban-btn">▤ Kanban</button>
             </div>
           </div>
+          <div class="pros-segbar">
+            <select class="pros-filter-btn" id="filter-source">
+              <option value="">Toutes les sources</option>
+              <option value="nfc">📶 NFC</option>
+              <option value="lien_direct">🔗 Lien direct</option>
+              <option value="formulaire">📝 Formulaire</option>
+            </select>
+            <select class="pros-filter-btn" id="filter-period">
+              <option value="">Toute période</option>
+              <option value="7">7 derniers jours</option>
+              <option value="30">30 derniers jours</option>
+              <option value="90">90 derniers jours</option>
+            </select>
+            <label class="pros-check"><input type="checkbox" id="filter-email"> Avec email uniquement</label>
+            <span class="pros-seg-spacer"></span>
+            <span class="pros-seg-count" id="selected-count">0 sélectionné</span>
+            <button class="pros-btn primary" id="campaign-btn">✉️ Campagne email</button>
+          </div>
           <table class="pros-table" id="pros-list-view">
             <thead>
-              <tr><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Statut</th><th>Source</th><th>Date</th><th>Actions</th></tr>
+              <tr><th style="width:32px"><input type="checkbox" id="select-all" title="Sélectionner tous les prospects affichés"></th><th>Prospect</th><th>Téléphone</th><th>Objet</th><th>Statut</th><th>Source</th><th>Date</th><th>Actions</th></tr>
             </thead>
             <tbody id="pros-tbody">
-              <tr class="pros-empty"><td colspan="7">Chargement...</td></tr>
+              <tr class="pros-empty"><td colspan="8">Chargement...</td></tr>
             </tbody>
           </table>
           <div id="pros-kanban-view" class="kanban-board" style="display:none"></div>
@@ -183,6 +238,64 @@
               <tr class="pros-empty"><td colspan="6">Chargement...</td></tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Marketing</div>
+            <div class="pros-sub">Cochez des prospects dans l'annuaire, puis lancez une campagne email. Lien de capture : bouton « Lien de capture » en haut de page.</div>
+          </div>
+        </div>
+        <div class="pros-card">
+          <div class="pros-card-head"><div><div class="pros-card-title">Campagnes envoyées</div></div></div>
+          <table class="pros-table">
+            <thead>
+              <tr><th>Date</th><th>Objet</th><th>Ciblés</th><th>Envoyés</th><th>Échecs</th></tr>
+            </thead>
+            <tbody id="campaigns-tbody">
+              <tr class="pros-empty"><td colspan="5">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pros-head" style="margin-top:32px">
+          <div>
+            <div class="pros-h1" style="font-size:22px">Automatisations</div>
+            <div class="pros-sub">Relances et changements de statut automatiques</div>
+          </div>
+        </div>
+        <div class="pros-card">
+          <div class="auto-form">
+            <div class="auto-row">
+              <input type="checkbox" id="auto-status">
+              <div class="auto-text"><label for="auto-status"><strong>Statut automatique</strong></label>
+                <small>Un prospect « Nouveau » passe à « Contacté » dès que vous lui envoyez un email ou un devis, ou enregistrez une interaction. Il passe à « Converti » quand un devis est accepté.</small></div>
+            </div>
+            <div class="auto-row">
+              <input type="checkbox" id="auto-followup">
+              <div class="auto-text"><label for="auto-followup"><strong>Relancer les prospects restés « Nouveau »</strong></label>
+                <small>Crée une tâche de relance pour chaque prospect resté « Nouveau » depuis <input type="number" id="auto-days" min="1" max="60" value="3" class="auto-days"> jour(s). Vérification quotidienne automatique (8 h UTC).</small></div>
+            </div>
+            <div class="auto-row">
+              <input type="checkbox" id="auto-notify">
+              <div class="auto-text"><label for="auto-notify"><strong>Me prévenir par email</strong></label>
+                <small>Recevoir un récapitulatif quand des relances sont créées.</small></div>
+            </div>
+            <div class="auto-row">
+              <input type="checkbox" id="auto-email">
+              <div class="auto-text"><label for="auto-email"><strong>Envoyer un email de relance au prospect</strong></label>
+                <small>En plus de la tâche, un email est envoyé automatiquement au prospect (avec lien de désabonnement). Vos prospects peuvent répondre directement à votre adresse email de profil.</small></div>
+            </div>
+            <div id="auto-email-fields" style="display:none;padding:0 24px 8px 52px">
+              <input type="text" id="auto-email-subject" class="lw-confirm-input" placeholder="Objet" style="margin-bottom:8px">
+              <textarea id="auto-email-message" class="lw-confirm-input" rows="6" placeholder="Message"></textarea>
+              <small style="display:block;margin-top:4px;color:var(--gray4);font-size:12px">Utilisez {{nom}} pour insérer le nom du prospect.</small>
+            </div>
+            <div class="auto-actions">
+              <button class="pros-btn primary" id="auto-save-btn">Enregistrer</button>
+              <button class="pros-btn" id="auto-run-btn" title="Exécute la relance maintenant, sans attendre la vérification quotidienne">▶ Lancer maintenant</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -243,11 +356,47 @@
   </div>
 </div>
 
+<div class="lw-confirm-overlay" id="campaign-overlay">
+  <div class="lw-confirm-box" style="max-width:520px">
+    <div class="lw-confirm-msg" style="font-weight:700;margin-bottom:4px">Campagne email</div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:14px" id="campaign-hint"></div>
+    <div class="lw-confirm-field" style="display:block;margin-bottom:12px">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Objet</label>
+      <input type="text" id="campaign-subject" class="lw-confirm-input" maxlength="150" placeholder="Ex : Votre devis personnalisé">
+    </div>
+    <div class="lw-confirm-field" style="display:block;margin-bottom:8px">
+      <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#888;margin-bottom:5px">Message</label>
+      <textarea id="campaign-message" class="lw-confirm-input" rows="8" maxlength="5000" placeholder="Bonjour {{nom}},&#10;&#10;..."></textarea>
+    </div>
+    <div style="font-size:12px;color:var(--gray4);margin-bottom:16px;line-height:1.5">Utilisez {{nom}} pour insérer le nom du prospect. Un lien de désabonnement est ajouté automatiquement. Les réponses arrivent sur l'email de votre profil. 50 destinataires maximum par envoi.</div>
+    <div class="lw-confirm-actions">
+      <button class="lw-confirm-cancel" id="campaign-cancel-btn">Annuler</button>
+      <button class="lw-confirm-ok" id="campaign-send-btn">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<div class="lw-confirm-overlay" id="docs-overlay">
+  <div class="lw-confirm-box" style="max-width:480px">
+    <div class="lw-confirm-msg" style="font-weight:700;margin-bottom:2px" id="docs-title">Documents</div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:14px">Contrats, devis signés… PDF, images, Word, Excel, TXT ou CSV — 2,5 Mo maximum par fichier.</div>
+    <div id="docs-list" style="max-height:240px;overflow-y:auto;margin-bottom:16px"></div>
+    <div class="lw-confirm-field" style="display:block">
+      <input type="file" id="docs-file" class="lw-confirm-input" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,.csv">
+    </div>
+    <div class="lw-confirm-actions">
+      <button class="lw-confirm-cancel" id="docs-close-btn">Fermer</button>
+      <button class="lw-confirm-ok" id="docs-upload-btn">Ajouter le fichier</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initDashboardAuth, toast, confirmDialog, promptDialog } from './js/dashboard-shared.js';
 import { auth } from './js/dashboard-shared.js';
 
 let lwId = null, allProspects = [], currentFilter = 'all';
+const selectedIds = new Set();
 const AVATAR_COLORS = ['#2f7bff','#e05a5a','#5fbf6d','#e8a13a','#9b59d0','#1f9e4e'];
 
 function colorFor(name) {
@@ -258,6 +407,16 @@ function colorFor(name) {
 function initials(name) {
   const parts = (name || '?').trim().split(/\s+/);
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?';
+}
+// Échappe tout texte saisi par un tiers (le formulaire public permet à n'importe qui de créer un prospect).
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function fmtFCFA(n) { return (Number(n) || 0).toLocaleString('fr-FR'); }
+function toDate(v) {
+  if (!v) return null;
+  const d = v._seconds ? new Date(v._seconds * 1000) : new Date(v);
+  return isNaN(d.getTime()) ? null : d;
 }
 function fmtDate(v) {
   if (!v) return '–';
@@ -290,7 +449,11 @@ async function api(action, opts = {}) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
     body: opts.body,
   });
-  return res.json();
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch (e) {
+    return { success: false, error: res.status === 413 ? 'Fichier trop volumineux' : `Réponse inattendue du serveur (${res.status})` };
+  }
 }
 
 function renderStats() {
@@ -315,9 +478,18 @@ let currentView = 'list';
 function getFilteredProspects() {
   const search = document.getElementById('search-input').value.trim().toLowerCase();
   const statusFilter = document.getElementById('filter-status').value;
+  const sourceFilter = document.getElementById('filter-source').value;
+  const periodDays = parseInt(document.getElementById('filter-period').value, 10) || 0;
+  const emailOnly = document.getElementById('filter-email').checked;
   let rows = allProspects;
   if (currentFilter === 'today') rows = rows.filter(p => isToday(p.createdAt));
   if (statusFilter) rows = rows.filter(p => (p.status || 'nouveau') === statusFilter);
+  if (sourceFilter) rows = rows.filter(p => (p.source || 'lien_direct') === sourceFilter);
+  if (periodDays) {
+    const since = Date.now() - periodDays * 864e5;
+    rows = rows.filter(p => { const d = toDate(p.createdAt); return d && d.getTime() >= since; });
+  }
+  if (emailOnly) rows = rows.filter(p => p.email);
   if (search) {
     rows = rows.filter(p =>
       (p.name || '').toLowerCase().includes(search) ||
@@ -339,9 +511,9 @@ function renderKanban() {
         <div class="kanban-col-body" data-status="${status}">
           ${cards.map(p => `
             <div class="kanban-card" draggable="true" data-id="${p.id}">
-              <div class="kanban-card-name">${p.name || '—'}</div>
-              <div class="kanban-card-meta">${p.phone || p.email || ''}</div>
-              ${p.object ? `<div class="kanban-card-obj">${p.object.length > 60 ? p.object.slice(0,60)+'…' : p.object}</div>` : ''}
+              <div class="kanban-card-name">${esc(p.name || '—')}</div>
+              <div class="kanban-card-meta">${esc(p.phone || p.email || '')}</div>
+              ${p.object ? `<div class="kanban-card-obj">${esc(p.object.length > 60 ? p.object.slice(0,60)+'…' : p.object)}</div>` : ''}
               <div class="kanban-card-date">${fmtDate(p.createdAt)}</div>
             </div>
           `).join('') || '<div class="kanban-empty">Aucun prospect</div>'}
@@ -383,45 +555,67 @@ function setView(view) {
 document.getElementById('view-list-btn').addEventListener('click', () => setView('list'));
 document.getElementById('view-kanban-btn').addEventListener('click', () => setView('kanban'));
 
+function sourceBadge(src) {
+  if (src === 'nfc') return '<span class="pros-badge nfc">📶 NFC Card</span>';
+  if (src === 'formulaire') return '<span class="pros-badge lien">📝 Formulaire</span>';
+  return '<span class="pros-badge lien">🔗 Lien direct</span>';
+}
+function sourceLabel(src) { return src === 'nfc' ? 'NFC Card' : src === 'formulaire' ? 'Formulaire' : 'Lien direct'; }
+
+function updateSelectionUi() {
+  const n = selectedIds.size;
+  document.getElementById('selected-count').textContent = `${n} sélectionné${n > 1 ? 's' : ''}`;
+  const rows = getFilteredProspects();
+  document.getElementById('select-all').checked = rows.length > 0 && rows.every(p => selectedIds.has(p.id));
+}
+window.toggleSelect = (id, checked) => {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  updateSelectionUi();
+};
+
 function renderTable() {
   const tbody  = document.getElementById('pros-tbody');
   const rows   = getFilteredProspects();
+  updateSelectionUi();
 
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="pros-empty"><td colspan="7">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
+    tbody.innerHTML = '<tr class="pros-empty"><td colspan="8">Aucun prospect pour le moment. Partagez votre carte NFC pour commencer à collecter des contacts !</td></tr>';
     return;
   }
 
   tbody.innerHTML = rows.map(p => {
-    const status = p.status || 'nouveau';
+    const status = STATUS_LABELS[p.status] ? p.status : 'nouveau';
+    const notes = p.notes || '';
     return `
     <tr>
+      <td style="width:32px"><input type="checkbox" class="pros-select" ${selectedIds.has(p.id) ? 'checked' : ''} onchange="toggleSelect('${p.id}', this.checked)"></td>
       <td>
         <div class="pros-name-cell">
-          <span class="pros-avatar" style="background:${colorFor(p.name)}">${initials(p.name)}</span>
+          <span class="pros-avatar" style="background:${colorFor(p.name)}">${esc(initials(p.name))}</span>
           <div>
-            <div class="pros-name">${p.name || '—'}</div>
-            <div class="pros-email">${p.email || '—'}</div>
+            <div class="pros-name">${esc(p.name || '—')}</div>
+            <div class="pros-email">${esc(p.email || '—')}${p.unsubscribed ? ' <span class="pros-badge lien" title="Ne souhaite plus recevoir d\u2019emails">🚫 désabonné</span>' : ''}</div>
           </div>
         </div>
       </td>
-      <td>${p.phone || '—'}</td>
-      <td style="max-width:220px">${p.object || '—'}${p.dealValue ? `<div style="font-size:12px;color:var(--green);font-weight:600;margin-top:3px">💰 ${fmtFCFA(p.dealValue)} FCFA</div>` : ''}${p.notes ? `<div style="font-size:12px;color:var(--gray4);margin-top:3px" title="${p.notes.replace(/"/g,'&quot;')}">📝 ${p.notes.length > 40 ? p.notes.slice(0,40)+'…' : p.notes}</div>` : ''}</td>
+      <td>${esc(p.phone || '—')}</td>
+      <td style="max-width:220px">${esc(p.object || '—')}${p.dealValue ? `<div style="font-size:12px;color:var(--green);font-weight:600;margin-top:3px">💰 ${fmtFCFA(p.dealValue)} FCFA</div>` : ''}${notes ? `<div style="font-size:12px;color:var(--gray4);margin-top:3px" title="${esc(notes)}">📝 ${esc(notes.length > 40 ? notes.slice(0,40)+'…' : notes)}</div>` : ''}</td>
       <td>
         <select class="status-select" style="border:1px solid ${STATUS_COLORS[status]};color:${STATUS_COLORS[status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateProspectStatus('${p.id}', this.value)">
           ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===status?'selected':''}>${v}</option>`).join('')}
         </select>
       </td>
-      <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC Card</span>' : '<span class="pros-badge lien">🔗 Lien direct</span>'}</td>
+      <td>${sourceBadge(p.source)}</td>
       <td style="color:var(--gray4);font-size:14px">${fmtDate(p.createdAt)}</td>
       <td>
         <div class="pros-act">
-          ${p.phone ? `<a class="pros-act-btn" href="tel:${p.phone}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
-          ${p.email ? `<a class="pros-act-btn" href="mailto:${p.email}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
-          <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}', '${(p.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">📝</button>
-          <button class="pros-act-btn" title="Montant potentiel" onclick="editDealValue('${p.id}', ${p.dealValue || 0})">💰</button>
-          <button class="pros-act-btn" title="Créer un devis" onclick="quickAddQuote('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📄</button>
-          <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}', '${(p.name||'—').replace(/'/g,"\\'")}')">📅</button>
+          ${p.phone ? `<a class="pros-act-btn" href="tel:${esc(p.phone)}" title="Appeler">💬</a>` : `<span class="pros-act-btn" style="opacity:.3">💬</span>`}
+          ${p.email ? `<a class="pros-act-btn" href="mailto:${esc(p.email)}" title="Email">✉️</a>` : `<span class="pros-act-btn" style="opacity:.3">✉️</span>`}
+          <button class="pros-act-btn" title="Note" onclick="editProspectNote('${p.id}')">📝</button>
+          <button class="pros-act-btn" title="Montant potentiel" onclick="editDealValue('${p.id}')">💰</button>
+          <button class="pros-act-btn" title="Créer un devis" onclick="quickAddQuote('${p.id}')">📄</button>
+          <button class="pros-act-btn" title="Documents" onclick="openDocuments('${p.id}')">📎</button>
+          <button class="pros-act-btn" title="Ajouter une tâche" onclick="quickAddTask('${p.id}')">📅</button>
           <button class="pros-act-btn" title="Historique" onclick="openHistory('${p.id}')">🕐</button>
           <button class="pros-act-btn del" title="Supprimer" onclick="deleteProspect('${p.id}')">🗑</button>
         </div>
@@ -444,29 +638,31 @@ window.updateProspectStatus = async (id, status) => {
   }
 };
 
-window.editProspectNote = async (id, currentNote) => {
-  const note = await promptDialog('Note sur ce prospect :', { defaultValue: currentNote, okLabel: 'Enregistrer' });
+window.editProspectNote = async (id) => {
+  const current = allProspects.find(x => x.id === id)?.notes || '';
+  const note = await promptDialog('Note sur ce prospect :', { defaultValue: current, okLabel: 'Enregistrer' });
   if (note === null) return;
   try {
     const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, notes: note }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     const p = allProspects.find(x => x.id === id);
     if (p) p.notes = note;
-    renderTable();
+    renderCurrentView();
     toast('Note enregistrée', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
-window.editDealValue = async (id, currentValue) => {
-  const val = await promptDialog('Montant potentiel de cette opportunité (FCFA) :', { defaultValue: currentValue || '', okLabel: 'Enregistrer' });
+window.editDealValue = async (id) => {
+  const current = allProspects.find(x => x.id === id)?.dealValue || '';
+  const val = await promptDialog('Montant potentiel de cette opportunité (FCFA) :', { defaultValue: current, okLabel: 'Enregistrer' });
   if (val === null) return;
-  const dealValue = parseInt(val, 10) || 0;
+  const dealValue = parseInt(String(val).replace(/\s/g, ''), 10) || 0;
   try {
     const d = await api('update-prospect', { method: 'POST', body: JSON.stringify({ prospectId: id, dealValue }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     const p = allProspects.find(x => x.id === id);
     if (p) p.dealValue = dealValue;
-    renderTable();
+    renderCurrentView();
     renderAdvancedStats();
     toast('Montant enregistré', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
@@ -478,7 +674,8 @@ window.deleteProspect = async (id) => {
     const d = await api('prospects', { method: 'DELETE', qs: '&prospectId=' + id });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = allProspects.filter(p => p.id !== id);
-    renderStats(); renderAdvancedStats(); renderTable(); loadQuotes();
+    selectedIds.delete(id);
+    renderStats(); renderAdvancedStats(); renderCurrentView(); loadQuotes();
     toast('Prospect supprimé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
@@ -494,20 +691,27 @@ document.getElementById('clear-btn').onclick = async () => {
     const d = await api('clear-prospects', { method: 'POST', body: '{}' });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allProspects = [];
-    renderStats(); renderAdvancedStats(); renderTable(); loadQuotes();
+    selectedIds.clear();
+    renderStats(); renderAdvancedStats(); renderCurrentView(); loadQuotes();
     toast('Annuaire vidé', 'success');
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
 
+function csvCell(v) {
+  let t = String(v ?? '').replace(/\r?\n/g, ' ');
+  // Neutralise l'injection de formules (=, +, -, @) à l'ouverture dans Excel / Sheets.
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return `"${t.replace(/"/g, '""')}"`;
+}
 function exportCsv() {
   if (!allProspects.length) { toast('Aucun prospect à exporter', 'error'); return; }
-  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Statut', 'Notes', 'Source', 'Date'];
+  const header = ['Nom', 'Téléphone', 'Email', 'Objet', 'Statut', 'Montant potentiel (FCFA)', 'Notes', 'Source', 'Date'];
   const lines  = allProspects.map(p => [
-    p.name || '', p.phone || '', p.email || '', (p.object || '').replace(/\n/g, ' '),
-    STATUS_LABELS[p.status || 'nouveau'] || p.status || '', (p.notes || '').replace(/\n/g, ' '),
-    p.source === 'nfc' ? 'NFC Card' : 'Lien direct', fmtDate(p.createdAt),
-  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
-  const csv  = [header.join(','), ...lines].join('\n');
+    p.name || '', p.phone || '', p.email || '', p.object || '',
+    STATUS_LABELS[p.status || 'nouveau'] || p.status || '', p.dealValue || '', p.notes || '',
+    sourceLabel(p.source), toDate(p.createdAt)?.toLocaleDateString('fr-FR') || '',
+  ].map(csvCell).join(','));
+  const csv  = [header.map(csvCell).join(','), ...lines].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -522,6 +726,13 @@ function renderCurrentView() { currentView === 'kanban' ? renderKanban() : rende
 
 document.getElementById('search-input').addEventListener('input', renderCurrentView);
 document.getElementById('filter-status').addEventListener('change', renderCurrentView);
+document.getElementById('filter-source').addEventListener('change', renderCurrentView);
+document.getElementById('filter-period').addEventListener('change', renderCurrentView);
+document.getElementById('filter-email').addEventListener('change', renderCurrentView);
+document.getElementById('select-all').addEventListener('change', e => {
+  getFilteredProspects().forEach(p => { if (e.target.checked) selectedIds.add(p.id); else selectedIds.delete(p.id); });
+  renderCurrentView();
+});
 document.getElementById('filter-all').onclick = () => {
   currentFilter = 'all';
   document.getElementById('filter-all').classList.add('active');
@@ -535,14 +746,7 @@ document.getElementById('filter-today').onclick = () => {
   renderCurrentView();
 };
 
-initDashboardAuth(async ({ lwId: id, isBusiness }) => {
-  if (!isBusiness) {
-    document.getElementById('app-layout').style.display = 'none';
-    document.getElementById('access-denied').style.display = 'flex';
-    return;
-  }
-  lwId = id;
-  document.getElementById('view-profile-btn').href = 'profil.html?id=' + lwId;
+async function loadProspects() {
   try {
     const d = await api('prospects');
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
@@ -552,12 +756,102 @@ initDashboardAuth(async ({ lwId: id, isBusiness }) => {
     toast('Erreur de chargement des prospects : ' + e.message, 'error');
     allProspects = [];
   }
+  const ids = new Set(allProspects.map(p => p.id));
+  [...selectedIds].forEach(id => { if (!ids.has(id)) selectedIds.delete(id); });
   renderStats();
   renderAdvancedStats();
-  renderTable();
+  renderCurrentView();
+}
+
+initDashboardAuth(async ({ lwId: id, isBusiness }) => {
+  if (!isBusiness) {
+    document.getElementById('app-layout').style.display = 'none';
+    document.getElementById('access-denied').style.display = 'flex';
+    return;
+  }
+  lwId = id;
+  document.getElementById('view-profile-btn').href = 'profil.html?id=' + lwId;
+  await loadProspects();
   loadTasks();
   loadQuotes();
+  loadCampaigns();
+  loadAutomations();
 });
+
+// ── Statistiques avancées : pipeline, prévision, CA réel, conversion, évolution ──
+const STAGE_WEIGHTS = { nouveau: 0.10, contacte: 0.25, qualifie: 0.60 };
+const MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+function monthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+
+// CA réel = devis acceptés + montant des prospects convertis qui n'ont pas de devis accepté (évite le double comptage).
+function revenueEvents() {
+  const withAcceptedQuote = new Set();
+  const events = [];
+  allQuotes.filter(q => q.status === 'accepted').forEach(q => {
+    if (q.prospectId) withAcceptedQuote.add(q.prospectId);
+    events.push({ date: toDate(q.acceptedAt || q.updatedAt || q.createdAt), amount: q.total || 0 });
+  });
+  allProspects.filter(p => p.status === 'converti' && p.dealValue && !withAcceptedQuote.has(p.id))
+    .forEach(p => events.push({ date: toDate(p.convertedAt || p.updatedAt || p.createdAt), amount: p.dealValue }));
+  return events;
+}
+
+function renderAdvancedStats() {
+  const total = allProspects.length;
+  let pipeline = 0, forecast = 0;
+  allProspects.forEach(p => {
+    const w = STAGE_WEIGHTS[p.status || 'nouveau'];
+    if (w !== undefined) { const v = p.dealValue || 0; pipeline += v; forecast += v * w; }
+  });
+  const events = revenueEvents();
+  const revenue = events.reduce((sum, e) => sum + e.amount, 0);
+  const converted = allProspects.filter(p => p.status === 'converti').length;
+  const lost = allProspects.filter(p => p.status === 'perdu').length;
+
+  document.getElementById('adv-pipeline').textContent = fmtFCFA(pipeline) + ' FCFA';
+  document.getElementById('adv-forecast').textContent = fmtFCFA(Math.round(forecast)) + ' FCFA';
+  document.getElementById('adv-revenue').textContent  = fmtFCFA(revenue) + ' FCFA';
+  document.getElementById('adv-conv').textContent     = (total ? Math.round(converted / total * 100) : 0) + '%';
+  document.getElementById('adv-conv-sub').textContent = !total ? 'Aucun prospect' :
+    `${converted} converti${converted > 1 ? 's' : ''} sur ${total}` +
+    ((converted + lost) ? ` · ${Math.round(converted / (converted + lost) * 100)} % de réussite sur les dossiers clos` : '');
+
+  document.getElementById('adv-status-bars').innerHTML = Object.entries(STATUS_LABELS).map(([k, label]) => {
+    const n = allProspects.filter(p => (p.status || 'nouveau') === k).length;
+    const pct = total ? Math.round(n / total * 100) : 0;
+    return `<div class="adv-bar-row"><div class="adv-bar-label">${label}</div>
+      <div class="adv-bar-track"><div class="adv-bar-fill" style="width:${pct}%;background:${STATUS_COLORS[k]}"></div></div>
+      <div class="adv-bar-val">${n} · ${pct} %</div></div>`;
+  }).join('');
+
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: monthKey(d), label: `${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`, created: 0, converted: 0, revenue: 0 });
+  }
+  const byKey = Object.fromEntries(months.map(m => [m.key, m]));
+  allProspects.forEach(p => {
+    const c = toDate(p.createdAt);
+    if (c && byKey[monthKey(c)]) byKey[monthKey(c)].created++;
+    if (p.status === 'converti') {
+      const cd = toDate(p.convertedAt || p.updatedAt || p.createdAt);
+      if (cd && byKey[monthKey(cd)]) byKey[monthKey(cd)].converted++;
+    }
+  });
+  events.forEach(e => { if (e.date && byKey[monthKey(e.date)]) byKey[monthKey(e.date)].revenue += e.amount; });
+  const maxCreated = Math.max(1, ...months.map(m => m.created));
+  document.getElementById('adv-monthly').innerHTML = `
+    <table class="adv-month">
+      <thead><tr><th>Mois</th><th>Nouveaux</th><th>Convertis</th><th>CA</th></tr></thead>
+      <tbody>${months.map(m => `<tr>
+        <td>${m.label}</td>
+        <td><div class="adv-mini-track"><div class="adv-mini-fill" style="width:${Math.round(m.created / maxCreated * 100)}%"></div></div> ${m.created}</td>
+        <td>${m.converted}</td>
+        <td>${fmtFCFA(m.revenue)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+}
 
 // ── Tâches & rappels ──────────────────────────────────────────────────────────
 let allTasks = [];
@@ -587,10 +881,10 @@ function renderTasks() {
       <div class="task-row ${t.done ? 'task-done' : ''}">
         <input type="checkbox" class="task-check" ${t.done ? 'checked' : ''} onchange="toggleTask('${t.id}', this.checked)">
         <div class="task-body">
-          <div class="task-title">${t.title}</div>
+          <div class="task-title">${t.auto ? '🤖 ' : ''}${esc(t.title)}</div>
           <div class="task-meta">
-            ${t.prospectName ? `<span class="pros-badge lien">${t.prospectName}</span>` : ''}
-            ${t.ownerName ? `<span class="pros-badge lien">${t.ownerName}</span>` : ''}
+            ${t.prospectName ? `<span class="pros-badge lien">${esc(t.prospectName)}</span>` : ''}
+            ${t.ownerName ? `<span class="pros-badge lien">${esc(t.ownerName)}</span>` : ''}
             ${due ? `<span class="task-due task-due-${due.tone}">📅 ${due.text}</span>` : ''}
           </div>
         </div>
@@ -607,7 +901,7 @@ async function loadTasks() {
     allTasks = d.tasks || [];
   } catch (e) {
     document.getElementById('tasks-list').innerHTML =
-      `<div class="pros-empty" style="padding:24px;text-align:center;color:#c0392b">Erreur : ${e.message}</div>`;
+      `<div class="pros-empty" style="padding:24px;text-align:center;color:#c0392b">Erreur : ${esc(e.message)}</div>`;
     return;
   }
   renderTasks();
@@ -645,7 +939,7 @@ function openTaskModal(prospectId, prospectName) {
   document.getElementById('task-overlay').classList.add('open');
   setTimeout(() => document.getElementById('task-title').focus(), 50);
 }
-window.quickAddTask = (prospectId, prospectName) => openTaskModal(prospectId, prospectName);
+window.quickAddTask = (prospectId) => openTaskModal(prospectId, allProspects.find(p => p.id === prospectId)?.name || '');
 document.getElementById('add-task-btn').addEventListener('click', () => openTaskModal());
 document.getElementById('task-cancel-btn').addEventListener('click', () => document.getElementById('task-overlay').classList.remove('open'));
 document.getElementById('task-overlay').addEventListener('click', e => { if (e.target.id === 'task-overlay') e.currentTarget.classList.remove('open'); });
@@ -669,7 +963,7 @@ document.getElementById('task-save-btn').addEventListener('click', async () => {
 
 // ── Historique de communication ───────────────────────────────────────────────
 let historyProspectId = null;
-const ACTIVITY_ICONS = { system: '⚡', status: '🔄', note: '📝', interaction: '💬' };
+const ACTIVITY_ICONS = { system: '⚡', status: '🔄', note: '📝', interaction: '💬', email: '📧', document: '📎', auto: '🤖' };
 
 function renderHistory(activity) {
   const list = document.getElementById('history-list');
@@ -681,7 +975,7 @@ function renderHistory(activity) {
     <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray6)">
       <span style="flex-shrink:0">${ACTIVITY_ICONS[a.type] || '•'}</span>
       <div>
-        <div style="font-size:13px;color:var(--black)">${a.text}</div>
+        <div style="font-size:13px;color:var(--black)">${esc(a.text)}</div>
         <div style="font-size:11px;color:var(--gray4);margin-top:2px">${fmtDate(a.createdAt)}</div>
       </div>
     </div>
@@ -701,7 +995,7 @@ window.openHistory = async (prospectId) => {
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     renderHistory(d.activity || []);
   } catch (e) {
-    document.getElementById('history-list').innerHTML = `<div style="padding:16px 0;color:#c0392b;font-size:13px">Erreur : ${e.message}</div>`;
+    document.getElementById('history-list').innerHTML = `<div style="padding:16px 0;color:#c0392b;font-size:13px">Erreur : ${esc(e.message)}</div>`;
   }
 };
 
@@ -716,6 +1010,7 @@ document.getElementById('history-add-btn').addEventListener('click', async () =>
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     document.getElementById('history-input').value = '';
     window.openHistory(historyProspectId);
+    loadProspects();   // une interaction peut faire passer le prospect à « Contacté »
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 });
 
@@ -758,7 +1053,7 @@ function openQuoteModal(prospectId, prospectName) {
   updateQuoteTotal();
   document.getElementById('quote-overlay').classList.add('open');
 }
-window.quickAddQuote = (prospectId, prospectName) => openQuoteModal(prospectId, prospectName);
+window.quickAddQuote = (prospectId) => openQuoteModal(prospectId, allProspects.find(p => p.id === prospectId)?.name || '');
 document.getElementById('add-quote-btn').addEventListener('click', () => openQuoteModal());
 document.getElementById('quote-add-item-btn').addEventListener('click', () => addQuoteItemRow());
 document.getElementById('quote-cancel-btn').addEventListener('click', () => document.getElementById('quote-overlay').classList.remove('open'));
@@ -794,8 +1089,8 @@ function renderQuotes() {
   }
   tbody.innerHTML = allQuotes.map(q => `
     <tr>
-      <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${q.quoteNumber}</td>
-      <td class="pros-name">${q.company || q.prospectName || '—'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${esc(q.quoteNumber)}</td>
+      <td class="pros-name">${esc(q.company || q.prospectName || '—')}</td>
       <td style="font-weight:700">${(q.total || 0).toLocaleString('fr-FR')} FCFA</td>
       <td>
         <select style="border:1px solid ${QUOTE_STATUS_COLORS[q.status]};color:${QUOTE_STATUS_COLORS[q.status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateQuoteStatus('${q.id}', this.value)">
@@ -820,10 +1115,11 @@ async function loadQuotes() {
     allQuotes = d.quotes || [];
   } catch (e) {
     document.getElementById('quotes-tbody').innerHTML =
-      `<tr class="pros-empty"><td colspan="6" style="color:#c0392b">Erreur : ${e.message}</td></tr>`;
+      `<tr class="pros-empty"><td colspan="6" style="color:#c0392b">Erreur : ${esc(e.message)}</td></tr>`;
     return;
   }
   renderQuotes();
+  renderAdvancedStats();
 }
 
 window.updateQuoteStatus = async (id, status) => {
@@ -833,6 +1129,7 @@ window.updateQuoteStatus = async (id, status) => {
     const q = allQuotes.find(x => x.id === id);
     if (q) q.status = status;
     toast('Statut du devis mis à jour', 'success');
+    loadProspects();   // un devis envoyé/accepté peut faire avancer le statut du prospect (et le CA réel)
   } catch (e) { toast('Erreur : ' + e.message, 'error'); renderQuotes(); }
 };
 
@@ -863,6 +1160,224 @@ window.downloadQuotePdf = async (id) => {
     URL.revokeObjectURL(url);
   } catch (e) { toast('Erreur : ' + e.message, 'error'); }
 };
+
+// ── Marketing : campagne email vers la sélection ──────────────────────────────
+const CAMPAIGN_MAX = 50;
+
+document.getElementById('campaign-btn').addEventListener('click', () => {
+  const picked = allProspects.filter(p => selectedIds.has(p.id));
+  if (!picked.length) { toast('Cochez au moins un prospect dans la liste', 'error'); return; }
+  if (picked.length > CAMPAIGN_MAX) { toast(`${CAMPAIGN_MAX} destinataires maximum par envoi : réduisez votre sélection`, 'error'); return; }
+  const valid = picked.filter(p => p.email && !p.unsubscribed);
+  if (!valid.length) { toast("Aucun prospect sélectionné n'a d'email valide (ou ils sont désabonnés)", 'error'); return; }
+  const ignored = picked.length - valid.length;
+  document.getElementById('campaign-hint').textContent =
+    `${valid.length} destinataire${valid.length > 1 ? 's' : ''}` +
+    (ignored ? ` — ${ignored} ignoré${ignored > 1 ? 's' : ''} (sans email ou désabonné${ignored > 1 ? 's' : ''})` : '');
+  document.getElementById('campaign-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('campaign-subject').focus(), 50);
+});
+document.getElementById('campaign-cancel-btn').addEventListener('click', () => document.getElementById('campaign-overlay').classList.remove('open'));
+document.getElementById('campaign-overlay').addEventListener('click', e => { if (e.target.id === 'campaign-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('campaign-send-btn').addEventListener('click', async () => {
+  const subject = document.getElementById('campaign-subject').value.trim();
+  const message = document.getElementById('campaign-message').value.trim();
+  if (!subject || !message) { toast("L'objet et le message sont requis", 'error'); return; }
+  const btn = document.getElementById('campaign-send-btn');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const d = await api('send-campaign', { method: 'POST', body: JSON.stringify({ prospectIds: [...selectedIds], subject, message }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    document.getElementById('campaign-overlay').classList.remove('open');
+    document.getElementById('campaign-subject').value = '';
+    document.getElementById('campaign-message').value = '';
+    const skippedTotal = d.skipped ? (d.skipped.noEmail || 0) + (d.skipped.unsubscribed || 0) + (d.skipped.notFound || 0) : 0;
+    if (d.failed) toast(`${d.sent} envoyé(s), ${d.failed} échec(s) : ${d.error || ''}`, 'error');
+    else toast(`${d.sent} email${d.sent > 1 ? 's' : ''} envoyé${d.sent > 1 ? 's' : ''}` + (skippedTotal ? ` (${skippedTotal} ignoré${skippedTotal > 1 ? 's' : ''})` : ''), 'success');
+    selectedIds.clear();
+    await loadProspects();
+    loadCampaigns();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
+});
+
+async function loadCampaigns() {
+  const tbody = document.getElementById('campaigns-tbody');
+  try {
+    const d = await api('list-campaigns');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const list = d.campaigns || [];
+    if (!list.length) { tbody.innerHTML = '<tr class="pros-empty"><td colspan="5">Aucune campagne envoyée pour le moment.</td></tr>'; return; }
+    tbody.innerHTML = list.map(c => `
+      <tr>
+        <td style="color:var(--gray4);font-size:13px">${fmtDate(c.createdAt)}</td>
+        <td class="pros-name">${esc(c.subject)}</td>
+        <td>${c.targeted ?? '–'}</td>
+        <td style="color:var(--green);font-weight:700">${c.sent ?? 0}</td>
+        <td style="color:${c.failed ? '#c0392b' : 'var(--gray4)'}">${c.failed ?? 0}</td>
+      </tr>`).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr class="pros-empty"><td colspan="5" style="color:#c0392b">Erreur : ${esc(e.message)}</td></tr>`;
+  }
+}
+
+// ── Lien de capture (formulaire public réutilisable hors profil NFC) ──────────
+document.getElementById('capture-link-btn').addEventListener('click', async () => {
+  const url = `${location.origin}/capture.html?id=${encodeURIComponent(lwId)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Lien de capture copié', 'success');
+  } catch (e) {
+    await promptDialog('Copiez ce lien de capture :', { defaultValue: url, okLabel: 'Fermer' });
+  }
+});
+
+// ── Documents joints à un prospect ────────────────────────────────────────────
+const DOC_MAX_BYTES = 2.5 * 1024 * 1024;
+const DOC_EXT = ['pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv'];
+let docsProspectId = null;
+
+function fmtSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Math.max(1, Math.round(n / 1024)) + ' Ko'; }
+function readFileBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = () => reject(new Error('Lecture du fichier impossible'));
+    r.readAsDataURL(file);
+  });
+}
+
+async function loadDocuments() {
+  const list = document.getElementById('docs-list');
+  list.innerHTML = '<div style="padding:12px 0;text-align:center;color:var(--gray4);font-size:13px">Chargement...</div>';
+  try {
+    const d = await api('list-documents', { qs: '&prospectId=' + docsProspectId });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const docs = d.documents || [];
+    if (!docs.length) { list.innerHTML = '<div style="padding:12px 0;text-align:center;color:var(--gray4);font-size:13px">Aucun document pour le moment.</div>'; return; }
+    list.innerHTML = docs.map(x => `
+      <div class="doc-row">
+        <span>📎</span>
+        <div class="doc-info"><div class="doc-name">${esc(x.name)}</div><div class="doc-meta">${fmtSize(x.size || 0)} · ${fmtDate(x.createdAt)}</div></div>
+        <button class="pros-act-btn" title="Télécharger" onclick="downloadDocument('${x.id}')">⬇</button>
+        <button class="pros-act-btn del" title="Supprimer" onclick="removeDocument('${x.id}')">🗑</button>
+      </div>`).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="padding:12px 0;color:#c0392b;font-size:13px">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+
+window.openDocuments = (prospectId) => {
+  docsProspectId = prospectId;
+  const p = allProspects.find(x => x.id === prospectId);
+  document.getElementById('docs-title').textContent = 'Documents — ' + (p?.name || 'Prospect');
+  document.getElementById('docs-file').value = '';
+  document.getElementById('docs-overlay').classList.add('open');
+  loadDocuments();
+};
+document.getElementById('docs-close-btn').addEventListener('click', () => document.getElementById('docs-overlay').classList.remove('open'));
+document.getElementById('docs-overlay').addEventListener('click', e => { if (e.target.id === 'docs-overlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('docs-upload-btn').addEventListener('click', async () => {
+  const file = document.getElementById('docs-file').files[0];
+  if (!file) { toast('Choisissez un fichier', 'error'); return; }
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!DOC_EXT.includes(ext)) { toast('Format non accepté (PDF, images, Word, Excel, TXT, CSV)', 'error'); return; }
+  if (file.size > DOC_MAX_BYTES) { toast('Fichier trop volumineux (2,5 Mo maximum)', 'error'); return; }
+  const btn = document.getElementById('docs-upload-btn');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const dataBase64 = await readFileBase64(file);
+    const d = await api('upload-document', { method: 'POST', body: JSON.stringify({ prospectId: docsProspectId, name: file.name, dataBase64 }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    document.getElementById('docs-file').value = '';
+    toast('Document ajouté', 'success');
+    loadDocuments();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Ajouter le fichier'; }
+});
+
+window.downloadDocument = async (docId) => {
+  try {
+    const d = await api('download-document', { qs: `&prospectId=${docsProspectId}&documentId=${docId}` });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const bin = atob(d.dataBase64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: d.mime || 'application/octet-stream' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = d.name || 'document';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+window.removeDocument = async (docId) => {
+  if (!(await confirmDialog('Supprimer ce document ?', { okLabel: 'Supprimer', danger: true }))) return;
+  try {
+    const d = await api('delete-document', { method: 'POST', body: JSON.stringify({ prospectId: docsProspectId, documentId: docId }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    toast('Document supprimé', 'success');
+    loadDocuments();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+};
+
+// ── Automatisations ───────────────────────────────────────────────────────────
+function syncAutoEmailFields() {
+  document.getElementById('auto-email-fields').style.display = document.getElementById('auto-email').checked ? 'block' : 'none';
+}
+document.getElementById('auto-email').addEventListener('change', syncAutoEmailFields);
+
+async function loadAutomations() {
+  try {
+    const d = await api('get-automations');
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    const s = d.settings;
+    document.getElementById('auto-status').checked   = !!s.autoStatus;
+    document.getElementById('auto-followup').checked = !!s.followUpEnabled;
+    document.getElementById('auto-days').value       = s.followUpDays || 3;
+    document.getElementById('auto-notify').checked   = !!s.notifyOwner;
+    document.getElementById('auto-email').checked    = !!s.autoEmail;
+    document.getElementById('auto-email-subject').value = s.autoEmailSubject || '';
+    document.getElementById('auto-email-message').value = s.autoEmailMessage || '';
+    syncAutoEmailFields();
+  } catch (e) { toast('Erreur de chargement des automatisations : ' + e.message, 'error'); }
+}
+
+document.getElementById('auto-save-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('auto-save-btn');
+  btn.disabled = true;
+  try {
+    const d = await api('save-automations', { method: 'POST', body: JSON.stringify({
+      autoStatus:       document.getElementById('auto-status').checked,
+      followUpEnabled:  document.getElementById('auto-followup').checked,
+      followUpDays:     parseInt(document.getElementById('auto-days').value, 10) || 3,
+      notifyOwner:      document.getElementById('auto-notify').checked,
+      autoEmail:        document.getElementById('auto-email').checked,
+      autoEmailSubject: document.getElementById('auto-email-subject').value,
+      autoEmailMessage: document.getElementById('auto-email-message').value,
+    }) });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    toast('Automatisations enregistrées', 'success');
+    loadAutomations();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+  finally { btn.disabled = false; }
+});
+
+document.getElementById('auto-run-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('auto-run-btn');
+  btn.disabled = true;
+  try {
+    const d = await api('run-automations', { method: 'POST', body: '{}' });
+    if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    toast(d.followUps ? `${d.followUps} relance${d.followUps > 1 ? 's' : ''} créée${d.followUps > 1 ? 's' : ''}` + (d.emailsSent ? `, ${d.emailsSent} email(s) envoyé(s)` : '')
+                      : 'Aucun prospect à relancer pour le moment', 'success');
+    loadTasks();
+    loadProspects();
+  } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+  finally { btn.disabled = false; }
+});
 
 document.querySelectorAll('.sidebar-item').forEach(a =>
   a.addEventListener('click', () => { if (window.innerWidth <= 800) closeSidebar(); }));

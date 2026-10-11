@@ -249,14 +249,14 @@ function renderTable() {
   tbody.innerHTML = rows.map(m => `
     <tr>
       <td>
-        <div class="pros-name">${m.name || '(non renseigné)'}</div>
-        <div class="pros-email">${m.email || '—'}</div>
+        <div class="pros-name">${esc(m.name || '(non renseigné)')}</div>
+        <div class="pros-email">${esc(m.email || '—')}</div>
       </td>
       <td style="font-family:'Space Mono',monospace;font-weight:700;color:var(--green)">${m.leadwaseId}</td>
       <td style="font-family:'Space Mono',monospace">${m.password || '—'}
         ${m.password ? `<button class="pros-act-btn" style="display:inline-flex;width:auto;height:auto;padding:2px 8px;margin-left:6px" onclick="copyCred('${m.leadwaseId}','${(m.password||'').replace(/'/g,"\\'")}')">Copier</button>` : ''}
       </td>
-      <td>${m.phone || '—'}</td>
+      <td>${esc(m.phone || '—')}</td>
       <td><span class="pros-badge lien">${(m.plan || 'free').toUpperCase()}</span></td>
       <td>
         <div class="pros-act">
@@ -392,7 +392,7 @@ async function loadTeamAnalytics() {
     }
     tbody.innerHTML = d.perMember.map(m => `
       <tr>
-        <td><div class="pros-name">${m.name}</div><div class="pros-email">${m.leadwaseId}</div></td>
+        <td><div class="pros-name">${esc(m.name)}</div><div class="pros-email">${esc(m.leadwaseId)}</div></td>
         <td>${m.views}</td>
         <td>${m.clicks}</td>
         <td style="font-weight:700">${m.total}</td>
@@ -406,6 +406,10 @@ async function loadTeamAnalytics() {
 
 // ── Prospects agrégés de l'équipe ─────────────────────────────────────────────
 let allTeamProspects = [];
+// Échappe tout texte saisi par un tiers (le formulaire public permet à n'importe qui de créer un prospect).
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 const STATUS_LABELS = { nouveau: '🆕 Nouveau', contacte: '📞 Contacté', qualifie: '✅ Qualifié', converti: '💰 Converti', perdu: '❌ Perdu' };
 const STATUS_COLORS  = { nouveau: '#6ea8ff', contacte: '#e8a13a', qualifie: '#5fbf6d', converti: '#1a7a3c', perdu: '#c0392b' };
 
@@ -436,16 +440,16 @@ function renderTeamProspects() {
     const status = p.status || 'nouveau';
     return `
     <tr>
-      <td><div class="pros-name">${p.name || '—'}</div><div class="pros-email">${p.email || '—'}</div></td>
-      <td>${p.phone || '—'}</td>
-      <td style="max-width:200px">${p.object || '—'}</td>
+      <td><div class="pros-name">${esc(p.name || '—')}</div><div class="pros-email">${esc(p.email || '—')}</div></td>
+      <td>${esc(p.phone || '—')}</td>
+      <td style="max-width:200px">${esc(p.object || '—')}</td>
       <td>
         <select style="border:1px solid ${STATUS_COLORS[status]};color:${STATUS_COLORS[status]};background:var(--white);border-radius:3px;padding:4px 6px;font-size:12px;font-weight:600" onchange="updateTeamProspectStatus('${p.id}', this.value)">
           ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k===status?'selected':''}>${v}</option>`).join('')}
         </select>
       </td>
-      <td><span class="pros-badge lien">${p.cardOwnerName}</span></td>
-      <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC</span>' : '<span class="pros-badge lien">🔗 Lien</span>'}</td>
+      <td><span class="pros-badge lien">${esc(p.cardOwnerName)}</span></td>
+      <td>${p.source === 'nfc' ? '<span class="pros-badge nfc">📶 NFC</span>' : p.source === 'formulaire' ? '<span class="pros-badge lien">📝 Formulaire</span>' : '<span class="pros-badge lien">🔗 Lien</span>'}</td>
       <td style="color:var(--gray4);font-size:13px">${fmtProspectDate(p.createdAt)}</td>
     </tr>
   `;
