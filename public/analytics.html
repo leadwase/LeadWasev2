@@ -445,19 +445,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
       <div class="sidebar-avatar" id="sb-av">?</div>
       <div><div class="sidebar-user-name" id="sb-name">Chargement...</div><div class="sidebar-user-plan" id="sb-plan">PRO</div></div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Principal</div>
-      <a class="sidebar-item" href="dashboard.html"><span class="s-icon">👤</span>Mon profil</a>
-      <a class="sidebar-item active" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>
-      <a class="sidebar-item" href="identifiants.html"><span class="s-icon">🔑</span>Identifiants</a>
-      <div id="prospects-nav-item"></div>
-      <div id="team-nav-item"></div>
-      <a class="sidebar-item" href="offres.html" target="_blank" rel="noopener"><span class="s-icon">⭐</span>Offres</a>
-      <a class="sidebar-item" href="#" id="sb-pub" target="_blank" rel="noopener"><span class="s-icon">🔗</span>Profil public</a>
-      <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
-      <a class="sidebar-item" href="commander.html" target="_blank" rel="noopener"><span class="s-icon">🛒</span>Commander une carte</a>
-      <a class="sidebar-item" href="mailto:contact@leadwase.com"><span class="s-icon">💬</span>Support</a>
-    </nav>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer"><button class="sidebar-logout" onclick="doLogout()">Se déconnecter</button></div>
   </aside>
 
@@ -531,6 +519,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
+import { renderUserSidebar } from './js/user-sidebar.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -598,7 +587,7 @@ onAuthStateChanged(auth, async user => {
     
     document.getElementById('sb-name').textContent = `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Utilisateur';
     document.getElementById('sb-plan').textContent = userPlan.toUpperCase();
-    document.getElementById('sb-pub').href = `profil.html?id=${lwId}`;
+    renderUserSidebar({ lwId, plan: userPlan, isTeamOwner: !!profile.isTeamOwner });
     
     document.getElementById('app-layout').style.display = '';
     loader.style.display = 'none';

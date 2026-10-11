@@ -6,6 +6,7 @@
 import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { renderUserSidebar } from './user-sidebar.js';
 import { getFirestore, doc, getDoc }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
@@ -166,24 +167,7 @@ export function initDashboardAuth(onReady) {
     document.getElementById('sb-av').textContent   = (p.firstName || '?')[0];
     document.getElementById('sb-name').textContent = (p.firstName || '') + ' ' + (p.lastName || '');
     document.getElementById('sb-plan').textContent = planFinal.toUpperCase();
-    const sbPub = document.getElementById('sb-pub');
-    if (sbPub) { sbPub.href = 'profil.html?id=' + lwId; sbPub.target = '_blank'; sbPub.rel = 'noopener'; }
-    const analyticsNav = document.getElementById('analytics-nav-item');
-    if (isPro && analyticsNav) {
-      analyticsNav.innerHTML = '<a class="sidebar-item" href="analytics.html"><span class="s-icon">📊</span>Analytics</a>';
-    }
-    const prospectsNav = document.getElementById('prospects-nav-item');
-    if (isBusiness && prospectsNav) {
-      const current = location.pathname.split('/').pop();
-      const active  = current === 'prospects.html' ? ' active' : '';
-      prospectsNav.innerHTML = `<a class="sidebar-item${active}" href="prospects.html"><span class="s-icon">📇</span>Mes Prospects</a>`;
-    }
-    const teamNav = document.getElementById('team-nav-item');
-    if (p.isTeamOwner && teamNav) {
-      const current = location.pathname.split('/').pop();
-      const active  = current === 'equipe.html' ? ' active' : '';
-      teamNav.innerHTML = `<a class="sidebar-item${active}" href="equipe.html"><span class="s-icon">👥</span>Mon équipe</a>`;
-    }
+    renderUserSidebar({ lwId, plan: planFinal, isTeamOwner: !!p.isTeamOwner });
 
     let currentLoginEmail = user.email;
     try {
