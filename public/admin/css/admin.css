@@ -265,3 +265,12 @@ select.f-input{cursor:pointer}
 .adm-confirm-ok:hover { background: var(--green2); }
 .adm-confirm-ok.danger { background: var(--red); border-color: var(--red); }
 .adm-confirm-ok.danger:hover { background: #b91c1c; }
+
+/* ── Correctif débordement horizontal (toutes les pages admin) ──
+   .main-wrap est un enfant flex : sans min-width:0 un tableau large l'élargit au-delà de l'écran,
+   et le overflow-x:hidden global coupe tout ce qui est à droite. Les tableaux défilent dans leur conteneur. */
+.main-wrap { min-width: 0; max-width: 100%; }
+.content { min-width: 0; max-width: 100%; }
+.card, .credentials-section { min-width: 0; max-width: 100%; }
+.table-wrap, .credentials-table-wrapper { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.filter-bar .filter-input { min-width: 0; flex: 1 1 160px; }
