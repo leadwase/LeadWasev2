@@ -106,6 +106,9 @@ a{text-decoration:none;color:inherit}
 .footer-links a:hover{color:var(--white)}
 .footer-bottom{border-top:1px solid var(--gray1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .footer-copy{font-size:14px;color:var(--gray2)}
+.footer-credit{white-space:nowrap}
+.footer-credit a{color:var(--green3);text-decoration:none;font-weight:600;transition:color .2s}
+.footer-credit a:hover{color:var(--white);text-decoration:underline}
 .footer-legal{display:flex;gap:20px}
 .footer-legal a{font-size:13px;color:var(--gray2);text-decoration:underline;transition:color .2s}
 .footer-legal a:hover{color:var(--white)}
