@@ -1,6 +1,8 @@
 // api/admin/orders.js — GET /api/admin/orders (liste)
 //                        POST /api/admin/orders?action=deliver               { orderId }
 //                        POST /api/admin/orders?action=generate-credentials  { orderId }
+//                        GET  /api/admin/orders?action=notifications          (centre de notifications admin)
+//                        POST /api/admin/orders?action=mark-notifications-read
 // Regroupées dans un seul fichier (cycle de vie d'une commande) pour rester
 // sous la limite de 12 fonctions serverless du plan Vercel Hobby.
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
@@ -137,17 +139,129 @@ async function provisionB2BTeam(req, res) {
   res.json({ success: true, chefLeadwaseId: chefId, teamSize: qty });
 }
 
+// ── Centre de notifications admin ─────────────────────────────────────────────
+// Les notifications sont calculées à partir de l'état réel des commandes, paiements et
+// abonnements (aucune duplication de données). Seul l'instant de dernière lecture est
+// mémorisé (adminState/{uid}.lastReadAt) : une notification est « non lue » si son
+// événement est plus récent que cet instant.
+const DAY = 86400000;
+const ms = (v) => {
+  if (!v) return 0;
+  if (typeof v.toMillis === 'function') return v.toMillis();
+  if (v._seconds) return v._seconds * 1000;
+  const t = new Date(v).getTime();
+  return Number.isNaN(t) ? 0 : t;
+};
+const fcfa = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' FCFA';
+const fullName = (o) => [o.firstName, o.lastName].filter(Boolean).join(' ') || o.company || o.email || 'Client';
+
+async function getNotifications(req, res, decoded) {
+  const now = Date.now();
+  const [ordersSnap, paymentsSnap, subsSnap, stateDoc] = await Promise.all([
+    db.collection('orders').orderBy('createdAt', 'desc').limit(200).get(),
+    db.collection('payments').orderBy('createdAt', 'desc').limit(200).get(),
+    db.collection('subscriptions').orderBy('createdAt', 'desc').limit(200).get(),
+    db.collection('adminState').doc(decoded.uid).get(),
+  ]);
+  const lastReadAt = ms(stateDoc.exists ? stateDoc.data().lastReadAt : 0);
+  const list = [];
+  const add = (n) => { if (n.date && n.date <= now + DAY) list.push(n); };
+
+  ordersSnap.docs.forEach(d => {
+    const o = d.data();
+    const created = ms(o.createdAt);
+    if (o.status === 'b2b_pending') {
+      add({ id: 'b2b:' + d.id, type: 'b2b', level: 'action', title: `Demande B2B — ${o.company || fullName(o)}`,
+        detail: `${o.quantity ? o.quantity + ' carte(s) · ' : ''}${o.email || ''}`.trim(), date: created, link: 'b2b.html' });
+    } else if (o.status === 'paid' && !o.leadwaseId && o.cardType !== 'b2b') {
+      add({ id: 'order_paid:' + d.id, type: 'order_paid', level: 'action', title: `Commande payée — accès à générer`,
+        detail: `${fullName(o)} · ${fcfa(o.amount)}`, date: ms(o.paidAt) || created, link: 'commandes.html' });
+    } else if (o.status === 'payment_failed' && now - created <= 30 * DAY) {
+      add({ id: 'payment_failed:o' + d.id, type: 'payment_failed', level: 'warning', title: 'Paiement de commande échoué',
+        detail: `${fullName(o)} · ${fcfa(o.amount)}`, date: created, link: 'paiements.html' });
+    } else if (o.status === 'gateway_error' && now - created <= 30 * DAY) {
+      add({ id: 'gateway_error:o' + d.id, type: 'gateway_error', level: 'warning', title: 'Erreur de la passerelle de paiement',
+        detail: `Commande de ${fullName(o)}`, date: created, link: 'commandes.html' });
+    }
+  });
+
+  // Paiements d'abonnement échoués (ceux des commandes sont déjà couverts ci-dessus).
+  paymentsSnap.docs.forEach(d => {
+    const p = d.data();
+    const created = ms(p.createdAt);
+    if (p.status === 'failed' && !p.orderId && now - created <= 30 * DAY) {
+      add({ id: 'payment_failed:p' + d.id, type: 'payment_failed', level: 'warning', title: "Paiement d'abonnement échoué",
+        detail: fcfa(p.amount), date: created, link: 'paiements.html' });
+    }
+  });
+
+  // Abonnements : on ne résout le nom du client que pour ceux qui produisent une notification.
+  const subItems = [];
+  subsSnap.docs.forEach(d => {
+    const s = d.data();
+    const expiry = ms(s.expiryDate);
+    const planLabel = (s.plan || '').toUpperCase();
+    if (s.status === 'active' && expiry) {
+      if (expiry <= now) {
+        subItems.push({ s, n: { id: 'sub_overdue:' + d.id, type: 'sub_overdue', level: 'warning', title: `Abonnement ${planLabel} arrivé à échéance`,
+          date: expiry, link: 'abonnements.html', extra: `expiré le ${new Date(expiry).toLocaleDateString('fr-FR')}` } });
+      } else if (expiry - now <= 7 * DAY) {
+        const days = Math.max(1, Math.ceil((expiry - now) / DAY));
+        subItems.push({ s, n: { id: 'sub_expiring:' + d.id, type: 'sub_expiring', level: 'warning', title: `Abonnement ${planLabel} bientôt expiré`,
+          date: expiry - 7 * DAY, link: 'abonnements.html', extra: `expire le ${new Date(expiry).toLocaleDateString('fr-FR')} (J-${days})` } });
+      }
+    }
+    if (s.status === 'expired' && now - ms(s.expiredAt) <= 30 * DAY) {
+      subItems.push({ s, n: { id: 'sub_expired:' + d.id, type: 'sub_expired', level: 'info', title: `Abonnement ${planLabel} expiré`,
+        date: ms(s.expiredAt), link: 'abonnements.html', extra: 'client repassé en Free' } });
+    }
+    if (s.status === 'active' && ms(s.paidAt) && now - ms(s.paidAt) <= 7 * DAY) {
+      subItems.push({ s, n: { id: 'sub_new:' + d.id, type: 'sub_new', level: 'success', title: `Nouvel abonnement ${planLabel}`,
+        date: ms(s.paidAt), link: 'abonnements.html', extra: fcfa(s.amount) } });
+    }
+    if (s.status === 'gateway_error' && now - ms(s.createdAt) <= 30 * DAY) {
+      subItems.push({ s, n: { id: 'gateway_error:s' + d.id, type: 'gateway_error', level: 'warning', title: 'Erreur passerelle sur un abonnement',
+        date: ms(s.createdAt), link: 'abonnements.html', extra: planLabel } });
+    }
+  });
+  const uids = [...new Set(subItems.map(x => x.s.uid).filter(Boolean))].slice(0, 40);
+  const names = {};
+  await Promise.all(uids.map(async uid => {
+    const q = await db.collection('profiles').where('firebaseUid', '==', uid).limit(1).get();
+    if (!q.empty) names[uid] = fullName(q.docs[0].data());
+  }));
+  subItems.forEach(({ s, n }) => {
+    const who = names[s.uid] || 'Client';
+    add({ ...n, detail: `${who} · ${n.extra}`, extra: undefined });
+  });
+
+  list.sort((a, b) => b.date - a.date);
+  const notifications = list.slice(0, 150).map(n => ({ ...n, unread: n.date > lastReadAt }));
+  res.json({
+    success: true, notifications, lastReadAt: lastReadAt || null,
+    unread: notifications.filter(n => n.unread).length,
+    actionCount: notifications.filter(n => n.level === 'action').length,
+  });
+}
+
+async function markNotificationsRead(req, res, decoded) {
+  await db.collection('adminState').doc(decoded.uid).set({ lastReadAt: new Date() }, { merge: true });
+  res.json({ success: true });
+}
+
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
-    await verifyAdmin(req);
+    const decoded = await verifyAdmin(req);
     const action = req.query.action;
 
-    if (req.method === 'GET' && !action) return listOrders(req, res);
-    if (req.method === 'POST' && action === 'deliver') return deliver(req, res);
-    if (req.method === 'POST' && action === 'generate-credentials') return generateCredentials(req, res);
-    if (req.method === 'POST' && action === 'provision-b2b-team') return provisionB2BTeam(req, res);
+    if (req.method === 'GET' && !action) return await listOrders(req, res);
+    if (req.method === 'POST' && action === 'deliver') return await deliver(req, res);
+    if (req.method === 'POST' && action === 'generate-credentials') return await generateCredentials(req, res);
+    if (req.method === 'POST' && action === 'provision-b2b-team') return await provisionB2BTeam(req, res);
+    if (req.method === 'GET'  && action === 'notifications') return await getNotifications(req, res, decoded);
+    if (req.method === 'POST' && action === 'mark-notifications-read') return await markNotificationsRead(req, res, decoded);
 
     res.status(400).json({ success: false, error: 'Requête invalide' });
   } catch (e) {

@@ -188,9 +188,16 @@ window.closeSidebar = () => {
   document.getElementById('sb-overlay').classList.remove('open');
 };
 
+export function setNotifBadge(n) {
+  const el = document.getElementById('sb-notif-count');
+  if (!el) return;
+  el.textContent = n > 99 ? '99+' : n;
+  el.style.display = n > 0 ? '' : 'none';
+}
+
 async function loadSidebarCounts() {
   try {
-    const [statsRes, b2bRes, credRes] = await Promise.allSettled([api('payments?action=stats'), api('b2b'), api('credentials')]);
+    const [statsRes, b2bRes, credRes, notifRes] = await Promise.allSettled([api('payments?action=stats'), api('b2b'), api('credentials'), api('orders?action=notifications')]);
     if (statsRes.status === 'fulfilled' && statsRes.value.success) {
       document.getElementById('sb-pending-count').textContent = statsRes.value.stats.pendingOrders || 0;
     }
@@ -199,6 +206,9 @@ async function loadSidebarCounts() {
     }
     if (credRes.status === 'fulfilled' && credRes.value.success) {
       document.getElementById('sb-cred-count').textContent = credRes.value.credentials.length;
+    }
+    if (notifRes.status === 'fulfilled' && notifRes.value.success) {
+      setNotifBadge(notifRes.value.unread);
     }
   } catch (e) { console.error('sidebar counts', e); }
 }

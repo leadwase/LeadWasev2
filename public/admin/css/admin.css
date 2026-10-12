@@ -274,3 +274,27 @@ select.f-input{cursor:pointer}
 .card, .credentials-section { min-width: 0; max-width: 100%; }
 .table-wrap, .credentials-table-wrapper { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .filter-bar .filter-input { min-width: 0; flex: 1 1 160px; }
+
+/* ── Centre de notifications ── */
+.notif-tabs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--gray5);background:#fafafa}
+.notif-tab{padding:7px 14px;font-size:14px;font-weight:600;border:1px solid var(--gray5);background:var(--white);color:var(--gray2);cursor:pointer;border-radius:2px;font-family:'DM Sans',sans-serif}
+.notif-tab:hover{background:var(--gray6)}
+.notif-tab.active{background:var(--gray1);border-color:var(--gray1);color:var(--white)}
+.notif-tab .n{margin-left:6px;opacity:.7;font-weight:700}
+.notif-item{display:flex;gap:14px;align-items:flex-start;padding:16px 24px;border-bottom:1px solid var(--gray6);border-left:4px solid transparent}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:#f6fbf8}
+.notif-item.lvl-action{border-left-color:var(--red)}
+.notif-item.lvl-warning{border-left-color:#d97706}
+.notif-item.lvl-success{border-left-color:var(--green)}
+.notif-item.lvl-info{border-left-color:var(--gray4)}
+.notif-ico{font-size:22px;width:30px;flex-shrink:0;text-align:center}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:16px;font-weight:700;color:var(--gray1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.notif-tag{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:2px;background:#fee2e2;color:#991b1b}
+.notif-detail{font-size:14px;color:var(--gray2);margin-top:3px;word-break:break-word}
+.notif-time{font-size:12px;color:var(--gray4);margin-top:4px}
+.notif-actions{flex-shrink:0}
+.notif-empty{padding:48px 24px;text-align:center;color:var(--gray4)}
+@media(max-width:600px){.notif-item{flex-wrap:wrap;padding:14px 16px}.notif-actions{width:100%}}
