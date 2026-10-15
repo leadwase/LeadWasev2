@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import PDFDocument from 'pdfkit';
 import crypto from 'crypto';
+import { limitOrReject } from '../../lib/rateLimit.js';
 
 if (!getApps().length) {
   initializeApp({ credential: cert({
@@ -58,13 +59,14 @@ async function verifyOwner(req, leadwaseId) {
     await profileDoc.ref.set({ firebaseUid: decoded.uid }, { merge: true }).catch(() => {});
   }
 
-  return { decoded, profile: pd };
+  return { decoded, profile: pd, profileDoc };
 }
 
 // POST /api/profile/[id]?action=capture-lead — public, appelé depuis le bouton
 // "Échanger" de la page profil publique. N'importe quel visiteur peut soumettre
 // ses coordonnées ; aucune authentification requise (comme un formulaire de contact).
 async function captureLead(req, res, leadwaseId) {
+  if (await limitOrReject(req, res, 'capture:' + leadwaseId, 8, 3600)) return;
   const { name, phone, email, object, source, website } = req.body || {};
   // Champ piège (honeypot) : invisible pour un humain, rempli par les robots → on ignore en silence.
   if (website) return res.json({ success: true });
@@ -94,10 +96,15 @@ async function captureLead(req, res, leadwaseId) {
 // POST /api/profile/[id]?action=submit-contact-form — public, formulaire de contact
 // personnalisé du profil public. Enregistre un prospect ET notifie le propriétaire par email.
 async function submitContactForm(req, res, leadwaseId) {
-  const { values, source } = req.body || {};
-  if (!values || typeof values !== 'object' || !Object.keys(values).length) {
+  if (await limitOrReject(req, res, 'contact:' + leadwaseId, 6, 3600)) return;
+  const { source } = req.body || {};
+  let values = (req.body || {}).values;
+  if (!values || typeof values !== 'object' || Array.isArray(values) || !Object.keys(values).length) {
     return res.status(400).json({ success: false, error: 'Formulaire vide' });
   }
+  // Bornes : 20 champs max, libellé ≤ 60 car., valeur ≤ 1000 car. (texte uniquement)
+  values = Object.fromEntries(Object.entries(values).slice(0, 20)
+    .map(([k, v]) => [String(k).slice(0, 60), String(v ?? '').slice(0, 1000)]));
 
   const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
   if (!profileDoc.exists) return res.status(404).json({ success: false, error: 'Profil introuvable' });
@@ -853,7 +860,7 @@ function fail(res, e) {
   const code = m === 'Accès refusé' ? 403
     : (m === 'Non autorisé' || m.startsWith('Session invalide')) ? 401 : 500;
   if (code === 500) console.error('[crm]', e);
-  return res.status(code).json({ success: false, error: m });
+  return res.status(code).json({ success: false, error: code === 500 ? 'Erreur serveur' : m });
 }
 
 // ── Réglages CRM par propriétaire (collection crmSettings, jamais exposée publiquement) ──
@@ -1278,6 +1285,156 @@ async function runAutomations(req, res, leadwaseId) {
   res.json({ success: true, ...r });
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// Sécurité : lien public opaque, profil public filtré, suivi, activation de compte
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ── Identifiant public opaque (URL /p/<slug>) ────────────────────────────────
+// L'identifiant de connexion (LW-xxxxx) ne doit jamais apparaître dans une URL publique :
+// il sert aussi à se connecter. Chaque profil reçoit un slug aléatoire non devinable.
+const SLUG_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
+const SLUG_RE = /^[a-z2-9]{12}$/;
+function randomSlug() {
+  const bytes = crypto.randomBytes(12);
+  let s = '';
+  for (const b of bytes) s += SLUG_ALPHABET[b % SLUG_ALPHABET.length];
+  return s;
+}
+async function ensurePublicSlug(docRef, data) {
+  if (data.publicSlug && SLUG_RE.test(data.publicSlug)) return data.publicSlug;
+  for (let i = 0; i < 5; i++) {
+    const slug = randomSlug();
+    const clash = await db.collection('profiles').where('publicSlug', '==', slug).limit(1).get();
+    if (clash.empty) { await docRef.update({ publicSlug: slug }); return slug; }
+  }
+  throw new Error('Impossible de générer le lien public');
+}
+
+// Liste blanche : seuls ces champs sont visibles publiquement. Tout le reste (leadwaseId,
+// firebaseUid, loginEmail, teamMembers, pricePerCard, parentLeadwaseId, teamOrderId…) reste privé.
+const PUBLIC_PROFILE_FIELDS = [
+  'firstName', 'lastName', 'jobTitle', 'company', 'phone', 'email', 'website', 'bio', 'photoURL', 'whatsapp',
+  'linkedin', 'instagram', 'twitter', 'facebook', 'youtube', 'tiktok',
+  'location', 'locationLat', 'locationLng', 'rdvLabel', 'rdvLink', 'googleReview', 'googlePlaceId',
+  'contactActive', 'contactFields', 'contactMessage', 'plan',
+];
+function toPublicProfile(data) {
+  const out = {};
+  for (const k of PUBLIC_PROFILE_FIELDS) if (data[k] !== undefined) out[k] = data[k];
+  return out;
+}
+
+// Retrouve un profil par id de document, champ leadwaseId, ou email de connexion interne.
+async function findProfileDoc(leadwaseId) {
+  let doc = await db.collection('profiles').doc(leadwaseId).get();
+  if (doc.exists) return doc;
+  let q = await db.collection('profiles').where('leadwaseId', '==', leadwaseId).limit(1).get();
+  if (!q.empty) return q.docs[0];
+  q = await db.collection('profiles').where('loginEmail', '==', `${leadwaseId.toLowerCase()}@leadwase.internal`).limit(1).get();
+  return q.empty ? null : q.docs[0];
+}
+
+// POST ?action=track { type, visitorId, source } — suivi des visites/clics (public, limité en débit).
+// Remplace l'écriture directe du navigateur dans Firestore : les règles peuvent donc l'interdire.
+async function trackEvent(req, res, leadwaseId) {
+  if (await limitOrReject(req, res, 'track:' + leadwaseId, 120, 600)) return;
+  const { type, visitorId, source } = req.body || {};
+  if (!/^(profile_view|vcard_download|click_[a-z_]{2,36})$/.test(String(type || ''))) {
+    return res.status(400).json({ success: false, error: 'Événement invalide' });
+  }
+  const snap = await db.collection('profiles').doc(leadwaseId).get();
+  if (!snap.exists) return res.status(404).json({ success: false, error: 'Profil introuvable' });
+  const ua = String(req.headers['user-agent'] || '');
+  await db.collection('analytics').doc(leadwaseId).collection('visits').add({
+    visitedAt: new Date(),
+    type,
+    device:    /Mobile|Tablet|iPhone|iPad|Android/i.test(ua) ? 'Mobile' : 'Desktop',
+    source:    String(source || 'Direct').replace(/[^a-zA-Z0-9.\-]/g, '').slice(0, 80) || 'Direct',
+    country:   'Inconnu',
+    visitorId: /^vis_[a-z0-9]{6,20}$/.test(String(visitorId || '')) ? visitorId : 'inconnu',
+  });
+  res.json({ success: true });
+}
+
+// GET ?action=public-link — lien public opaque du propriétaire connecté.
+async function getPublicLink(req, res, leadwaseId) {
+  const { profile, profileDoc } = await verifyOwner(req, leadwaseId);
+  const slug = await ensurePublicSlug(profileDoc.ref, profile);
+  res.json({ success: true, slug, url: `${SITE_URL()}/p/${slug}` });
+}
+
+// POST ?action=activate-account { password } — première connexion d'une carte neuve.
+// Avant : le navigateur créait lui-même le compte avec n'importe quel mot de passe (prise de contrôle
+// possible d'une carte non activée par quiconque connaissait son identifiant). Désormais le serveur
+// vérifie le mot de passe initial remis au client avant de créer le compte.
+async function activateAccount(req, res, leadwaseId) {
+  const GENERIC = 'Identifiant ou mot de passe incorrect.';
+  if (await limitOrReject(req, res, 'activate-ip', 20, 900)) return;
+  if (await limitOrReject(req, res, 'activate:' + leadwaseId, 6, 900)) return;
+  const password = (req.body || {}).password;
+  if (typeof password !== 'string' || !password || password.length > 128) {
+    return res.status(401).json({ success: false, error: GENERIC });
+  }
+  const [credDoc, profDoc] = await Promise.all([
+    db.collection('credentials').doc(leadwaseId).get(),
+    db.collection('profiles').doc(leadwaseId).get(),
+  ]);
+  const stored = credDoc.exists ? credDoc.data().passwordHash : null;
+  const sha = (v) => crypto.createHash('sha256').update(String(v)).digest();
+  const matches = typeof stored === 'string' && stored.length > 0 && crypto.timingSafeEqual(sha(stored), sha(password));
+  if (!credDoc.exists || !profDoc.exists || !matches) return res.status(401).json({ success: false, error: GENERIC });
+  if (profDoc.data().disabled) {
+    return res.status(403).json({ success: false, error: 'Ce compte a été désactivé. Contactez le support LeadWase.' });
+  }
+
+  const email = `${leadwaseId.toLowerCase()}@leadwase.internal`;
+  const adminAuth = getAuth();
+  let user, created = false;
+  try {
+    user = await adminAuth.getUserByEmail(email);
+  } catch (e) {
+    if (e.code !== 'auth/user-not-found') throw e;
+    user = await adminAuth.createUser({ email, password, emailVerified: true });
+    created = true;
+  }
+  if (!profDoc.data().firebaseUid) await profDoc.ref.update({ firebaseUid: user.uid });
+  await db.collection('users').doc(user.uid).set(
+    { leadwaseId, plan: profDoc.data().plan || 'free', role: 'user', createdAt: new Date() }, { merge: true });
+  res.json({ success: true, created });
+}
+
+// POST ?action=password-changed — appelé après un changement de mot de passe réussi :
+// le mot de passe initial (stocké pour la remise des identifiants) est effacé de la base.
+async function passwordChanged(req, res, leadwaseId) {
+  await verifyOwner(req, leadwaseId);
+  await db.collection('credentials').doc(leadwaseId).set(
+    { passwordHash: null, passwordChangedAt: new Date() }, { merge: true });
+  res.json({ success: true });
+}
+
+// POST ?action=request-team-quote { quantity } — le chef d'équipe sans prix négocié demande un devis.
+async function requestTeamQuote(req, res, leadwaseId) {
+  const { profile } = await verifyOwner(req, leadwaseId);
+  if (!profile.isTeamOwner) throw new Error('Accès refusé');
+  if (await limitOrReject(req, res, 'team-quote:' + leadwaseId, 3, 86400)) return;
+  const rawQty = parseInt((req.body || {}).quantity, 10);
+  const quantity = Number.isFinite(rawQty) ? Math.min(Math.max(rawQty, 1), EXTRA_CARD_MAX) : 1;
+  const name = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.company || leadwaseId;
+  const ref = await db.collection('orders').add({
+    cardType: 'b2b', status: 'b2b_pending', teamQuoteFor: leadwaseId,
+    firstName: profile.firstName || '', lastName: profile.lastName || '', company: profile.company || '',
+    email: profile.email || '', phone: profile.phone || '', quantity: String(quantity),
+    description: `Demande de devis — ${quantity} carte(s) supplémentaire(s) pour l'équipe existante (${leadwaseId})`,
+    createdAt: new Date(),
+  });
+  try {
+    const { notifyAdminB2BRequest } = await import('../../lib/brevo.js');
+    await notifyAdminB2BRequest({ orderId: ref.id, company: profile.company || name, name, email: profile.email || '',
+      phone: profile.phone || '', quantity, description: `Cartes supplémentaires pour l'équipe ${leadwaseId}` });
+  } catch (e) { console.error('[team-quote] email admin :', e.message); }
+  res.json({ success: true });
+}
+
 const CRM_ROUTES = {
   'POST:upload-document':   uploadDocument,
   'GET:list-documents':     listDocuments,
@@ -1289,6 +1446,11 @@ const CRM_ROUTES = {
   'POST:save-automations':  saveAutomations,
   'GET:run-automations':    runAutomations,
   'POST:run-automations':   runAutomations,
+  'POST:track':             trackEvent,
+  'GET:public-link':        getPublicLink,
+  'POST:activate-account':  activateAccount,
+  'POST:password-changed':  passwordChanged,
+  'POST:request-team-quote': requestTeamQuote,
 };
 
 export default async function handler(req, res) {
@@ -1299,17 +1461,30 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'ID manquant' });
     }
     
-    const leadwaseId = id.toString().toUpperCase();
+    // Identifiant public opaque (/p/<slug>) → identifiant interne. Le reste du code n'a pas à le savoir.
+    let leadwaseId;
+    const rawId = id.toString();
+    if (SLUG_RE.test(rawId)) {
+      const bySlug = await db.collection('profiles').where('publicSlug', '==', rawId).limit(1).get();
+      if (bySlug.empty) return res.status(404).json({ error: 'Profil introuvable' });
+      leadwaseId = bySlug.docs[0].id;
+    } else {
+      leadwaseId = rawId.toUpperCase().slice(0, 120);
+    }
 
     // ── Routage des actions "prospects" (CRM) ───────────────────────────────
     const action = req.query.action;
     if (action === 'capture-lead' && req.method === 'POST') {
-      return captureLead(req, res, leadwaseId).catch(e =>
-        res.status(500).json({ success: false, error: e.message }));
+      return captureLead(req, res, leadwaseId).catch(e => {
+        console.error('[capture-lead]', e);
+        res.status(500).json({ success: false, error: 'Erreur serveur' });
+      });
     }
     if (action === 'submit-contact-form' && req.method === 'POST') {
-      return submitContactForm(req, res, leadwaseId).catch(e =>
-        res.status(500).json({ success: false, error: e.message }));
+      return submitContactForm(req, res, leadwaseId).catch(e => {
+        console.error('[contact-form]', e);
+        res.status(500).json({ success: false, error: 'Erreur serveur' });
+      });
     }
     if (action === 'prospects' && req.method === 'GET') {
       return listProspects(req, res, leadwaseId).catch(e =>
@@ -1372,6 +1547,7 @@ export default async function handler(req, res) {
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
     if (action === 'unsubscribe' && req.method === 'GET') {
+      if (await limitOrReject(req, res, 'unsubscribe', 30, 3600)) return;
       return unsubscribeProspect(req, res, leadwaseId).catch(e => {
         console.error('[unsubscribe]', e);
         res.status(500).send('Erreur, merci de réessayer.');
@@ -1408,114 +1584,35 @@ export default async function handler(req, res) {
         res.status(e.message === 'Accès refusé' ? 403 : 401).json({ success: false, error: e.message }));
     }
 
-    console.log(`🔍 Recherche du profil: ${leadwaseId}`);
-    
-    // 1. Chercher le profil par son ID de document
-    let profileDoc = await db.collection('profiles').doc(leadwaseId).get();
-    let profileData = null;
-    let actualDocId = leadwaseId;
-    
-    // 2. Si non trouvé, chercher par le champ leadwaseId
-    if (!profileDoc.exists) {
-      console.log(`⚠️ Document ${leadwaseId} non trouvé, recherche par champ leadwaseId...`);
-      const querySnapshot = await db.collection('profiles')
-        .where('leadwaseId', '==', leadwaseId)
-        .limit(1)
-        .get();
-      
-      if (!querySnapshot.empty) {
-        profileDoc = querySnapshot.docs[0];
-        actualDocId = profileDoc.id;
-        console.log(`✅ Profil trouvé par leadwaseId: ${actualDocId}`);
-      }
-    }
-    
-    // 3. Si non trouvé, chercher par loginEmail ou email
-    if (!profileDoc.exists) {
-      console.log(`⚠️ Recherche par email...`);
-      const emailQuery = await db.collection('profiles')
-        .where('loginEmail', '==', `${leadwaseId.toLowerCase()}@leadwase.internal`)
-        .limit(1)
-        .get();
-      
-      if (!emailQuery.empty) {
-        profileDoc = emailQuery.docs[0];
-        actualDocId = profileDoc.id;
-        console.log(`✅ Profil trouvé par loginEmail: ${actualDocId}`);
-      }
-    }
-    
-    if (!profileDoc.exists) {
-      console.log(`❌ Profil non trouvé pour l'ID: ${leadwaseId}`);
-      return res.status(404).json({ error: 'Profil introuvable' });
-    }
-    
-    profileData = profileDoc.data();
-    console.log(`✅ Profil chargé: ${actualDocId}, plan: ${profileData.plan || 'free'}`);
-    
-    // Récupérer l'abonnement actif si l'utilisateur a un firebaseUid
-    let subscription = null;
+    // ── Profil public (GET sans action) ──────────────────────────────────────
+    const profileDoc = await findProfileDoc(leadwaseId);
+    if (!profileDoc || profileDoc.data().disabled) return res.status(404).json({ error: 'Profil introuvable' });
+    const profileData = profileDoc.data();
+
+    // Aligne le plan du profil sur l'abonnement actif (comportement conservé).
     if (profileData.firebaseUid) {
-      console.log(`🔍 Recherche d'abonnement pour firebaseUid: ${profileData.firebaseUid}`);
-      
       const subQuery = await db.collection('subscriptions')
         .where('uid', '==', profileData.firebaseUid)
         .where('status', '==', 'active')
         .orderBy('createdAt', 'desc')
         .limit(1)
         .get();
-      
       if (!subQuery.empty) {
-        const subDoc = subQuery.docs[0];
-        const subData = subDoc.data();
-        subscription = {
-          id: subDoc.id,
-          plan: subData.plan,
-          status: subData.status,
-          startDate: subData.startDate,
-          expiryDate: subData.expiryDate,
-          amount: subData.amount
-        };
-        console.log(`✅ Abonnement actif trouvé: ${subData.plan}`);
-        
-        // Si l'abonnement est actif mais le profil est encore "free", mettre à jour
+        const subData = subQuery.docs[0].data();
         if (profileData.plan !== subData.plan && subData.plan !== 'free') {
-          console.log(`⚠️ Mise à jour du plan: ${profileData.plan} → ${subData.plan}`);
-          await profileDoc.ref.update({ 
-            plan: subData.plan,
-            updatedAt: new Date()
-          });
+          await profileDoc.ref.update({ plan: subData.plan, updatedAt: new Date() });
           profileData.plan = subData.plan;
         }
-      } else {
-        console.log(`ℹ️ Aucun abonnement actif trouvé pour cet utilisateur`);
       }
-    } else {
-      console.log(`ℹ️ Pas de firebaseUid associé au profil`);
     }
-    
-    // Exclure les champs sensibles
-    const { uid, firebaseUid, ...publicProfile } = profileData;
-    
-    // Ajouter le code public
-    const publicCode = getPublicCode(actualDocId);
-    
-    // Ajouter les infos d'abonnement si disponibles
-    const response = {
-      success: true,
-      profile: publicProfile,
-      publicCode: publicCode,
-      plan: profileData.plan || 'free'
-    };
-    
-    if (subscription) {
-      response.subscription = subscription;
-    }
-    
-    res.json(response);
-    
-  } catch (e) { 
+
+    const slug = await ensurePublicSlug(profileDoc.ref, profileData);
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=20');
+    // Réponse publique : uniquement la liste blanche. Ni identifiant de connexion, ni abonnement, ni équipe.
+    return res.json({ success: true, profile: toPublicProfile(profileData), plan: profileData.plan || 'free', slug });
+
+  } catch (e) {
     console.error('❌ Erreur API profil:', e);
-    res.status(500).json({ error: e.message }); 
+    res.status(500).json({ error: 'Erreur serveur' });
   }
 }
