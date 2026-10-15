@@ -60,10 +60,17 @@
       <ul class="plan-features">
         <li><span class="ck">✓</span>Profil</li>
         <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>WhatsApp</li>
+        <li><span class="ck">✓</span>Titre</li>
+        <li><span class="ck">✓</span>Nom</li>
+        <li><span class="ck">✓</span>Prénom</li>
+        <li><span class="ck">✓</span>Entreprise</li>
+        <li><span class="ck">✓</span>Email</li>
+        <li><span class="ck">✓</span>Site web</li>
+        <li><span class="ck">✓</span>Téléphone</li>
         <li><span class="ck">✗</span>Réseaux sociaux</li>
         <li><span class="ck">✗</span>Photo de Profil</li>
         <li><span class="ck">✗</span>Analytics</li>
-        <li><span class="ck">✗</span>Lien de votre site</li>
         <li><span class="ck">✗</span>Localisation</li>
       </ul>
       <span class="plan-btn outline" id="btn-free" style="cursor:default">Inclus avec la carte</span>
@@ -88,6 +95,7 @@
         <li><span class="ck">✓</span>Photo de profil</li>
         <li><span class="ck">✓</span>Analytics</li>
         <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Support prioritaire</li>
         <li><span class="ck">✗</span>Localisation</li>
       </ul>
       <button class="plan-btn filled" id="btn-pro" onclick="subscribe('pro')">Passer au Pro →</button>
@@ -108,6 +116,7 @@
         <li><span class="ck">✓</span>Profil</li>
         <li><span class="ck">✓</span>Personnalisation et Modification</li>
         <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>CRM dynamique</li>
         <li><span class="ck">✓</span>Photo de profil</li>
         <li><span class="ck">✓</span>Analytics</li>
         <li><span class="ck">✓</span>Lien de votre site</li>
@@ -115,6 +124,7 @@
         <li><span class="ck">✓</span>Prise de rendez-vous</li>
         <li><span class="ck">✓</span>Avis Google</li>
         <li><span class="ck">✓</span>Localisation</li>
+        <li><span class="ck">✓</span>Support prioritaire</li>
       </ul>
       <button class="plan-btn outline" id="btn-biz" onclick="subscribe('business')">Choisir Business →</button>
     </div>
@@ -156,6 +166,7 @@
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
+import { loadPrices } from './js/prices.js';
 import { onAuthStateChanged, getIdToken }                          from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, collection, query, where, getDocs, limit }  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -287,7 +298,7 @@ const DURATIONS = {
   6:  { label: 'facturé tous les 6 mois',               discount: 0.10 },
   12: { label: 'facturé une fois par an',                discount: 0.15 },
 };
-const BASE_PRICES = { pro: 2999, business: 4566 };
+const BASE_PRICES = { pro: 2999, business: 4566 };   // repli si l'API des prix est indisponible
 const selectedDuration = { pro: 1, business: 1 };
 
 function fmtXOF(n) { return Math.round(n).toLocaleString('fr-FR'); }
@@ -313,8 +324,14 @@ document.querySelectorAll('.plan-duration-picker').forEach(picker => {
     });
   });
 });
-updatePlanDisplay('pro');
-updatePlanDisplay('business');
+// Prix = ceux saisis dans Admin → Paramètres (affichés dès leur réponse, jamais un ancien prix).
+setTimeout(() => document.documentElement.classList.add('prices-ready'), 3000);
+loadPrices().then(prices => {
+  if (prices) { BASE_PRICES.pro = prices.pro; BASE_PRICES.business = prices.business; }
+  updatePlanDisplay('pro');
+  updatePlanDisplay('business');
+  document.documentElement.classList.add('prices-ready');
+});
 
 // ── Fonction subscribe ────────────────────────────────────────────────────────
 window.subscribe = async plan => {

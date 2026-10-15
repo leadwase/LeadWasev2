@@ -103,13 +103,13 @@
 import { initAuth, api, fmtDateTime, toast, setNotifBadge } from './js/admin-shared.js';
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const ICONS = { b2b: '📋', order_paid: '📦', payment_failed: '💳', gateway_error: '⚠️',
+const ICONS = { b2b: '📋', order_paid: '📦', provision_error: '🛠️', payment_failed: '💳', gateway_error: '⚠️',
   sub_expiring: '⏳', sub_overdue: '🔄', sub_expired: '⌛', sub_new: '🎉' };
 const FILTERS = [
   { key: 'all',    label: 'Tout',          test: () => true },
   { key: 'action', label: 'À traiter',     test: n => n.level === 'action' },
   { key: 'unread', label: 'Non lues',      test: n => n.unread },
-  { key: 'orders', label: 'Commandes',     test: n => ['b2b', 'order_paid'].includes(n.type) },
+  { key: 'orders', label: 'Commandes',     test: n => ['b2b', 'order_paid', 'provision_error'].includes(n.type) },
   { key: 'pay',    label: 'Paiements',     test: n => ['payment_failed', 'gateway_error'].includes(n.type) },
   { key: 'subs',   label: 'Abonnements',   test: n => n.type.startsWith('sub_') },
 ];

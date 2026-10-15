@@ -70,6 +70,7 @@
             <div class="pros-sub">Gérez les cartes et identifiants de vos employés</div>
           </div>
           <div class="pros-actions">
+            <button class="pros-btn" id="order-cards-btn">🛒 Commander des cartes</button>
             <button class="pros-btn primary" id="add-member-btn">+ Ajouter un employé</button>
           </div>
         </div>
@@ -201,10 +202,25 @@
   </div>
 </div>
 
+<!-- ── Modal commander des cartes supplémentaires ── -->
+<div class="xchg-overlay" id="order-overlay">
+  <div class="xchg-modal">
+    <button class="xchg-close" id="order-close" aria-label="Fermer">&times;</button>
+    <h3 class="xchg-title">Commander des cartes</h3>
+    <p style="font-size:15px;color:var(--gray3);line-height:1.5;margin-bottom:14px">Ajoutez des cartes pour de nouveaux employés, au prix négocié pour votre équipe. Chaque carte arrive avec son identifiant et son mot de passe, envoyés par email après le paiement.</p>
+    <div class="xchg-field"><label>Nombre de cartes</label><input id="order-qty" type="number" min="1" max="50" value="1" inputmode="numeric"></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;margin:6px 0"><span>Prix par carte</span><strong id="order-unit">–</strong></div>
+    <div style="display:flex;justify-content:space-between;font-size:18px;margin:6px 0 14px;padding-top:8px;border-top:1px solid var(--gray5)"><span>Total</span><strong id="order-total" style="color:var(--green)">–</strong></div>
+    <div class="xchg-err" id="order-err"></div>
+    <button class="pros-btn primary" id="order-pay-btn" style="width:100%;justify-content:center">Payer maintenant</button>
+    <p style="font-size:12px;color:var(--gray4);text-align:center;margin-top:10px">Les nouvelles cartes apparaissent dans votre équipe dès la confirmation du paiement.</p>
+  </div>
+</div>
+
 <script type="module">
 import { initDashboardAuth, toast, auth, confirmDialog } from './js/dashboard-shared.js';
 
-let lwId = null, allMembers = [], editingId = null;
+let lwId = null, allMembers = [], editingId = null, pricePerCard = 0, maxExtraCards = 50;
 
 async function api(action, opts = {}) {
   const token = await auth.currentUser.getIdToken();
@@ -288,17 +304,46 @@ document.getElementById('add-member-btn').addEventListener('click', async () => 
   const unassigned = allMembers.find(m => !m.name && !m.email);
   if (unassigned) { window.editMember(unassigned.leadwaseId); return; }
 
-  const ok = await confirmDialog(
-    "Toutes les cartes de votre équipe sont déjà assignées. Pour ajouter un nouvel employé, une carte supplémentaire doit être achetée.\n\nContinuer vers le paiement ?",
-    { okLabel: 'Acheter une carte' }
-  );
-  if (!ok) return;
+  toast('Toutes vos cartes sont déjà assignées : commandez-en de nouvelles pour ajouter un employé.', 'success');
+  openOrderModal();
+});
+
+// ── Commander des cartes supplémentaires ──────────────────────────────────────
+const fmtFCFA = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' FCFA';
+function orderQty() {
+  const q = parseInt(document.getElementById('order-qty').value, 10);
+  return Number.isFinite(q) ? q : 0;
+}
+function refreshOrderTotals() {
+  const q = orderQty(), err = document.getElementById('order-err'), btn = document.getElementById('order-pay-btn');
+  document.getElementById('order-unit').textContent  = pricePerCard ? fmtFCFA(pricePerCard) : 'non défini';
+  document.getElementById('order-total').textContent = pricePerCard && q >= 1 ? fmtFCFA(pricePerCard * q) : '–';
+  err.textContent = '';
+  btn.disabled = false;
+  if (!pricePerCard) { err.textContent = 'Le prix par carte de votre équipe n\u2019est pas défini. Contactez le support.'; btn.disabled = true; }
+  else if (q < 1 || q > maxExtraCards) { err.textContent = `Choisissez entre 1 et ${maxExtraCards} cartes.`; btn.disabled = true; }
+}
+function openOrderModal() {
+  document.getElementById('order-qty').value = 1;
+  refreshOrderTotals();
+  document.getElementById('order-overlay').classList.add('open');
+}
+document.getElementById('order-cards-btn').addEventListener('click', openOrderModal);
+document.getElementById('order-qty').addEventListener('input', refreshOrderTotals);
+document.getElementById('order-close').onclick = () => document.getElementById('order-overlay').classList.remove('open');
+document.getElementById('order-overlay').addEventListener('click', e => { if (e.target.id === 'order-overlay') e.currentTarget.classList.remove('open'); });
+document.getElementById('order-pay-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('order-pay-btn'), err = document.getElementById('order-err');
+  const quantity = orderQty();
+  err.textContent = '';
+  btn.disabled = true; btn.textContent = 'Redirection vers le paiement...';
   try {
-    const d = await api('buy-extra-card', { method: 'POST', body: '{}' });
+    const d = await api('buy-extra-card', { method: 'POST', body: JSON.stringify({ quantity }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     window.location.href = d.payUrl;
   } catch (e) {
-    toast('Erreur : ' + e.message, 'error');
+    err.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Payer maintenant';
   }
 });
 
@@ -353,6 +398,8 @@ initDashboardAuth(async ({ lwId: id, p }) => {
     const d = await api('team-list');
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
     allMembers = d.members || [];
+    pricePerCard = d.pricePerCard || 0;
+    if (d.maxExtraCards) maxExtraCards = d.maxExtraCards;
   } catch (e) {
     toast('Erreur de chargement : ' + e.message, 'error');
     allMembers = [];

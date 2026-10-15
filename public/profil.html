@@ -1193,14 +1193,14 @@ async function load(leadwaseId) {
         }
       });
       if (has) document.getElementById('pf-socials-wrap').style.display = 'block';
+    }
 
-      // WhatsApp
-      if (p.whatsapp?.trim()) {
-        const waLink = p.whatsapp.startsWith('http') ? p.whatsapp : `https://wa.me/${p.whatsapp.replace(/[^0-9]/g,'')}`;
-        const extraBox = document.getElementById('pf-extra-links');
-        extraBox.appendChild(makeLink(waLink, 'icon-whatsapp', 'WhatsApp', 'whatsapp', leadwaseId, 'whatsapp'));
-        document.getElementById('pf-extra-links-wrap').style.display = 'block';
-      }
+    // WhatsApp : disponible sur toutes les offres (Free, Pro, Business)
+    if (p.whatsapp?.trim()) {
+      const waLink = p.whatsapp.startsWith('http') ? p.whatsapp : `https://wa.me/${p.whatsapp.replace(/[^0-9]/g,'')}`;
+      const extraBox = document.getElementById('pf-extra-links');
+      extraBox.appendChild(makeLink(waLink, 'icon-whatsapp', 'WhatsApp', 'whatsapp', leadwaseId, 'whatsapp'));
+      document.getElementById('pf-extra-links-wrap').style.display = 'block';
     }
 
     // Business features

@@ -696,22 +696,29 @@ async function getTeamAnalytics(req, res, leadwaseId) {
   res.json({ success: true, totalVisits, totalClicks, teamSize: memberIds.length, perMember });
 }
 
-// POST /api/profile/[id]?action=buy-extra-card — le chef d'équipe achète une carte
-// supplémentaire (au prix négocié à la commande B2B). Retourne un lien de paiement ;
-// la carte n'est provisionnée qu'après paiement confirmé (webhook).
+// POST /api/profile/[id]?action=buy-extra-card { quantity } — le chef d'équipe achète 1 à 50 cartes
+// supplémentaires (au prix négocié à la commande B2B). Retourne un lien de paiement ;
+// les cartes ne sont provisionnées qu'après paiement confirmé (webhook).
+const EXTRA_CARD_MAX = 50;
 async function buyExtraCard(req, res, leadwaseId) {
   const { profile } = await verifyOwner(req, leadwaseId);
   if (!profile.isTeamOwner) throw new Error('Accès refusé');
 
-  const amount = parseInt(profile.pricePerCard, 10);
-  if (!amount || amount < 1) {
+  const unitPrice = parseInt(profile.pricePerCard, 10);
+  if (!unitPrice || unitPrice < 1) {
     return res.status(400).json({ success: false, error: "Prix par carte non défini pour votre équipe. Contactez le support." });
   }
+  const rawQty = parseInt((req.body || {}).quantity, 10);
+  const quantity = Number.isFinite(rawQty) ? rawQty : 1;
+  if (quantity < 1 || quantity > EXTRA_CARD_MAX) {
+    return res.status(400).json({ success: false, error: `Quantité invalide (1 à ${EXTRA_CARD_MAX} cartes)` });
+  }
+  const amount = unitPrice * quantity;
 
   const orderRef = await db.collection('orders').add({
     cardType: 'b2b_extra', orderContext: 'extra_team_card', parentChefId: leadwaseId,
     firstName: profile.firstName || '', company: profile.company || '', email: profile.email || '',
-    amount, status: 'pending', createdAt: new Date(),
+    quantity, unitPrice, amount, status: 'pending', createdAt: new Date(),
   });
   const payRef = await db.collection('payments').add({
     orderId: orderRef.id, amount, status: 'pending', createdAt: new Date(),
@@ -724,7 +731,7 @@ async function buyExtraCard(req, res, leadwaseId) {
     headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.GATEWAY_API_KEY },
     body: JSON.stringify({
       amount, country: 'bj',
-      description: `LeadWase — carte employé supplémentaire (${profile.company || leadwaseId})`,
+      description: `LeadWase — ${quantity} carte${quantity > 1 ? 's' : ''} employé supplémentaire${quantity > 1 ? 's' : ''} (${profile.company || leadwaseId})`,
       origin: SITE, sendWebhook: true,
       metadata: { transactionId: payRef.id, orderId: orderRef.id, origin: SITE, sendWebhook: true },
     }),
@@ -737,7 +744,7 @@ async function buyExtraCard(req, res, leadwaseId) {
   await payRef.update({ pid: gData.pid, payUrl: gData.url });
   await orderRef.update({ paymentId: payRef.id, pid: gData.pid });
 
-  res.json({ success: true, payUrl: gData.url, amount });
+  res.json({ success: true, payUrl: gData.url, amount, quantity, unitPrice });
 }
 
 async function listTeam(req, res, leadwaseId) {
@@ -761,7 +768,7 @@ async function listTeam(req, res, leadwaseId) {
       createdAt: p.createdAt || null,
     });
   }
-  res.json({ success: true, members, company: profile.company || '' });
+  res.json({ success: true, members, company: profile.company || '', pricePerCard: parseInt(profile.pricePerCard, 10) || 0, maxExtraCards: EXTRA_CARD_MAX });
 }
 
 // POST /api/profile/[id]?action=team-update-member — { memberId, name, email, phone }

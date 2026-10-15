@@ -170,7 +170,10 @@ async function getNotifications(req, res, decoded) {
   ordersSnap.docs.forEach(d => {
     const o = d.data();
     const created = ms(o.createdAt);
-    if (o.status === 'b2b_pending') {
+    if (o.provisionError) {
+      add({ id: 'provision_error:' + d.id, type: 'provision_error', level: 'action', title: "Cartes d'équipe à créer manuellement",
+        detail: `${o.company || fullName(o)} · ${o.provisionError}`, date: ms(o.paidAt) || created, link: 'commandes.html' });
+    } else if (o.status === 'b2b_pending') {
       add({ id: 'b2b:' + d.id, type: 'b2b', level: 'action', title: `Demande B2B — ${o.company || fullName(o)}`,
         detail: `${o.quantity ? o.quantity + ' carte(s) · ' : ''}${o.email || ''}`.trim(), date: created, link: 'b2b.html' });
     } else if (o.status === 'paid' && !o.leadwaseId && o.cardType !== 'b2b') {

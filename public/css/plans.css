@@ -157,3 +157,6 @@
 @media(max-width:520px){
   .compare-table th, .compare-table td{padding:8px 4px;font-size:11.5px}
 }
+
+/* Prix chargés depuis l'admin : masqués jusqu'à la réponse de l'API */
+html:not(.prices-ready) #price-pro, html:not(.prices-ready) #price-business { visibility: hidden; }

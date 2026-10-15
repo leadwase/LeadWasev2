@@ -189,32 +189,56 @@ export default async function handler(req, res) {
 
       // ── Carte employé supplémentaire (équipe B2B) ────────────────────────────
       if (oData.orderContext === 'extra_team_card' && oData.parentChefId) {
+        const qty = Math.min(50, Math.max(1, parseInt(oData.quantity, 10) || 1));
+        const created = [];
+        let provisionError = '';
         try {
           const chefRef = db.collection('profiles').doc(oData.parentChefId);
           const chefDoc = await chefRef.get();
           const chef = chefDoc.exists ? chefDoc.data() : {};
 
-          let subId = genId();
-          const exSub = await db.collection('profiles').where('leadwaseId', '==', subId).get();
-          if (!exSub.empty) subId = genId();
-          const subPwd = genPwd();
+          for (let i = 0; i < qty; i++) {
+            try {
+              let subId = genId();
+              for (let t = 0; t < 5; t++) {
+                const exSub = await db.collection('profiles').where('leadwaseId', '==', subId).get();
+                if (exSub.empty) break;
+                subId = genId();
+              }
+              const subPwd = genPwd();
+              await db.collection('profiles').doc(subId).set({
+                leadwaseId: subId, firstName: '', lastName: '', company: chef.company || '',
+                phone: '', email: '', plan: chef.plan || 'free',
+                parentLeadwaseId: oData.parentChefId, teamOrderId: chef.teamOrderId || '', createdAt: new Date(),
+              });
+              await db.collection('credentials').doc(subId).set({ leadwaseId: subId, passwordHash: subPwd, createdAt: new Date() });
+              await chefRef.update({ teamMembers: FieldValue.arrayUnion(subId) });
+              created.push({ subId, subPwd });
+            } catch (e) {
+              provisionError = e.message;
+              console.error(`[extra_team_card] carte ${i + 1}/${qty} échouée:`, e);
+            }
+          }
 
-          await db.collection('profiles').doc(subId).set({
-            leadwaseId: subId, firstName: '', lastName: '', company: chef.company || '',
-            phone: '', email: '', plan: chef.plan || 'free',
-            parentLeadwaseId: oData.parentChefId, teamOrderId: chef.teamOrderId || '', createdAt: new Date(),
+          // Le paiement est confirmé : la commande est « payée » même si une carte a échoué,
+          // et l'écart est signalé (provisionError) pour que l'admin termine à la main.
+          await ord.ref.update({
+            status: 'paid', paidAt: new Date(),
+            ...(created.length ? { leadwaseId: created[0].subId, leadwaseIds: created.map(c => c.subId) } : {}),
+            provisioned: created.length,
+            ...(created.length < qty ? { provisionError: `${created.length}/${qty} cartes créées${provisionError ? ' — ' + provisionError : ''}` } : {}),
           });
-          await db.collection('credentials').doc(subId).set({ leadwaseId: subId, passwordHash: subPwd, createdAt: new Date() });
-          await chefRef.update({ teamMembers: FieldValue.arrayUnion(subId) });
-          await ord.ref.update({ status: 'paid', leadwaseId: subId, paidAt: new Date() });
 
           if (chef.email) {
-            try {
-              await notifyClientCredentials({ firstName: chef.firstName || '', email: chef.email, leadwaseId: subId, password: subPwd });
-            } catch (e) { console.error('[extra_team_card] email échoué:', e.message); }
+            for (const c of created) {
+              try {
+                await notifyClientCredentials({ firstName: chef.firstName || '', email: chef.email, leadwaseId: c.subId, password: c.subPwd });
+              } catch (e) { console.error('[extra_team_card] email échoué:', e.message); }
+            }
           }
         } catch (e) {
           console.error('[extra_team_card] provisioning échoué:', e);
+          await ord.ref.update({ status: 'paid', paidAt: new Date(), provisioned: created.length, provisionError: `${created.length}/${qty} cartes créées — ${e.message}` }).catch(() => {});
         }
         return res.status(200).json({ success: true });
       }

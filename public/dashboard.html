@@ -155,6 +155,7 @@
             </div>
             <div class="edit-grid edit-solo" style="margin-top:12px">
               <div class="f-group"><label class="f-label">Site web</label><input class="f-input" type="url" id="e-web" placeholder="https://monsite.com"></div>
+              <div class="f-group"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="e-wa" placeholder="+229 XX XX XX XX"></div>
               <div class="f-group"><label class="f-label">Bio</label><textarea class="f-textarea" id="e-bio" placeholder="Décrivez votre activité..."></textarea></div>
             </div>
             <button class="save-btn" onclick="saveProfile()">Enregistrer les modifications</button>
@@ -181,7 +182,6 @@
           <div class="link-row"><div class="link-icon">📘</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Facebook</label><input class="f-input" id="l-fb" placeholder="https://facebook.com/..."></div></div>
           <div class="link-row"><div class="link-icon">📺</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">YouTube</label><input class="f-input" id="l-yt" placeholder="https://youtube.com/@..."></div></div>
           <div class="link-row"><div class="link-icon">🐦</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">Twitter / X</label><input class="f-input" id="l-tw" placeholder="https://twitter.com/..."></div></div>
-          <div class="link-row"><div class="link-icon">💬</div><div class="f-group" style="flex:1;margin:0"><label class="f-label">WhatsApp (numéro)</label><input class="f-input" type="tel" id="l-wa" placeholder="+229 XX XX XX XX"></div></div>
           <button class="save-btn" onclick="saveLinks()">Sauvegarder les liens</button>
           </div>
         </div>
@@ -270,7 +270,7 @@
         <!-- ── Fonctionnalités verrouillées (Free) ── -->
         <div class="locked-card" id="locked-sec">
           <div class="locked-title">🔒 Fonctionnalités non disponibles sur Free</div>
-          <div class="locked-item">🔒 Liens réseaux sociaux (LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter, WhatsApp)</div>
+          <div class="locked-item">🔒 Liens réseaux sociaux (LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter)</div>
           <div class="locked-item">🔒 Photo de profil</div>
           <div class="locked-item">🔒 Localisation / Adresse</div>
           <div class="locked-item">🔒 Prise de rendez-vous</div>
@@ -293,13 +293,14 @@
                 <tr><td>Site web personnel</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
                 <tr><td>Photo de profil</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
                 <tr><td>LinkedIn, Instagram, TikTok, Facebook, YouTube, Twitter</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
-                <tr><td>WhatsApp direct</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>WhatsApp direct</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
                 <tr><td>Analytics de visites</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
                 <tr><td><strong>Localisation / Adresse</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
                 <tr><td><strong>Prise de rendez-vous</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
                 <tr><td><strong>Avis Google</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
                 <tr><td><strong>Formulaire de contact</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
-                <tr><td>Support prioritaire</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td><strong>CRM dynamique</strong></td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>Support prioritaire</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
               </tbody>
             </table>
           </div>
@@ -307,10 +308,10 @@
 
         <div class="upgrade" id="upgrade-sec">
           <h3>🚀 Passez à Pro ou Business</h3>
-          <p>Débloquez les réseaux sociaux, WhatsApp, la localisation, les rendez-vous, les avis Google, les analytics et bien plus encore.</p>
+          <p>Débloquez les réseaux sociaux, la localisation, les rendez-vous, les avis Google, les analytics et bien plus encore.</p>
           <div class="upgrade-btns">
-            <a class="ucta ucta-pro" href="offres.html">Passer à Pro — 2 999 XOF/mois</a>
-            <a class="ucta ucta-biz" href="offres.html">Voir Business — 4 566 XOF/mois</a>
+            <a class="ucta ucta-pro" href="offres.html">Passer à Pro — <data data-price="pro">2 999</data> XOF/mois</a>
+            <a class="ucta ucta-biz" href="offres.html">Voir Business — <data data-price="business">4 566</data> XOF/mois</a>
           </div>
         </div>
 
@@ -322,6 +323,8 @@
 
 <script type="module">
 import { initDashboardAuth, toast, getPublicCode } from './js/dashboard-shared.js';
+import { initPrices } from './js/prices.js';
+initPrices();
 import { auth, db } from './js/dashboard-shared.js';
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -465,6 +468,7 @@ window.saveProfile = async () => {
       phone:     document.getElementById('e-phone').value.trim(),
       email:     document.getElementById('e-email').value.trim(),
       website:   document.getElementById('e-web').value.trim(),
+      whatsapp:  document.getElementById('e-wa').value.trim(),
       bio:       document.getElementById('e-bio').value.trim(),
       updatedAt: new Date(),
     };
@@ -487,7 +491,6 @@ window.saveLinks = async () => {
       facebook:  document.getElementById('l-fb').value.trim(),
       youtube:   document.getElementById('l-yt').value.trim(),
       twitter:   document.getElementById('l-tw').value.trim(),
-      whatsapp:  document.getElementById('l-wa').value.trim(),
       updatedAt: new Date(),
     };
     await updateDoc(doc(db, 'profiles', lwId), payload);
@@ -580,6 +583,7 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
   ['first', 'last', 'job', 'co', 'phone', 'email'].forEach((k, i) =>
     document.getElementById('e-' + k).value = [p.firstName, p.lastName, p.jobTitle, p.company, p.phone, p.email][i] || '');
   document.getElementById('e-web').value = p.website || '';
+  document.getElementById('e-wa').value  = p.whatsapp || '';
   document.getElementById('e-bio').value = p.bio || '';
 
   if (isPro) {
@@ -595,7 +599,6 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
     document.getElementById('l-fb').value = p.facebook  || '';
     document.getElementById('l-yt').value = p.youtube   || '';
     document.getElementById('l-tw').value = p.twitter   || '';
-    document.getElementById('l-wa').value = p.whatsapp  || '';
 
     document.getElementById('extras-sec').style.display = 'block';
 

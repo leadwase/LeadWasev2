@@ -178,3 +178,7 @@ a{text-decoration:none;color:inherit}
 @media(max-width:560px){
   .clients-grid { grid-template-columns: 1fr; max-width: 340px; }
 }
+
+/* Prix dynamiques (js/prices.js) : masqués jusqu'à la réponse de l'API pour ne jamais montrer un ancien prix */
+data[data-price]{display:inline}
+html:not(.prices-ready) data[data-price]{visibility:hidden}
