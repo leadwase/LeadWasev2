@@ -9,7 +9,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{overflow-x:hidden;max-width:100%}
-body{font-family:var(--serif);background:var(--white);color:var(--black);min-height:100vh;overflow-x:hidden;max-width:100%}
+body{font-family:var(--serif);background:var(--white);color:var(--black);min-height:100vh;overflow-x:hidden;overflow-x:clip;max-width:100%}
 img,video,iframe,table{max-width:100%}
 a{text-decoration:none;color:inherit}
 
@@ -182,3 +182,8 @@ a{text-decoration:none;color:inherit}
 /* Prix dynamiques (js/prices.js) : masqués jusqu'à la réponse de l'API pour ne jamais montrer un ancien prix */
 data[data-price]{display:inline}
 html:not(.prices-ready) data[data-price]{visibility:hidden}
+
+/* Header collant : le conteneur injecté (#site-header) reste fixé en haut pendant le défilement.
+   (overflow-x:clip sur body évite d'en faire un conteneur de défilement, ce qui casserait sticky.) */
+#site-header{position:sticky;top:0;z-index:100}
+html{scroll-padding-top:72px}

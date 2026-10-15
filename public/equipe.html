@@ -316,11 +316,11 @@ function orderQty() {
 }
 function refreshOrderTotals() {
   const q = orderQty(), err = document.getElementById('order-err'), btn = document.getElementById('order-pay-btn');
-  document.getElementById('order-unit').textContent  = pricePerCard ? fmtFCFA(pricePerCard) : 'non défini';
-  document.getElementById('order-total').textContent = pricePerCard && q >= 1 ? fmtFCFA(pricePerCard * q) : '–';
+  document.getElementById('order-unit').textContent  = pricePerCard ? fmtFCFA(pricePerCard) : 'Sur devis';
+  document.getElementById('order-total').textContent = pricePerCard ? (q >= 1 ? fmtFCFA(pricePerCard * q) : '–') : 'À définir';
   err.textContent = '';
   btn.disabled = false;
-  if (!pricePerCard) { err.textContent = 'Le prix par carte de votre équipe n\u2019est pas défini. Contactez le support.'; btn.disabled = true; }
+  if (!pricePerCard) { err.textContent = 'Le prix par carte est établi sur devis pour votre équipe. Contactez le support pour recevoir votre devis.'; btn.disabled = true; }
   else if (q < 1 || q > maxExtraCards) { err.textContent = `Choisissez entre 1 et ${maxExtraCards} cartes.`; btn.disabled = true; }
 }
 function openOrderModal() {
