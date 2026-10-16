@@ -160,3 +160,6 @@
 
 /* Prix chargés depuis l'admin : masqués jusqu'à la réponse de l'API */
 html:not(.prices-ready) #price-pro, html:not(.prices-ready) #price-business { visibility: hidden; }
+
+/* Évite d'afficher un instant les mauvais tarifs avant de connaître le type de compte */
+html:not(.plans-ready) .plans-grid { visibility: hidden; }

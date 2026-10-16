@@ -86,6 +86,23 @@ export function promptDialog(message, { defaultValue = '', okLabel = 'Enregistre
   });
 }
 
+// ── Lien public opaque (/p/<slug>) ───────────────────────────────────────────
+// L'identifiant de connexion n'apparaît jamais dans une URL : tous les liens « profil public »
+// (balise portant data-public-link) sont renseignés avec le lien opaque dès qu'il est connu.
+export function applyPublicLink(url) {
+  window.__publicUrl = url;
+  document.querySelectorAll('[data-public-link]').forEach(a => { a.href = url; });
+  document.dispatchEvent(new CustomEvent('public-link-ready', { detail: url }));
+}
+async function loadPublicLink(user, lwId) {
+  try {
+    const token = await user.getIdToken();
+    const r = await fetch(`/api/profile/${encodeURIComponent(lwId)}?action=public-link`, { headers: { Authorization: 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.success && d.url) applyPublicLink(d.url);
+  } catch (e) { console.warn('[public-link]', e.message); }
+}
+
 // ── Code public (masqué) ─────────────────────────────────────────────────────
 export function getPublicCode(lwId) {
   if (!lwId) return 'LW-????';
@@ -168,6 +185,7 @@ export function initDashboardAuth(onReady) {
     document.getElementById('sb-name').textContent = (p.firstName || '') + ' ' + (p.lastName || '');
     document.getElementById('sb-plan').textContent = planFinal.toUpperCase();
     renderUserSidebar({ lwId, plan: planFinal, isTeamOwner: !!p.isTeamOwner });
+    loadPublicLink(user, lwId);
 
     let currentLoginEmail = user.email;
     try {

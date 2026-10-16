@@ -2,7 +2,7 @@
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
 
 export default async function handler(req, res) {
-  setCors(res);
+  setCors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
     await verifyAdmin(req);

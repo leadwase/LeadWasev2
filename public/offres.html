@@ -4,7 +4,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Offres — LeadWase</title>
+<title>Tarifs — LeadWase</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/plans.css">
 </head>
@@ -13,13 +13,14 @@
 
 <div style="background:var(--off)">
   <div class="offers-hero">
-    <h1 class="offers-h1">Choisissez votre <em>offre</em></h1>
-    <p class="offers-sub">Débloquez instantanément les fonctionnalités dès confirmation du paiement. Sans engagement.</p>
+    <h1 class="offers-h1" id="offers-h1">Choisissez votre <em>offre</em></h1>
+    <p class="offers-sub" id="offers-sub">Débloquez instantanément les fonctionnalités dès confirmation du paiement. Sans engagement.</p>
   </div>
 
   <div class="plans-intro">
-    <h2>Plans d'abonnement</h2>
-    <p>Débloquez plus de fonctionnalités pour votre profil LeadWase.<br>Paiement Mobile Money accepté · Résiliable à tout moment.</p>
+    <h2 id="plans-intro-h2">Plans d'abonnement</h2>
+    <p id="plans-intro-p">Débloquez plus de fonctionnalités pour votre profil LeadWase.<br>Paiement Mobile Money accepté · Résiliable à tout moment.</p>
+    <p id="b2b-teaser" style="margin-top:10px;font-size:14px">Vous êtes une entreprise ? <a href="commander.html" style="color:var(--green);font-weight:600;text-decoration:underline">Découvrez nos tarifs B2B pour vos équipes</a></p>
   </div>
 
   <!-- Bannière : utilisateur non connecté -->
@@ -51,7 +52,7 @@
     </div>
   </div>
 
-  <div class="plans-grid">
+  <div class="plans-grid" id="plans-standard">
     <div class="plan-col">
       <div class="plan-name">Free</div>
       <div class="plan-price">0 <small>XOF</small></div>
@@ -130,6 +131,48 @@
     </div>
   </div>
 
+  <!-- Forfaits entreprises (B2B) : visibles uniquement pour un compte entreprise connecté -->
+  <div class="plans-grid" id="plans-b2b" style="display:none">
+    <div class="plan-col">
+      <div class="plan-name">Pro — Entreprise</div>
+      <div class="plan-price"><data data-price="b2bPro">5 500</data> <small>FCFA</small></div>
+      <div class="plan-period">par carte employé · par an</div>
+      <p class="plan-desc">Pour équiper chaque collaborateur d'un profil professionnel complet.</p>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Support prioritaire</li>
+        <li><span class="ck">✗</span>Localisation</li>
+      </ul>
+      <a class="plan-btn filled" href="equipe.html" style="text-align:center;display:block;text-decoration:none">Gérer mon équipe →</a>
+    </div>
+    <div class="plan-col">
+      <div class="plan-name">Business — Entreprise</div>
+      <div class="plan-price"><data data-price="b2bBusiness">7 500</data> <small>FCFA</small></div>
+      <div class="plan-period">par carte employé · par an</div>
+      <p class="plan-desc">Pour les équipes commerciales qui veulent le CRM, la prise de rendez-vous et tout maîtriser.</p>
+      <ul class="plan-features">
+        <li><span class="ck">✓</span>Profil</li>
+        <li><span class="ck">✓</span>Personnalisation et Modification</li>
+        <li><span class="ck">✓</span>Réseaux sociaux</li>
+        <li><span class="ck">✓</span>CRM dynamique</li>
+        <li><span class="ck">✓</span>Photo de profil</li>
+        <li><span class="ck">✓</span>Analytics</li>
+        <li><span class="ck">✓</span>Lien de votre site</li>
+        <li><span class="ck">✓</span>Formulaire de contact</li>
+        <li><span class="ck">✓</span>Prise de rendez-vous</li>
+        <li><span class="ck">✓</span>Avis Google</li>
+        <li><span class="ck">✓</span>Localisation</li>
+        <li><span class="ck">✓</span>Support prioritaire</li>
+      </ul>
+      <a class="plan-btn outline" href="equipe.html" style="text-align:center;display:block;text-decoration:none">Gérer mon équipe →</a>
+    </div>
+  </div>
+
   <div class="compare-wrap">
     <div class="compare-title">Comparaison détaillée</div>
     <div class="compare-scroll">
@@ -175,7 +218,7 @@
 
 <script type="module">
 import { auth, db } from './js/firebase-config.js';
-import { loadPrices } from './js/prices.js';
+import { loadPrices, applyPrices } from './js/prices.js';
 import { onAuthStateChanged, getIdToken }                          from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, collection, query, where, getDocs, limit }  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -191,6 +234,23 @@ const loginBanner  = document.getElementById('login-banner');
 const carteBanner  = document.getElementById('carte-banner');
 // Le lien "Connexion" ⇄ "Mon profil" du header est géré par js/include-layout.js
 // (le header est injecté de façon asynchrone, donc on ne le référence pas ici).
+
+// ── Tarifs standard OU tarifs entreprises (B2B), jamais les deux ──────────────
+// Compte entreprise (chef d'équipe ou employé d'une équipe) → uniquement les forfaits B2B.
+// Tous les autres visiteurs / utilisateurs → uniquement les forfaits standard.
+function showTariffs(isB2B) {
+  document.getElementById('plans-standard').style.display = isB2B ? 'none' : '';
+  document.getElementById('plans-b2b').style.display      = isB2B ? '' : 'none';
+  document.getElementById('b2b-teaser').style.display     = isB2B ? 'none' : '';
+  if (isB2B) {
+    document.getElementById('offers-h1').innerHTML = 'Tarifs <em>entreprises</em>';
+    document.getElementById('offers-sub').textContent = 'Abonnements annuels par carte employé, pour les équipes LeadWase.';
+    document.getElementById('plans-intro-h2').textContent = 'Forfaits entreprises (B2B)';
+    document.getElementById('plans-intro-p').innerHTML = 'Prix par carte employé et par an.<br>Pour modifier le forfait de votre équipe, rendez-vous dans « Mon équipe ».';
+  }
+  document.documentElement.classList.add('plans-ready');
+}
+setTimeout(() => document.documentElement.classList.add('plans-ready'), 3000);
 
 // ── Grise les boutons payants et affiche la bonne bannière ───────────────────
 function lockPlans(reason) {
@@ -257,6 +317,7 @@ onAuthStateChanged(auth, async user => {
     // ── Non connecté ──────────────────────────────────────────────────────
     currentUser  = null;
     userHasCarte = false;
+    showTariffs(false);
     lockPlans('not_logged');
     return;
   }
@@ -273,7 +334,11 @@ const [profilesSnap, hasCarte] = await Promise.all([
 
 userHasCarte = hasCarte; // ← cette ligne manque !
 
-const userPlan = !profilesSnap.empty ? (profilesSnap.docs[0].data()?.plan || 'free') : 'free';
+const myProfile = !profilesSnap.empty ? profilesSnap.docs[0].data() : {};
+const userPlan = myProfile.plan || 'free';
+const isB2B = myProfile.isTeamOwner === true || !!myProfile.parentLeadwaseId;
+showTariffs(isB2B);
+if (isB2B) { loginBanner.classList.remove('visible'); carteBanner.classList.remove('visible'); return; }
 
   if (!hasCarte) {
     // Connecté mais pas de carte → griser + bannière carte
@@ -339,7 +404,7 @@ loadPrices().then(prices => {
   if (prices) { BASE_PRICES.pro = prices.pro; BASE_PRICES.business = prices.business; }
   updatePlanDisplay('pro');
   updatePlanDisplay('business');
-  document.documentElement.classList.add('prices-ready');
+  applyPrices(prices);   // prix B2B (data-price) + levée du masquage
 });
 
 // ── Fonction subscribe ────────────────────────────────────────────────────────

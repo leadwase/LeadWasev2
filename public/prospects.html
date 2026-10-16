@@ -16,7 +16,7 @@
   <div style="font-size:55px">📇</div>
   <h2>Mes Prospects réservé aux abonnés Business</h2>
   <p>Passez à l'offre Business pour collecter et gérer les contacts capturés via votre carte NFC.</p>
-  <a href="offres.html">Voir les offres</a>
+  <a href="offres.html">Voir les tarifs</a>
 </div>
 
 <!-- MOBILE TOPBAR -->
@@ -60,7 +60,7 @@
           <div class="pros-actions">
             <button class="pros-btn" id="capture-link-btn" title="Page publique de capture de leads, utilisable hors carte NFC">🔗 Lien de capture</button>
             <button class="pros-btn" id="export-csv-btn">📤 Exporter CSV</button>
-            <a class="pros-btn primary" id="view-profile-btn" href="#" target="_blank" rel="noopener">🪪 Voir mon profil</a>
+            <a class="pros-btn primary" id="view-profile-btn" data-public-link href="#" target="_blank" rel="noopener">🪪 Voir mon profil</a>
           </div>
         </div>
 
@@ -777,7 +777,6 @@ initDashboardAuth(async ({ lwId: id, isBusiness }) => {
     return;
   }
   lwId = id;
-  document.getElementById('view-profile-btn').href = 'profil.html?id=' + lwId;
   await loadProspects();
   loadTasks();
   loadQuotes();
@@ -1232,7 +1231,9 @@ async function loadCampaigns() {
 
 // ── Lien de capture (formulaire public réutilisable hors profil NFC) ──────────
 document.getElementById('capture-link-btn').addEventListener('click', async () => {
-  const url = `${location.origin}/capture.html?id=${encodeURIComponent(lwId)}`;
+  const slug = (window.__publicUrl || '').split('/p/')[1];
+  if (!slug) { toast('Lien en cours de préparation, réessayez dans un instant', 'error'); return; }
+  const url = `${location.origin}/capture.html?c=${encodeURIComponent(slug)}`;
   try {
     await navigator.clipboard.writeText(url);
     toast('Lien de capture copié', 'success');

@@ -206,13 +206,12 @@
 import { auth, db } from './js/firebase-config.js';
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
   updatePassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ── État interne reset ────────────────────────────────────────────────────────
 let _resetUser  = null;
@@ -253,56 +252,31 @@ async function signInAndSyncUid(id, pwd) {
 
   try {
     userCredential = await signInWithEmailAndPassword(auth, email, pwd);
-  } catch {
-    // Fallback : vérif passwordHash dans Firestore credentials
-    // À ce stade on n'est pas encore authentifié → lecture publique impossible
-    // On utilise la règle :
-    //   request.auth.token.email == leadwaseId.lower() + '@leadwase.internal'
-    // Mais on n'est pas auth → on ne peut pas lire credentials directement.
-    // Solution : créer/connexion Auth d'abord via le hash stocké côté admin.
-    // Si le compte Auth n'existe pas encore, on le crée avec le mot de passe fourni
-    // après avoir validé le hash via une Cloud Function ou... on accepte l'approche
-    // bootstrap : on tente createUser, si ça marche le hash était bon côté admin.
-    // Fallback réel : on lit credentials SANS auth uniquement si la règle le permet.
-    // Ici on contourne en tentant une création → si le compte existait déjà on re-login.
+  } catch (signErr) {
+    // Compte pas encore activé (première connexion avec le mot de passe remis au client) ?
+    // L'activation est vérifiée CÔTÉ SERVEUR : le mot de passe doit correspondre à celui remis au client.
+    // (Avant, le navigateur créait lui-même le compte avec n'importe quel mot de passe : faille supprimée.)
+    let activation;
     try {
-      userCredential = await createUserWithEmailAndPassword(auth, email, pwd);
-      // Écrit users/{uid} séparément : les règles Firestore n'autorisent la création
-      // de ce document qu'à un admin, donc un échec ici ne doit JAMAIS faire échouer
-      // la connexion elle-même (le compte Auth est déjà créé à ce stade).
-      try {
-        await setDoc(doc(db, 'users', userCredential.user.uid),
-          { leadwaseId: id, plan: 'free', role: 'user', createdAt: new Date() },
-          { merge: true });
-      } catch (usersDocErr) {
-        console.warn('[login] écriture users/{uid} ignorée (permissions) :', usersDocErr.code);
-      }
-    } catch (createErr) {
-      console.error('[login] createUser a échoué:', createErr.code, createErr.message);
-      if (createErr.code === 'auth/email-already-in-use') {
-        // Compte existant mais mauvais mot de passe → erreur authentification
-        throw new Error('Identifiant ou mot de passe incorrect.');
-      }
-      throw new Error('Identifiant introuvable ou mot de passe incorrect.');
+      const r = await fetch(`/api/profile/${encodeURIComponent(id)}?action=activate-account`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwd }),
+      });
+      activation = { status: r.status, body: await r.json().catch(() => ({})) };
+    } catch (_) {
+      throw new Error('Connexion impossible, vérifiez votre réseau et réessayez.');
+    }
+    if (activation.status === 429) throw new Error(activation.body.error || 'Trop de tentatives. Réessayez dans quelques minutes.');
+    if (!activation.body.success) throw new Error(activation.body.error || 'Identifiant ou mot de passe incorrect.');
+    try {
+      userCredential = await signInWithEmailAndPassword(auth, email, pwd);
+    } catch (_) {
+      throw new Error('Identifiant ou mot de passe incorrect.');
     }
   }
 
   const user = userCredential.user;
-
-  // ── Écriture de firebaseUid dans le profil ─────────────────────────────────
-  // Ceci est la clé : profiles/{lwId}.firebaseUid = user.uid
-  // Une fois écrit, les règles Firestore credentials autorisent
-  // read/write pour ce user via resource.data.firebaseUid == request.auth.uid
-  // La règle profiles autorise update si resource.data.firebaseUid == request.auth.uid
-  // Mais au tout premier appel, firebaseUid n'existe pas encore → on utilise allow create: if true
-  try {
-    await setDoc(doc(db, 'profiles', id),
-      { firebaseUid: user.uid },
-      { merge: true });
-  } catch (_) {
-    // Peut échouer si la règle update l'interdit (firebaseUid déjà différent)
-    // Ce cas ne doit pas bloquer la connexion
-  }
 
   // ── Compte désactivé par l'admin → refuse la connexion ──────────────────────
   try {
@@ -427,17 +401,14 @@ window.doChangePassword = async () => {
     // 1. Mise à jour Firebase Auth
     await updatePassword(_resetUser, newPwd);
 
-    // 2. Mise à jour Firestore credentials (passwordHash)
-    //    À ce stade _resetUser est authentifié et profiles/{lwId}.firebaseUid
-    //    est synchronisé → la règle credentials autorise le write
+    // 2. Le mot de passe n'est JAMAIS recopié dans la base : on efface seulement le mot de passe
+    //    initial remis à la livraison (appel serveur authentifié, non bloquant).
     try {
-      await setDoc(doc(db, 'credentials', _resetLwId),
-        { passwordHash: newPwd, updatedAt: new Date() },
-        { merge: true });
-    } catch (fe) {
-      // Non bloquant : Auth est déjà mis à jour, c'est l'essentiel
-      console.warn('Firestore credentials non mis à jour :', fe.message);
-    }
+      const idToken = await _resetUser.getIdToken();
+      await fetch(`/api/profile/${encodeURIComponent(_resetLwId)}?action=password-changed`, {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken, 'Content-Type': 'application/json' }, body: '{}',
+      });
+    } catch (fe) { console.warn('Effacement du mot de passe initial non effectué :', fe.message); }
 
     goToStep(3);
   } catch (e) {

@@ -262,7 +262,7 @@ function renderTable() {
       <td>
         <div class="pros-act">
           <button class="pros-act-btn" title="Modifier" onclick="editMember('${m.leadwaseId}')">✏️</button>
-          <button class="pros-act-btn" title="Voir le profil public" onclick="window.open('profil.html?id=${m.leadwaseId}','_blank')">🔗</button>
+          <button class="pros-act-btn" title="Voir le profil public" onclick="window.open('/p/${esc(m.publicSlug)}','_blank')">🔗</button>
           <button class="pros-act-btn del" title="Régénérer le mot de passe" onclick="regenPassword('${m.leadwaseId}')">🔄</button>
         </div>
       </td>
@@ -320,8 +320,9 @@ function refreshOrderTotals() {
   document.getElementById('order-total').textContent = pricePerCard ? (q >= 1 ? fmtFCFA(pricePerCard * q) : '–') : 'À définir';
   err.textContent = '';
   btn.disabled = false;
-  if (!pricePerCard) { err.textContent = 'Le prix par carte est établi sur devis pour votre équipe. Contactez le support pour recevoir votre devis.'; btn.disabled = true; }
-  else if (q < 1 || q > maxExtraCards) { err.textContent = `Choisissez entre 1 et ${maxExtraCards} cartes.`; btn.disabled = true; }
+  // Sans prix négocié, le bouton devient « Demander un devis » (le paiement en ligne n'est pas possible).
+  btn.textContent = pricePerCard ? 'Payer maintenant' : 'Demander un devis';
+  if (q < 1 || q > maxExtraCards) { err.textContent = `Choisissez entre 1 et ${maxExtraCards} cartes.`; btn.disabled = true; }
 }
 function openOrderModal() {
   document.getElementById('order-qty').value = 1;
@@ -335,15 +336,22 @@ document.getElementById('order-overlay').addEventListener('click', e => { if (e.
 document.getElementById('order-pay-btn').addEventListener('click', async () => {
   const btn = document.getElementById('order-pay-btn'), err = document.getElementById('order-err');
   const quantity = orderQty();
+  const quoteMode = !pricePerCard;
   err.textContent = '';
-  btn.disabled = true; btn.textContent = 'Redirection vers le paiement...';
+  btn.disabled = true; btn.textContent = quoteMode ? 'Envoi de la demande...' : 'Redirection vers le paiement...';
   try {
-    const d = await api('buy-extra-card', { method: 'POST', body: JSON.stringify({ quantity }) });
+    const d = await api(quoteMode ? 'request-team-quote' : 'buy-extra-card', { method: 'POST', body: JSON.stringify({ quantity }) });
     if (!d.success) throw new Error(d.error || 'Erreur inconnue');
+    if (quoteMode) {
+      document.getElementById('order-overlay').classList.remove('open');
+      toast('Demande de devis envoyée : nous vous répondons rapidement par email.', 'success');
+      btn.disabled = false; btn.textContent = 'Demander un devis';
+      return;
+    }
     window.location.href = d.payUrl;
   } catch (e) {
     err.textContent = e.message;
-    btn.disabled = false; btn.textContent = 'Payer maintenant';
+    btn.disabled = false; btn.textContent = quoteMode ? 'Demander un devis' : 'Payer maintenant';
   }
 });
 

@@ -124,6 +124,41 @@
             </div>
           </div>
 
+          <!-- Tarifs Abonnements entreprises (B2B) -->
+          <div class="settings-grid">
+            <div class="settings-card">
+              <div class="settings-card-head">
+                <h3>🏢 Tarifs — Abonnements entreprises (B2B)</h3>
+              </div>
+              <div class="settings-body">
+                <div class="settings-info-box">
+                  <strong>💡 Prix annuel par carte employé</strong>
+                  Affichés dans la liste « Forfait souhaité » de la page Commander (carte B2B) et sur la page Tarifs pour les entreprises. Le montant total est calculé automatiquement selon le nombre de cartes.
+                </div>
+                <div class="price-row">
+                  <div class="price-info">
+                    <div class="price-name">Pro — entreprise</div>
+                    <div class="price-desc">Abonnement annuel par carte employé</div>
+                  </div>
+                  <div class="price-input-wrap">
+                    <input type="number" id="price-b2b-pro" class="price-input" placeholder="5500" min="0" step="100">
+                    <span class="price-currency">FCFA/an</span>
+                  </div>
+                </div>
+                <div class="price-row">
+                  <div class="price-info">
+                    <div class="price-name">Business — entreprise</div>
+                    <div class="price-desc">Abonnement annuel par carte employé</div>
+                  </div>
+                  <div class="price-input-wrap">
+                    <input type="number" id="price-b2b-business" class="price-input" placeholder="7500" min="0" step="100">
+                    <span class="price-currency">FCFA/an</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Bouton global de sauvegarde -->
           <div class="settings-card" style="max-width:500px">
             <div class="settings-card-head"><h3>⚡ Sauvegarder les prix</h3></div>
@@ -163,13 +198,17 @@ async function loadPrices() {
     document.getElementById('price-classic').value  = prices.classic  || 25000;
     document.getElementById('price-pro').value      = prices.pro      || 3500;
     document.getElementById('price-business').value = prices.business || 9900;
+    document.getElementById('price-b2b-pro').value      = prices.b2bPro      || 5500;
+    document.getElementById('price-b2b-business').value = prices.b2bBusiness || 7500;
     updatePricesPreview(prices);
   } catch(e) {
     console.error('Erreur chargement prix:', e);
     document.getElementById('price-classic').value  = 25000;
     document.getElementById('price-pro').value      = 3500;
     document.getElementById('price-business').value = 9900;
-    updatePricesPreview({ classic:25000, pro:3500, business:9900 });
+    document.getElementById('price-b2b-pro').value      = 5500;
+    document.getElementById('price-b2b-business').value = 7500;
+    updatePricesPreview({ classic:25000, pro:3500, business:9900, b2bPro:5500, b2bBusiness:7500 });
   }
 }
 
@@ -178,7 +217,8 @@ function updatePricesPreview(prices) {
   const c = prices.classic  ? fmtNum(prices.classic)  : '25 000';
   const r = prices.pro      ? fmtNum(prices.pro)       : '3 500';
   const b = prices.business ? fmtNum(prices.business)  : '9 900';
-  p.innerHTML = `Classique : <strong>${c} FCFA</strong> &nbsp;|&nbsp; Pro : <strong>${r} FCFA/mois</strong> &nbsp;|&nbsp; Business : <strong>${b} FCFA/mois</strong>`;
+  p.innerHTML = `Classique : <strong>${c} FCFA</strong> &nbsp;|&nbsp; Pro : <strong>${r} FCFA/mois</strong> &nbsp;|&nbsp; Business : <strong>${b} FCFA/mois</strong>` +
+    `<br>B2B (par carte) : Pro <strong>${fmtNum(prices.b2bPro || 5500)} FCFA/an</strong> &nbsp;|&nbsp; Business <strong>${fmtNum(prices.b2bBusiness || 7500)} FCFA/an</strong>`;
   // Ces labels vivent sur la page Tableau de bord : on les met à jour seulement s'ils sont présents.
   const proLabel = document.getElementById('sub-pro-price-label');
   const bizLabel = document.getElementById('sub-business-price-label');
@@ -192,8 +232,10 @@ window.savePrices = async () => {
   const classic  = parseInt(document.getElementById('price-classic').value)  || 0;
   const pro      = parseInt(document.getElementById('price-pro').value)      || 0;
   const business = parseInt(document.getElementById('price-business').value) || 0;
+  const b2bPro      = parseInt(document.getElementById('price-b2b-pro').value)      || 0;
+  const b2bBusiness = parseInt(document.getElementById('price-b2b-business').value) || 0;
 
-  if (classic <= 0 || pro <= 0 || business <= 0) {
+  if (classic <= 0 || pro <= 0 || business <= 0 || b2bPro <= 0 || b2bBusiness <= 0) {
     msg.textContent = '⚠️ Tous les prix doivent être supérieurs à 0.';
     msg.className   = 'save-msg err';
     return;
@@ -207,7 +249,7 @@ window.savePrices = async () => {
   try {
     const d = await api('settings-prices', {
       method: 'POST',
-      body: JSON.stringify({ prices: { classic, pro, business } }),
+      body: JSON.stringify({ prices: { classic, pro, business, b2bPro, b2bBusiness } }),
     });
     if (d.success) {
       msg.textContent = '✅ Prix mis à jour avec succès !';

@@ -125,11 +125,13 @@
           <div class="f-group"><label class="f-label">Nom de l'entreprise *</label><input class="f-input" id="b2b-company" placeholder="Ex : AMANI Consulting"></div>
           <div class="f-group"><label class="f-label">Nombre de cartes *</label>
             <select class="f-input" id="b2b-qty">
-              <option>10 – 25 cartes</option>
-              <option>26 – 50 cartes</option>
-              <option>51 – 100 cartes</option>
-              <option>100+ cartes</option>
+              <option value="10 – 25 cartes">10 – 25 cartes</option>
+              <option value="26 – 50 cartes">26 – 50 cartes</option>
+              <option value="51 – 100 cartes">51 – 100 cartes</option>
+              <option value="100+ cartes">100+ cartes</option>
+              <option value="custom">Autre nombre (je le saisis)</option>
             </select>
+            <input class="f-input" id="b2b-qty-custom" type="number" min="1" max="100000" step="1" inputmode="numeric" placeholder="Saisissez le nombre exact de cartes" style="display:none;margin-top:8px">
           </div>
         </div>
         <div class="form-row">
@@ -151,6 +153,7 @@
               <option value="pro">Pro</option>
               <option value="business">Business</option>
             </select>
+            <div id="b2b-plan-estimate" style="font-size:13px;color:var(--gray3);margin-top:8px;line-height:1.5"></div>
           </div>
         </div>
 
@@ -385,19 +388,73 @@
     }
   });
 
+  // ── Tarifs entreprises (abonnements B2B, prix annuel par carte) ─────────────
+  // Valeurs de repli ; remplacées par celles de Admin → Paramètres dès que l'API répond.
+  let B2B_PRICES = { pro: 5500, business: 7500 };
+  const fmtN = (n) => Math.round(n).toLocaleString('fr-FR');
+
+  // Quantité saisie : { exact } si nombre précis, { min, max } si fourchette (max null si « 100+ »).
+  function b2bQuantity() {
+    const v = document.getElementById('b2b-qty').value;
+    if (v === 'custom') {
+      const n = parseInt(document.getElementById('b2b-qty-custom').value, 10);
+      return Number.isInteger(n) && n >= 1 && n <= 100000 ? { exact: n } : null;
+    }
+    const range = v.match(/(\d+)\s*[–-]\s*(\d+)/);
+    if (range) return { min: +range[1], max: +range[2] };
+    const plus = v.match(/(\d+)\+/);
+    return plus ? { min: +plus[1], max: null } : null;
+  }
+
+  function refreshB2BPlans() {
+    const sel = document.getElementById('b2b-plan');
+    const labels = { free: 'Free — inclus avec la carte',
+      pro: `Pro — ${fmtN(B2B_PRICES.pro)} FCFA / an par carte`,
+      business: `Business — ${fmtN(B2B_PRICES.business)} FCFA / an par carte` };
+    [...sel.options].forEach(o => { if (labels[o.value]) o.textContent = labels[o.value]; });
+
+    const est = document.getElementById('b2b-plan-estimate');
+    const unit = B2B_PRICES[sel.value];
+    const q = b2bQuantity();
+    if (!unit) { est.textContent = ''; return; }
+    if (!q) { est.textContent = `Abonnement annuel : ${fmtN(unit)} FCFA par carte.`; return; }
+    if (q.exact) est.innerHTML = `Estimation : <strong>${q.exact.toLocaleString('fr-FR')} × ${fmtN(unit)} = ${fmtN(q.exact * unit)} FCFA / an</strong> (devis final établi par notre équipe).`;
+    else if (q.max) est.innerHTML = `Estimation : <strong>${fmtN(q.min * unit)} à ${fmtN(q.max * unit)} FCFA / an</strong> (${fmtN(unit)} FCFA par carte).`;
+    else est.innerHTML = `Estimation : <strong>à partir de ${fmtN(q.min * unit)} FCFA / an</strong> (${fmtN(unit)} FCFA par carte).`;
+  }
+  window.setB2BPrices = (prices) => {
+    if (prices && prices.b2bPro > 0) B2B_PRICES.pro = prices.b2bPro;
+    if (prices && prices.b2bBusiness > 0) B2B_PRICES.business = prices.b2bBusiness;
+    refreshB2BPlans();
+  };
+  document.getElementById('b2b-qty').addEventListener('change', () => {
+    const custom = document.getElementById('b2b-qty-custom');
+    custom.style.display = document.getElementById('b2b-qty').value === 'custom' ? 'block' : 'none';
+    if (custom.style.display === 'block') custom.focus();
+    refreshB2BPlans();
+  });
+  document.getElementById('b2b-qty-custom').addEventListener('input', refreshB2BPlans);
+  document.getElementById('b2b-plan').addEventListener('change', refreshB2BPlans);
+  refreshB2BPlans();
+
   // ── Demande B2B ───────────────────────────────────────────────
   async function submitB2B() {
     const company = document.getElementById('b2b-company').value.trim();
     const name    = document.getElementById('b2b-name').value.trim();
     const email   = document.getElementById('b2b-email').value.trim();
     const phone   = document.getElementById('b2b-phone').value.trim();
-    const qty     = document.getElementById('b2b-qty').value;
+    let qty       = document.getElementById('b2b-qty').value;
     const desc    = document.getElementById('b2b-desc').value.trim();
     const subPlan = document.getElementById('b2b-plan').value;
 
     if (!company || !name || !email) {
       showPopup('⚠️', 'Champs manquants', 'Veuillez renseigner l\'entreprise, le responsable et l\'email.', null);
       return;
+    }
+    if (qty === 'custom') {
+      const q = b2bQuantity();
+      if (!q) { showPopup('⚠️', 'Nombre de cartes', 'Saisissez un nombre de cartes valide (entier entre 1 et 100 000).', null); return; }
+      qty = `${q.exact} cartes`;
     }
 
     const btn = document.getElementById('b2b-btn');
@@ -432,7 +489,7 @@
           'Référence : ' + (d.orderId ? d.orderId.slice(-6).toUpperCase() : '—')
         );
         // Vider le formulaire
-        ['b2b-company','b2b-name','b2b-phone','b2b-email','b2b-desc'].forEach(id =>
+        ['b2b-company','b2b-name','b2b-phone','b2b-email','b2b-desc','b2b-qty-custom'].forEach(id =>
           document.getElementById(id).value = '');
         b2bEmployees = [];
         renderEmployees();
@@ -455,6 +512,6 @@
   })();
 </script>
 <script type="module" src="js/include-layout.js"></script>
-<script type="module">import { initPrices } from './js/prices.js'; initPrices();</script>
+<script type="module">import { initPrices } from './js/prices.js'; initPrices().then(p => { if (p && window.setB2BPrices) window.setB2BPrices(p); });</script>
 </body>
 </html>

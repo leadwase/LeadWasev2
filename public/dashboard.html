@@ -108,7 +108,7 @@
     <div class="dash" id="content" style="display:none">
       <div class="dash-header">
         <div class="dash-h1">Mon profil</div>
-        <a class="dash-pub" href="#" id="pub-link" target="_blank" rel="noopener">Voir mon profil public →</a>
+        <a class="dash-pub" href="#" id="pub-link" data-public-link target="_blank" rel="noopener">Voir mon profil public →</a>
       </div>
 
 
@@ -325,6 +325,7 @@
 import { initDashboardAuth, toast, getPublicCode } from './js/dashboard-shared.js';
 import { initPrices } from './js/prices.js';
 initPrices();
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 import { auth, db } from './js/dashboard-shared.js';
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -512,8 +513,8 @@ function renderContactFields() {
     return;
   }
   list.innerHTML = contactFields.map(f => `
-    <div class="cf-row" data-id="${f.id}">
-      <input type="text" class="cf-label" placeholder="Nom du champ (ex: Votre nom)" value="${(f.label || '').replace(/"/g, '&quot;')}">
+    <div class="cf-row" data-id="${esc(f.id)}">
+      <input type="text" class="cf-label" placeholder="Nom du champ (ex: Votre nom)" value="${esc(f.label || '')}">
       <select class="cf-type">
         <option value="text" ${f.type === 'text' ? 'selected' : ''}>Texte court</option>
         <option value="email" ${f.type === 'email' ? 'selected' : ''}>Email</option>
@@ -574,7 +575,6 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
   document.getElementById('pf-job').textContent  = p.jobTitle || '';
   document.getElementById('pf-co').textContent   = p.company || '';
   document.getElementById('pf-id').textContent   = getPublicCode(lwId);
-  document.getElementById('pub-link').href = 'profil.html?id=' + lwId;
 
   const pb = document.getElementById('pf-plan');
   pb.textContent = plan.toUpperCase();
@@ -627,7 +627,7 @@ initDashboardAuth(({ p, lwId: id, plan, isPro, isBusiness }) => {
   const photoInput   = document.getElementById('profile-photo');
   const photoPreview = document.getElementById('photo-preview');
   if (p.photoURL) {
-    photoPreview.innerHTML = `<img src="${p.photoURL}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px">`;
+    photoPreview.innerHTML = `<img src="${esc(p.photoURL)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover; margin-top:8px">`;
   }
   photoInput.onchange = async (e) => {
     const file = e.target.files[0];

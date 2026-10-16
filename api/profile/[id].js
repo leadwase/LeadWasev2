@@ -171,6 +171,11 @@ const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'converti', 'perdu
 // POST /api/profile/[id]?action=create-task { title, dueDate?, prospectId? }
 // ── Devis (objet CRM autonome, indépendant de l'achat d'une carte) ────────────
 
+// 1250000 → « 1.250.000 »
+function pdfMoney(n) {
+  return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 function generateQuotePDF({ quoteNumber, date, company, items, total, ownerName, ownerCompany }) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
@@ -195,31 +200,40 @@ function generateQuotePDF({ quoteNumber, date, company, items, total, ownerName,
     doc.fontSize(9).fillColor('#999').font('Helvetica').text('DEVIS POUR', 50, 130);
     doc.fontSize(11).fillColor('#1a1a2e').font('Helvetica-Bold').text(company || '—', 50, 144);
 
+    // Montants : séparateur de milliers « . » (le « espace fine insécable » de toLocaleString n'existe pas dans
+    // la police Helvetica du PDF et s'affichait comme un caractère parasite), et jamais de retour à la ligne.
+    const cols = { desc: { x: 54, w: 215 }, qty: { x: 275, w: 45 }, pu: { x: 325, w: 100 }, tot: { x: 430, w: 112 } };
     const tableTop = 190;
     doc.rect(50, tableTop, pageWidth, 24).fill('#1a1a2e');
     doc.fontSize(9).fillColor('#fff').font('Helvetica-Bold');
-    doc.text('DESCRIPTION', 54, tableTop + 8);
-    doc.text('QTÉ', 350, tableTop + 8, { width: 60, align: 'center' });
-    doc.text('P.U.', 420, tableTop + 8, { width: 60, align: 'right' });
-    doc.text('TOTAL', 490, tableTop + 8, { width: 55, align: 'right' });
+    doc.text('DESCRIPTION', cols.desc.x, tableTop + 8, { width: cols.desc.w, lineBreak: false });
+    doc.text('QTÉ', cols.qty.x, tableTop + 8, { width: cols.qty.w, align: 'center', lineBreak: false });
+    doc.text('P.U. (FCFA)', cols.pu.x, tableTop + 8, { width: cols.pu.w, align: 'right', lineBreak: false });
+    doc.text('TOTAL (FCFA)', cols.tot.x, tableTop + 8, { width: cols.tot.w, align: 'right', lineBreak: false });
 
     let y = tableTop + 24;
     items.forEach((it, i) => {
-      const rowH = 28;
+      doc.fontSize(10).font('Helvetica');
+      const textH = doc.heightOfString(String(it.description), { width: cols.desc.w });
+      const rowH = Math.max(28, Math.ceil(textH) + 16);
+      if (y + rowH > 700) { doc.addPage(); y = 50; }
       if (i % 2 === 0) doc.rect(50, y, pageWidth, rowH).fill('#f7f7fb');
       const lineTotal = it.quantity * it.unitPrice;
-      doc.fontSize(10).fillColor('#1a1a2e').font('Helvetica').text(it.description, 54, y + 9, { width: 280 });
-      doc.fontSize(9).fillColor('#555').text(String(it.quantity), 350, y + 10, { width: 60, align: 'center' });
-      doc.text(`${it.unitPrice.toLocaleString('fr-FR')}`, 420, y + 10, { width: 60, align: 'right' });
-      doc.text(`${lineTotal.toLocaleString('fr-FR')}`, 490, y + 10, { width: 55, align: 'right' });
+      doc.fontSize(10).fillColor('#1a1a2e').font('Helvetica').text(String(it.description), cols.desc.x, y + 8, { width: cols.desc.w });
+      doc.fontSize(9).fillColor('#555');
+      doc.text(String(it.quantity), cols.qty.x, y + 9, { width: cols.qty.w, align: 'center', lineBreak: false });
+      doc.text(pdfMoney(it.unitPrice), cols.pu.x, y + 9, { width: cols.pu.w, align: 'right', lineBreak: false });
+      doc.fillColor('#1a1a2e').font('Helvetica-Bold').text(pdfMoney(lineTotal), cols.tot.x, y + 9, { width: cols.tot.w, align: 'right', lineBreak: false });
       y += rowH;
     });
 
+    if (y + 90 > 740) { doc.addPage(); y = 50; }
     const totY = y + 26;
-    doc.moveTo(350, totY).lineTo(545, totY).strokeColor('#ccc').lineWidth(0.5).stroke();
-    doc.rect(350, totY + 6, 195, 26).fill('#1a1a2e');
-    doc.fontSize(11).fillColor('#fff').font('Helvetica-Bold').text('TOTAL', 354, totY + 14, { width: 125, align: 'right' });
-    doc.text(`${total.toLocaleString('fr-FR')} FCFA`, 490, totY + 14, { width: 55, align: 'right' });
+    doc.moveTo(300, totY).lineTo(545, totY).strokeColor('#ccc').lineWidth(0.5).stroke();
+    doc.rect(300, totY + 6, 245, 30).fill('#1a1a2e');
+    doc.fontSize(11).fillColor('#fff').font('Helvetica-Bold');
+    doc.text('TOTAL', 312, totY + 16, { width: 60, lineBreak: false });
+    doc.text(`${pdfMoney(total)} FCFA`, 372, totY + 16, { width: 165, align: 'right', lineBreak: false });
 
     doc.fontSize(9).fillColor('#999').font('Helvetica')
        .text('Ce devis est valable 30 jours à compter de sa date d\u2019émission.', 50, totY + 60, { align: 'center', width: pageWidth });
@@ -256,7 +270,7 @@ async function createQuote(req, res, leadwaseId) {
     items: cleanItems, total, status: 'draft', createdAt: new Date(),
   });
 
-  if (prospectId) await logActivity(prospectId, 'note', `Devis créé (${quoteNumber}) — ${total.toLocaleString('fr-FR')} FCFA`);
+  if (prospectId) await logActivity(prospectId, 'note', `Devis créé (${quoteNumber}) — ${pdfMoney(total)} FCFA`);
   res.json({ success: true, quoteId: ref.id, quoteNumber });
 }
 
@@ -769,6 +783,7 @@ async function listTeam(req, res, leadwaseId) {
     const p = pDoc.data();
     members.push({
       leadwaseId: mid,
+      publicSlug: await ensurePublicSlug(pDoc.ref, p),
       name: p.firstName || '', email: p.email || '', phone: p.phone || '',
       plan: p.plan || 'free',
       password: cDoc.exists ? (cDoc.data().passwordHash || '') : '',

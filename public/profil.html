@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -995,11 +996,15 @@ svg.icon-lg { width: 22px; height: 22px; }
 </div>
 
 <script type="module">
-import { db, auth } from './js/firebase-config.js';
-import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-const id = new URLSearchParams(window.location.search).get('id');
-if (!id) showErr(); else load(id.toUpperCase());
+// Aucun accès direct à la base depuis cette page : tout passe par l'API (profil filtré, suivi côté serveur).
+// Lien public opaque : /p/<slug>. Les anciens liens ?id=LW-xxxxx (cartes NFC déjà gravées) restent valides :
+// après chargement, l'adresse affichée est réécrite en /p/<slug> pour ne plus montrer l'identifiant.
+// Tout texte venant d'un tiers (avis Google, libellés…) est échappé avant d'entrer dans le HTML.
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pathMatch = window.location.pathname.match(/^\/p\/([a-z2-9]{12})\/?$/);
+const qs = new URLSearchParams(window.location.search);
+const ident = pathMatch ? pathMatch[1] : (qs.get('c') || qs.get('id') || '').trim();
+if (!ident) showErr(); else load(ident);
 
 async function loadGoogleReviews(leadwaseId, fallbackLink) {
   try {
@@ -1021,12 +1026,12 @@ async function loadGoogleReviews(leadwaseId, fallbackLink) {
     document.getElementById('reviews-list').innerHTML = (d.reviews || []).slice(0, 3).map(rv => `
       <div class="review-item">
         <div class="review-item-head">
-          ${rv.profilePhoto ? `<img class="review-item-avatar" src="${rv.profilePhoto}" alt="">` : ''}
-          <span class="review-item-author">${rv.author}</span>
-          <span class="review-item-time">${rv.relativeTime || ''}</span>
+          ${/^https:\/\//.test(rv.profilePhoto || '') ? `<img class="review-item-avatar" src="${esc(rv.profilePhoto)}" alt="">` : ''}
+          <span class="review-item-author">${esc(rv.author)}</span>
+          <span class="review-item-time">${esc(rv.relativeTime || '')}</span>
         </div>
-        <div class="review-item-stars">${'★'.repeat(rv.rating)}${'☆'.repeat(5 - rv.rating)}</div>
-        <div class="review-item-text">${(rv.text || '').replace(/</g, '&lt;')}</div>
+        <div class="review-item-stars">${'★'.repeat(Math.max(0, Math.min(5, Math.round(Number(rv.rating) || 0))))}${'☆'.repeat(5 - Math.max(0, Math.min(5, Math.round(Number(rv.rating) || 0))))}</div>
+        <div class="review-item-text">${esc(rv.text || '')}</div>
       </div>
     `).join('');
     const allLink = document.getElementById('reviews-all-link');
@@ -1053,13 +1058,13 @@ async function recordAnalytics(type, leadwaseId) {
       visitorId = 'vis_' + Math.random().toString(36).slice(2, 15);
       localStorage.setItem('visitor_id', visitorId);
     }
-    const device = /Mobile|Tablet|iPhone|iPad|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
-    const source = document.referrer ? new URL(document.referrer).hostname : 'Direct';
-    await setDoc(doc(db, 'analytics', leadwaseId, 'visits', new Date().toISOString()), {
-      visitedAt: serverTimestamp(),
-      type, device, source,
-      country: 'Inconnu',
-      visitorId
+    let source = 'Direct';
+    try { if (document.referrer) source = new URL(document.referrer).hostname || 'Direct'; } catch (_) {}
+    await fetch(`/api/profile/${encodeURIComponent(leadwaseId)}?action=track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, visitorId, source }),
+      keepalive: true,
     });
   } catch(e) { console.error('Analytics:', e); }
 }
@@ -1100,12 +1105,17 @@ function makeLink(href, icon, label, brand, leadwaseId, clickType) {
   return a;
 }
 
-async function load(leadwaseId) {
+async function load(ident) {
   try {
-    const snap = await getDoc(doc(db, 'profiles', leadwaseId));
-    if (!snap.exists()) { showErr(); return; }
-
-    const p = snap.data();
+    const res = await fetch(`/api/profile/${encodeURIComponent(ident)}`);
+    if (!res.ok) { showErr(); return; }
+    const data = await res.json();
+    if (!data.success || !data.profile || !data.slug) { showErr(); return; }
+    const p = data.profile;
+    const leadwaseId = data.slug;   // identifiant public opaque : seul identifiant manipulé par cette page
+    if (window.location.pathname !== `/p/${leadwaseId}`) {
+      try { history.replaceState(null, '', `/p/${leadwaseId}`); } catch (_) {}
+    }
     const isPro     = ['pro','business'].includes(p.plan);
     const isBusiness = p.plan === 'business';
 
@@ -1235,9 +1245,9 @@ async function load(leadwaseId) {
         const fieldsWrap = document.getElementById('contact-form-fields');
         fieldsWrap.innerHTML = p.contactFields.map(f => {
           const inputEl = f.type === 'textarea'
-            ? `<textarea id="cf-${f.id}" rows="3" ${f.required ? 'required' : ''}></textarea>`
-            : `<input id="cf-${f.id}" type="${f.type === 'email' ? 'email' : f.type === 'tel' ? 'tel' : 'text'}" ${f.required ? 'required' : ''}>`;
-          return `<div class="cf-field-group"><label>${f.label}${f.required ? ' *' : ''}</label>${inputEl}</div>`;
+            ? `<textarea id="cf-${esc(f.id)}" rows="3" ${f.required ? 'required' : ''}></textarea>`
+            : `<input id="cf-${esc(f.id)}" type="${f.type === 'email' ? 'email' : f.type === 'tel' ? 'tel' : 'text'}" ${f.required ? 'required' : ''}>`;
+          return `<div class="cf-field-group"><label>${esc(f.label)}${f.required ? ' *' : ''}</label>${inputEl}</div>`;
         }).join('');
 
         document.getElementById('contact-form-submit').onclick = async () => {
@@ -1286,7 +1296,7 @@ async function load(leadwaseId) {
         `EMAIL:${p.email||''}`,
         `URL:${p.website||''}`,
         `ADR:${isBusiness && p.location ? p.location : ''}`,
-        `NOTE:Profil LeadWase — leadwase.com/profil/${leadwaseId}`,
+        `NOTE:Profil LeadWase — leadwase.com/p/${leadwaseId}`,
         'END:VCARD'
       ].join('\n');
       const blob = new Blob([vcard], { type:'text/vcard' });

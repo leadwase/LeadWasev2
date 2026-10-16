@@ -77,11 +77,14 @@
 
 <script>
 (function () {
-  const id = (new URLSearchParams(location.search).get('id') || '').trim().toUpperCase();
+  // Lien opaque (?c=<slug>) ; l'ancien ?id=LW-xxxxx reste accepté.
+  const qs = new URLSearchParams(location.search);
+  const rawSlug = (qs.get('c') || '').trim();
+  const id = /^[a-z2-9]{12}$/.test(rawSlug) ? rawSlug : (qs.get('id') || '').trim().toUpperCase();
   const $ = (x) => document.getElementById(x);
   const show = (name) => ['loading', 'invalid', 'done', 'form'].forEach(k => { $(k).hidden = (k !== name); });
 
-  if (!/^[A-Z0-9-]{3,40}$/.test(id)) { show('invalid'); return; }
+  if (!/^([a-z2-9]{12}|[A-Z0-9-]{3,40})$/.test(id)) { show('invalid'); return; }
 
   fetch('/api/profile/' + encodeURIComponent(id))
     .then(r => r.ok ? r.json() : null)

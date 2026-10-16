@@ -435,7 +435,7 @@ body { font-family: var(--serif); background: var(--gray6); color: var(--black);
   <div style="font-size:55px">📊</div>
   <h2>Analytics réservé aux abonnés Pro & Business</h2>
   <p>Passez à un plan supérieur pour accéder aux statistiques de visites de votre profil.</p>
-  <a href="offres.html">Voir les offres</a>
+  <a href="offres.html">Voir les tarifs</a>
 </div>
 
 <div class="app-layout" id="app-layout" style="display:none">
@@ -723,12 +723,14 @@ function buildSources(visits) {
   
   el.innerHTML = sorted.map(([name, count]) => `
     <div class="source-row">
-      <span class="source-name">${name}</span>
+      <span class="source-name">${esc(name)}</span>
       <div class="source-bar-wrap"><div class="source-bar-fill" style="width: ${(count / max * 100).toFixed(0)}%"></div></div>
       <span class="source-count">${count}</span>
     </div>
   `).join('');
 }
+
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function buildRecentVisits(visits) {
   const el = document.getElementById('visits-list');
@@ -756,8 +758,8 @@ function buildRecentVisits(visits) {
     const source = v.source || 'Direct';
     return `
       <div class="visit-row">
-        <span>${country} — ${device}<br><small style="color:var(--gray4)">${typeLabel}</small></span>
-        <span class="visit-src">${source}</span>
+        <span>${esc(country)} — ${esc(device)}<br><small style="color:var(--gray4)">${typeLabel}</small></span>
+        <span class="visit-src">${esc(source)}</span>
         <span class="visit-date">${lbl}</span>
       </div>
     `;

@@ -15,7 +15,7 @@ export function renderUserSidebar({ lwId, plan, isTeamOwner }) {
   const page = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
 
   const item = (key, href, icon, label, external = false) => `
-      <a class="sidebar-item${key && key === page ? ' active' : ''}" href="${esc(href)}"${external ? ' target="_blank" rel="noopener"' : ''}${key === 'public' ? ' id="sb-pub"' : ''}>
+      <a class="sidebar-item${key && key === page ? ' active' : ''}" href="${esc(href)}"${external ? ' target="_blank" rel="noopener"' : ''}${key === 'public' ? ' id="sb-pub" data-public-link' : ''}>
         <span class="s-icon">${icon}</span>${label}
       </a>`;
 
@@ -26,8 +26,8 @@ export function renderUserSidebar({ lwId, plan, isTeamOwner }) {
     ${isBusiness   ? item('prospects', 'prospects.html', '📇', 'Mes Prospects') : ''}
     ${isTeamOwner  ? item('equipe',    'equipe.html',    '👥', 'Mon équipe')    : ''}
     ${isPro        ? item('analytics', 'analytics.html', '📊', 'Analytics')     : ''}
-    ${item('offres', 'offres.html', '⭐', 'Offres', true)}
-    ${item('public', lwId ? 'profil.html?id=' + encodeURIComponent(lwId) : '#', '🔗', 'Profil public', true)}
+    ${item('offres', 'offres.html', '⭐', 'Tarifs', true)}
+    ${item('public', window.__publicUrl || '#', '🔗', 'Profil public', true)}
     <div class="sidebar-section-label" style="margin-top:8px">Compte</div>
     ${item('', 'commander.html', '🛒', 'Commander une carte', true)}
     ${item('', 'mailto:contact@leadwase.com', '💬', 'Support')}
