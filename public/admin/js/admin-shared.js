@@ -121,10 +121,10 @@ export function orderRow(o, showId) {
     : o.status === 'paid'
       ? `<button class="act-btn btn-gen" onclick="generateAccess('${o.id}')">Générer accès</button>`
       : `<span style="color:var(--gray4);font-size:13px">—</span>`;
-  const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:13px">${o.leadwaseId || '—'}</td>` : '';
+  const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:13px">${esc(o.leadwaseId || '—')}</td>` : '';
   return `<tr>
     <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">${shortId_}</td>
-    <td style="font-weight:600">${o.firstName || ''} ${o.lastName || ''}</td>
+    <td style="font-weight:600">${esc(`${o.firstName || ''} ${o.lastName || ''}`)}</td>
     <td>${o.cardType === 'b2b' ? 'B2B' : 'Classique'}</td>
     <td style="font-weight:600;color:var(--green)">${o.amount ? fmtNum(o.amount) + ' FCFA' : 'Sur devis'}</td>
     <td style="color:var(--gray4)">${fmtDate(o.createdAt)}</td>
@@ -148,7 +148,7 @@ export async function showDetail(orderId) {
       ['Type', o.cardType || '—'], ['Montant', o.amount ? fmtNum(o.amount) + ' FCFA' : '—'],
       ['Statut', o.status || '—'], ['ID LeadWase', o.leadwaseId || '—'],
       ['Date', fmtDate(o.createdAt)], ['Adresse', o.address || '—'],
-    ].map(([k, v]) => `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`).join('');
+    ].map(([k, v]) => `<div class="detail-row"><span class="detail-key">${esc(k)}</span><span class="detail-val">${esc(v)}</span></div>`).join('');
     document.getElementById('detail-modal').classList.add('open');
   } catch (e) { console.error(e); }
 }
@@ -254,3 +254,7 @@ export function initAuth(onReady) {
     if (e.target === e.currentTarget) closeModal();
   });
 }
+
+// Échappe tout texte saisi par un tiers avant de l'insérer dans du HTML (anti-XSS sur l'interface admin).
+export const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+window.esc = esc;

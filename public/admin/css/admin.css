@@ -298,3 +298,11 @@ select.f-input{cursor:pointer}
 .notif-actions{flex-shrink:0}
 .notif-empty{padding:48px 24px;text-align:center;color:var(--gray4)}
 @media(max-width:600px){.notif-item{flex-wrap:wrap;padding:14px 16px}.notif-actions{width:100%}}
+
+/* ── Comptes d'une équipe regroupés sous le compte du chef ── */
+.credentials-table tr.group-head td{background:#f6fbf8;border-top:2px solid var(--gray5)}
+.credentials-table tr.child-row td{background:#fcfcfa}
+.credentials-table tr.child-row td:first-child{padding-left:28px}
+.child-mark{color:var(--gray4);margin-right:6px}
+.grp-toggle{margin-left:6px;padding:3px 9px;font-size:12px;font-weight:700;border:1px solid var(--green);color:var(--green);background:var(--white);border-radius:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.grp-toggle:hover{background:var(--green);color:var(--white)}

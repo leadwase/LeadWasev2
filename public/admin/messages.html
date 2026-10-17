@@ -124,7 +124,7 @@
 </div><!-- /app -->
 
 <script type="module">
-import { initAuth, api, confirmDialog } from './js/admin-shared.js';
+import { esc, initAuth, api, confirmDialog } from './js/admin-shared.js';
 
 let allUsers = [];
 let selectedIds = new Set();
@@ -147,10 +147,10 @@ function renderUserList() {
   }
   list.innerHTML = rows.map(u => `
     <label class="msg-user-row">
-      <input type="checkbox" class="msg-user-check" data-id="${u.leadwaseId}" ${selectedIds.has(u.leadwaseId) ? 'checked' : ''}>
-      <span style="font-weight:600">${u.clientName || u.leadwaseId}</span>
-      <span style="color:var(--gray4);font-size:15px">${u.email}</span>
-      <span class="badge b-pending" style="margin-left:auto">${(u.plan || 'free').toUpperCase()}</span>
+      <input type="checkbox" class="msg-user-check" data-id="${esc(u.leadwaseId)}" ${selectedIds.has(u.leadwaseId) ? 'checked' : ''}>
+      <span style="font-weight:600">${esc(u.clientName || u.leadwaseId)}</span>
+      <span style="color:var(--gray4);font-size:15px">${esc(u.email)}</span>
+      <span class="badge b-pending" style="margin-left:auto">${esc((u.plan || 'free').toUpperCase())}</span>
     </label>
   `).join('');
 

@@ -3,14 +3,16 @@
 // footer.html) dans tous les points d'ancrage <div id="site-header">/<div
 // id="site-footer">, met en surbrillance le lien de nav actif, et adapte le
 // lien "Connexion" ⇄ "Mon profil" selon l'état d'authentification.
-import { auth } from './firebase-config.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+// Le header/footer ne dépendent PAS de Firebase : s'il est lent ou bloqué, le menu s'affiche quand même.
+// (Firebase n'est chargé qu'ensuite, uniquement pour basculer « Connexion » → « Mon profil ».)
 
 async function injectPartial(placeholderId, url) {
   const el = document.getElementById(placeholderId);
   if (!el) return;
-  const html = await fetch(url).then(r => r.text());
-  el.outerHTML = html;
+  try {
+    const html = await fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+    el.outerHTML = html;
+  } catch (e) { console.warn('[layout]', url, e.message); }
 }
 
 async function initLayout() {
@@ -40,14 +42,20 @@ async function initLayout() {
     }));
   }
 
-  // Connexion ⇄ Mon profil selon l'état d'authentification.
-  onAuthStateChanged(auth, user => {
-    [document.getElementById('nav-auth'), document.getElementById('nav-auth-mobile')].forEach(el => {
-      if (el && user) { el.textContent = 'Mon profil'; el.href = '/dashboard.html'; }
-    });
-  });
-
   document.dispatchEvent(new CustomEvent('layout:ready'));
+
+  // Connexion ⇄ Mon profil selon l'état d'authentification (best effort, après l'affichage).
+  try {
+    const [{ auth }, { onAuthStateChanged }] = await Promise.all([
+      import('./firebase-config.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js'),
+    ]);
+    onAuthStateChanged(auth, user => {
+      [document.getElementById('nav-auth'), document.getElementById('nav-auth-mobile')].forEach(el => {
+        if (el && user) { el.textContent = 'Mon profil'; el.href = '/dashboard.html'; }
+      });
+    });
+  } catch (e) { console.warn('[layout] état de connexion indisponible :', e.message); }
 }
 
 initLayout();

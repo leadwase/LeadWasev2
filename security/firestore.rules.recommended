@@ -1,0 +1,66 @@
+rules_version = '2';
+// ═══════════════════════════════════════════════════════════════════════════
+// Règles Firestore RECOMMANDÉES pour LeadWase — à publier dans Firebase Console → Firestore → Règles
+// (le fichier firestore.rules du dépôt est vide : les règles réellement actives sont celles de la console).
+//
+// Principe : le navigateur n'a accès qu'à SON profil. Tout le reste (profil public, suivi des visites,
+// commandes, abonnements, prospects, devis, équipe, limitation de débit…) passe par l'API (Admin SDK),
+// qui ignore ces règles. Depuis la mise à jour de sécurité, profil.html n'accède plus à Firestore.
+//
+// À FAIRE avant publication : tester dans « Simulateur de règles » (connecté / déconnecté) et vérifier
+// que Mon profil, Identifiants, Analytics et Tarifs fonctionnent.
+// ═══════════════════════════════════════════════════════════════════════════
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function ownsProfile(id) {
+      return signedIn()
+        && get(/databases/$(database)/documents/profiles/$(id)).data.firebaseUid == request.auth.uid;
+    }
+
+    // Profil : lecture par son propriétaire (ou admin). Modification par le propriétaire SAUF champs sensibles.
+    match /profiles/{id} {
+      allow get, list: if signedIn() && (resource.data.firebaseUid == request.auth.uid || isAdmin());
+      allow create, delete: if false;                       // création/suppression : API uniquement
+      allow update: if (ownsProfile(id) || isAdmin())
+        && (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'firebaseUid', 'uid', 'leadwaseId', 'loginEmail', 'plan', 'isTeamOwner', 'teamMembers', 'teamOrderId',
+          'parentLeadwaseId', 'pricePerCard', 'disabled', 'disabledAt', 'publicSlug'
+        ]));
+    }
+
+    // Rôle / lien utilisateur : lecture de son propre document ; écriture réservée à l'API.
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    // Identifiants de livraison : lisibles par le propriétaire (affichage de l'identifiant), jamais modifiables côté client.
+    match /credentials/{id} {
+      allow read: if ownsProfile(id) || isAdmin();
+      allow write: if false;
+    }
+
+    // Statistiques de visites : lecture par le propriétaire ; écriture par l'API uniquement (anti-fausses statistiques).
+    match /analytics/{id}/visits/{visit} {
+      allow read: if ownsProfile(id) || isAdmin();
+      allow write: if false;
+    }
+
+    // Abonnements : le client peut lire les siens (affichage du plan), jamais écrire.
+    match /subscriptions/{sid} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // Tout le reste (orders, payments, prospects, tasks, quotes, campaigns, crmSettings, rateLimits, settings, adminState…) :
+    // aucun accès direct depuis un navigateur.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

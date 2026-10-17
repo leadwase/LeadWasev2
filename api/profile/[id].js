@@ -37,6 +37,8 @@ async function verifyOwner(req, leadwaseId) {
   const profileDoc = await db.collection('profiles').doc(leadwaseId).get();
   if (!profileDoc.exists) throw new Error('Accès refusé');
   const pd = profileDoc.data();
+  // Compte désactivé par l'admin : aucune action possible, même avec une session encore valide.
+  if (pd.disabled) throw new Error('Accès refusé');
 
   const ownsByFirebaseUid = pd.firebaseUid && pd.firebaseUid === decoded.uid;
   const ownsByUid         = pd.uid && pd.uid === decoded.uid;

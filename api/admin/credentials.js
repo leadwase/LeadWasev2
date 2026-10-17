@@ -5,6 +5,19 @@
 // déjà l'annuaire complet des utilisateurs (profils + emails), nécessaire pour
 // cibler les destinataires d'un message.
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
+import { getAuth } from 'firebase-admin/auth';
+
+// Désactive/réactive le compte Firebase Auth lié et révoque les sessions ouvertes (sans quoi un compte
+// « désactivé » pouvait continuer à utiliser son jeton jusqu'à expiration).
+async function setAuthDisabled(leadwaseId, disabled) {
+  const snap = await db.collection('profiles').doc(leadwaseId).get();
+  const uid = snap.exists ? snap.data().firebaseUid : null;
+  if (!uid) return;
+  try {
+    await getAuth().updateUser(uid, { disabled });
+    if (disabled) await getAuth().revokeRefreshTokens(uid);
+  } catch (e) { console.error('[credentials] auth update :', e.message); }
+}
 
 async function listCredentials(req, res) {
   const credentialsSnapshot = await db.collection('credentials').get();
@@ -87,6 +100,7 @@ async function disableUser(req, res) {
   const { leadwaseId } = req.body || {};
   if (!leadwaseId) return res.status(400).json({ success: false, error: 'leadwaseId requis' });
   await db.collection('profiles').doc(leadwaseId).update({ disabled: true, disabledAt: new Date() });
+  await setAuthDisabled(leadwaseId, true);
   res.json({ success: true });
 }
 
@@ -95,6 +109,7 @@ async function enableUser(req, res) {
   const { leadwaseId } = req.body || {};
   if (!leadwaseId) return res.status(400).json({ success: false, error: 'leadwaseId requis' });
   await db.collection('profiles').doc(leadwaseId).update({ disabled: false, disabledAt: null });
+  await setAuthDisabled(leadwaseId, false);
   res.json({ success: true });
 }
 

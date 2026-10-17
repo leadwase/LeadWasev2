@@ -99,7 +99,7 @@
 </div>
 
 <script type="module">
-import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow, confirmDialog, promptDialog, toast } from './js/admin-shared.js';
+import { esc, initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow, confirmDialog, promptDialog, toast } from './js/admin-shared.js';
 
 let allB2B = [];
 
@@ -109,22 +109,26 @@ function renderB2BTable(rows) {
   tbody.innerHTML = rows.map(o => {
     const empCount = Array.isArray(o.employees) ? o.employees.length : 0;
     const action = o.teamProvisioned
-      ? `<span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);font-weight:700">✓ ${o.chefLeadwaseId}</span>`
-      : `<button class="act-btn btn-gen" onclick="provisionTeam('${o.id}', '${(o.quantity||'').replace(/'/g,"\\'")}')">Créer l'équipe</button>`;
+      ? `<span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);font-weight:700">✓ ${esc(o.chefLeadwaseId)}</span>`
+      : `<button class="act-btn btn-gen" data-prov="${esc(o.id)}" data-qty="${esc(o.quantity || '')}">Créer l'équipe</button>`;
     return `<tr>
-    <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${o.id.slice(-6).toUpperCase()}</td>
-    <td style="font-weight:600">${o.company||'—'}</td>
-    <td>${o.firstName||'—'}</td>
-    <td style="color:var(--gray4)">${o.email||'—'}</td>
-    <td style="color:var(--gray4)">${o.phone||'—'}</td>
-    <td style="color:var(--gray4)">${o.quantity||'—'}${empCount ? ` <span style="color:var(--green);font-size:11px">(${empCount} importé${empCount>1?'s':''})</span>` : ''}</td>
-    <td>${(o.subPlan||'free').toUpperCase()}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${esc(o.id.slice(-6).toUpperCase())}</td>
+    <td style="font-weight:600">${esc(o.company||'—')}</td>
+    <td>${esc(o.firstName||'—')}</td>
+    <td style="color:var(--gray4)">${esc(o.email||'—')}</td>
+    <td style="color:var(--gray4)">${esc(o.phone||'—')}</td>
+    <td style="color:var(--gray4)">${esc(o.quantity||'—')}${empCount ? ` <span style="color:var(--green);font-size:11px">(${empCount} importé${empCount>1?'s':''})</span>` : ''}</td>
+    <td>${esc((o.subPlan||'free').toUpperCase())}</td>
     <td style="color:var(--gray4);font-size:13px">${fmtDate(o.createdAt)}</td>
     <td>${badge(o.status)}</td>
-    <td style="display:flex;gap:6px;flex-wrap:wrap">${action}<a href="mailto:${o.email}" class="act-btn btn-view" style="text-decoration:none">Répondre</a></td>
+    <td style="display:flex;gap:6px;flex-wrap:wrap">${action}<a href="mailto:${esc(o.email)}" class="act-btn btn-view" style="text-decoration:none">Répondre</a></td>
   </tr>`;
   }).join('');
 }
+
+document.getElementById('b2b-body').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-prov]'); if (b) window.provisionTeam(b.dataset.prov, b.dataset.qty);
+});
 
 window.provisionTeam = async (orderId, quantityRange) => {
   const suggestion = (quantityRange.match(/\d+/g) || [])[0] || '';
