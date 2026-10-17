@@ -1,66 +1,130 @@
 rules_version = '2';
 // ═══════════════════════════════════════════════════════════════════════════
-// Règles Firestore RECOMMANDÉES pour LeadWase — à publier dans Firebase Console → Firestore → Règles
-// (le fichier firestore.rules du dépôt est vide : les règles réellement actives sont celles de la console).
+// Règles Firestore LeadWase — version durcie (remplace les règles actuelles de la console)
 //
-// Principe : le navigateur n'a accès qu'à SON profil. Tout le reste (profil public, suivi des visites,
-// commandes, abonnements, prospects, devis, équipe, limitation de débit…) passe par l'API (Admin SDK),
-// qui ignore ces règles. Depuis la mise à jour de sécurité, profil.html n'accède plus à Firestore.
-//
-// À FAIRE avant publication : tester dans « Simulateur de règles » (connecté / déconnecté) et vérifier
-// que Mon profil, Identifiants, Analytics et Tarifs fonctionnent.
+// Le navigateur ne fait QUE : lire son profil / son identifiant / ses statistiques, et modifier
+// les champs de son propre profil. Tout le reste passe par l'API (Admin SDK, qui ignore ces règles) :
+// profil public, suivi des visites, commandes, paiements, abonnements, prospects, devis, équipe…
 // ═══════════════════════════════════════════════════════════════════════════
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function signedIn() { return request.auth != null; }
+    // ── Fonctions communes ────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
     function isAdmin() {
-      return signedIn()
+      return isAuth()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin';
     }
-    function ownsProfile(id) {
-      return signedIn()
-        && get(/databases/$(database)/documents/profiles/$(id)).data.firebaseUid == request.auth.uid;
+    // Propriétaire d'un profil : même UID Firebase, ou compte de connexion interne « lw-xxxxx@leadwase.internal ».
+    function ownsProfile(leadwaseId) {
+      return isAuth() && (
+        get(/databases/$(database)/documents/profiles/$(leadwaseId)).data.get('firebaseUid', '') == request.auth.uid
+        || request.auth.token.email == leadwaseId.lower() + '@leadwase.internal'
+      );
     }
-
-    // Profil : lecture par son propriétaire (ou admin). Modification par le propriétaire SAUF champs sensibles.
-    match /profiles/{id} {
-      allow get, list: if signedIn() && (resource.data.firebaseUid == request.auth.uid || isAdmin());
-      allow create, delete: if false;                       // création/suppression : API uniquement
-      allow update: if (ownsProfile(id) || isAdmin())
-        && (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          'firebaseUid', 'uid', 'leadwaseId', 'loginEmail', 'plan', 'isTeamOwner', 'teamMembers', 'teamOrderId',
-          'parentLeadwaseId', 'pricePerCard', 'disabled', 'disabledAt', 'publicSlug'
-        ]));
+    function profilePlan(leadwaseId) {
+      return get(/databases/$(database)/documents/profiles/$(leadwaseId)).data.get('plan', 'free');
     }
 
-    // Rôle / lien utilisateur : lecture de son propre document ; écriture réservée à l'API.
+    // ── Profils ───────────────────────────────────────────────────────────
+    // Le profil public s'affiche via l'API (champs filtrés) : plus aucune lecture publique directe.
+    match /profiles/{leadwaseId} {
+
+      function isPaid()     { return resource.data.get('plan', 'free') in ['pro', 'business']; }
+      function isBusiness() { return resource.data.get('plan', 'free') == 'business'; }
+
+      // Seuls ces champs sont modifiables par l'utilisateur, selon son offre.
+      // (plan, firebaseUid, leadwaseId, isTeamOwner, teamMembers, pricePerCard, disabled, publicSlug… : API uniquement)
+      function allowedKeys() {
+        return ['firstName', 'lastName', 'jobTitle', 'company', 'phone', 'email', 'website', 'whatsapp', 'bio', 'updatedAt']
+          .concat(isPaid() ? ['photoURL', 'linkedin', 'instagram', 'tiktok', 'facebook', 'youtube', 'twitter'] : [])
+          .concat(isBusiness() ? ['location', 'locationLat', 'locationLng', 'rdvLink', 'rdvLabel', 'googleReview',
+                                  'googlePlaceId', 'contactMessage', 'contactActive', 'contactFields'] : []);
+      }
+      // Bornes de taille (anti-bourrage de la base).
+      function str(k, max) {
+        return !(k in request.resource.data)
+          || (request.resource.data[k] is string && request.resource.data[k].size() <= max);
+      }
+      function validValues() {
+        return str('firstName', 100) && str('lastName', 100) && str('jobTitle', 150) && str('company', 150)
+          && str('phone', 40) && str('email', 150) && str('website', 300) && str('whatsapp', 60) && str('bio', 2000)
+          && str('photoURL', 700000)
+          && str('linkedin', 300) && str('instagram', 300) && str('tiktok', 300) && str('facebook', 300)
+          && str('youtube', 300) && str('twitter', 300)
+          && str('location', 300) && str('rdvLink', 500) && str('rdvLabel', 100)
+          && str('googleReview', 500) && str('googlePlaceId', 200) && str('contactMessage', 500)
+          && (!('contactFields' in request.resource.data)
+              || (request.resource.data.contactFields is list && request.resource.data.contactFields.size() <= 20));
+      }
+
+      // Lecture : son propre profil uniquement (get par identifiant, ou requête where firebaseUid == uid).
+      allow get: if isAdmin() || ownsProfile(leadwaseId);
+      allow list: if isAdmin() || (isAuth() && resource.data.get('firebaseUid', '') == request.auth.uid);
+
+      // Création / suppression : API uniquement (avant : create ouvert à tout le monde).
+      allow create, delete: if false;
+
+      allow update: if isAdmin()
+        || (ownsProfile(leadwaseId)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedKeys())
+            && validValues());
+    }
+
+    // ── Identifiants de livraison ─────────────────────────────────────────
+    // Lecture par le propriétaire (affichage de l'identifiant). Plus aucune écriture depuis le navigateur :
+    // le changement de mot de passe passe par Firebase Auth, l'effacement du mot de passe initial par l'API.
+    match /credentials/{leadwaseId} {
+      allow read: if isAdmin() || ownsProfile(leadwaseId);
+      allow write: if false;
+    }
+
+    // ── Statistiques de visites ───────────────────────────────────────────
+    // Lecture réservée au propriétaire d'une offre Pro/Business. Écriture : API uniquement
+    // (avant : n'importe qui pouvait écrire de fausses visites).
+    match /analytics/{leadwaseId} {
+      allow read: if isAdmin()
+        || (ownsProfile(leadwaseId) && profilePlan(leadwaseId) in ['pro', 'business']);
+      allow write: if false;
+
+      match /visits/{visitId} {
+        allow read: if isAdmin()
+          || (ownsProfile(leadwaseId) && profilePlan(leadwaseId) in ['pro', 'business']);
+        allow write: if false;
+      }
+    }
+
+    // ── Commandes, paiements, abonnements : API uniquement ───────────────
+    // (avant : create ouvert à tous sur orders/payments, et création libre d'un abonnement « active » par
+    //  n'importe quel utilisateur connecté — ce qui permettait de s'attribuer gratuitement l'offre Business.)
+    match /orders/{orderId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /payments/{paymentId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /subscriptions/{subId} {
+      allow read: if isAdmin() || (isAuth() && resource.data.get('uid', '') == request.auth.uid);
+      allow write: if false;
+    }
+
+    // ── Utilisateurs (rôle, lien profil) ──────────────────────────────────
+    // Lecture de son propre document. Aucune écriture depuis le navigateur
+    // (avant : un utilisateur pouvait se donner role = 'admin' en modifiant son propre document).
     match /users/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow read: if isAdmin() || (isAuth() && request.auth.uid == uid);
       allow write: if false;
     }
 
-    // Identifiants de livraison : lisibles par le propriétaire (affichage de l'identifiant), jamais modifiables côté client.
-    match /credentials/{id} {
-      allow read: if ownsProfile(id) || isAdmin();
-      allow write: if false;
+    // ── Tout le reste : aucun accès direct ────────────────────────────────
+    // prospects, tasks, quotes, campaigns, crmSettings, rateLimits, settings, adminState, activity…
+    match /{document=**} {
+      allow read, write: if false;
     }
-
-    // Statistiques de visites : lecture par le propriétaire ; écriture par l'API uniquement (anti-fausses statistiques).
-    match /analytics/{id}/visits/{visit} {
-      allow read: if ownsProfile(id) || isAdmin();
-      allow write: if false;
-    }
-
-    // Abonnements : le client peut lire les siens (affichage du plan), jamais écrire.
-    match /subscriptions/{sid} {
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
-      allow write: if false;
-    }
-
-    // Tout le reste (orders, payments, prospects, tasks, quotes, campaigns, crmSettings, rateLimits, settings, adminState…) :
-    // aucun accès direct depuis un navigateur.
-    match /{document=**} { allow read, write: if false; }
   }
 }

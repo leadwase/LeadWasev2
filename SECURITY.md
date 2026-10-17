@@ -11,7 +11,7 @@
 - **API** : erreurs génériques (plus de détails internes ni de données personnelles dans les journaux), entrées bornées, admin protégé par rôle.
 
 ## À faire de votre côté (non faisable depuis le code)
-1. **Publier les règles Firestore** : `security/firestore.rules.recommended` → Firebase Console → Firestore → Règles. Tester d'abord avec le simulateur. C'est la protection la plus importante : tant que les anciennes règles sont actives, la base reste accessible directement depuis un navigateur.
+1. **Publier les règles Firestore** : `security/firestore.rules.recommended` (version complète, commentée) → Firebase Console → Firestore → Règles. Tester d'abord avec le simulateur. C'est la protection la plus importante : tant que les anciennes règles sont actives, la base reste accessible directement depuis un navigateur.
 2. **Variables Vercel** : `CRON_SECRET` (long, aléatoire), `RATE_LIMIT_SALT` (aléatoire), `SITE_URL`.
 3. **TTL Firestore** sur `rateLimits.expireAt` (purge automatique).
 4. **Révoquer** les jetons GitHub et le secret du cron qui ont été partagés dans des conversations, et en créer de nouveaux.
