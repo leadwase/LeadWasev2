@@ -163,3 +163,9 @@ html:not(.prices-ready) #price-pro, html:not(.prices-ready) #price-business { vi
 
 /* Évite d'afficher un instant les mauvais tarifs avant de connaître le type de compte */
 html:not(.plans-ready) .plans-grid { visibility: hidden; }
+
+/* Forfaits entreprises (B2B) : 2 cartes, centrées sur la page */
+#plans-b2b { grid-template-columns: repeat(2, minmax(0, 380px)); justify-content: center; gap: 24px; max-width: 900px; }
+#plans-b2b .plan-col { border: 1px solid var(--gray5); border-radius: 8px; }
+#plans-b2b .plan-col:last-child { border-right: 1px solid var(--gray5); }
+@media (max-width: 760px) { #plans-b2b { grid-template-columns: minmax(0, 1fr); max-width: 460px; } }
