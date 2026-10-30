@@ -407,20 +407,16 @@
   }
 
   function refreshB2BPlans() {
+    // Un SEUL abonnement annuel pour l'équipe et le chef d'équipe (pas de prix par carte).
     const sel = document.getElementById('b2b-plan');
     const labels = { free: 'Free — inclus avec la carte',
-      pro: `Pro — ${fmtN(B2B_PRICES.pro)} FCFA / an par carte`,
-      business: `Business — ${fmtN(B2B_PRICES.business)} FCFA / an par carte` };
+      pro: `Pro — ${fmtN(B2B_PRICES.pro)} FCFA / an`,
+      business: `Business — ${fmtN(B2B_PRICES.business)} FCFA / an` };
     [...sel.options].forEach(o => { if (labels[o.value]) o.textContent = labels[o.value]; });
-
     const est = document.getElementById('b2b-plan-estimate');
-    const unit = B2B_PRICES[sel.value];
-    const q = b2bQuantity();
-    if (!unit) { est.textContent = ''; return; }
-    if (!q) { est.textContent = `Abonnement annuel : ${fmtN(unit)} FCFA par carte.`; return; }
-    if (q.exact) est.innerHTML = `Estimation : <strong>${q.exact.toLocaleString('fr-FR')} × ${fmtN(unit)} = ${fmtN(q.exact * unit)} FCFA / an</strong> (devis final établi par notre équipe).`;
-    else if (q.max) est.innerHTML = `Estimation : <strong>${fmtN(q.min * unit)} à ${fmtN(q.max * unit)} FCFA / an</strong> (${fmtN(unit)} FCFA par carte).`;
-    else est.innerHTML = `Estimation : <strong>à partir de ${fmtN(q.min * unit)} FCFA / an</strong> (${fmtN(unit)} FCFA par carte).`;
+    est.textContent = B2B_PRICES[sel.value]
+      ? `Un seul abonnement annuel de ${fmtN(B2B_PRICES[sel.value])} FCFA pour toute l'équipe, chef d'équipe inclus (quel que soit le nombre de cartes).`
+      : '';
   }
   window.setB2BPrices = (prices) => {
     if (prices && prices.b2bPro > 0) B2B_PRICES.pro = prices.b2bPro;

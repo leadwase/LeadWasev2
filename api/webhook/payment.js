@@ -395,6 +395,19 @@ export default async function handler(req, res) {
           });
           console.log(`✅ Plan mis à jour: ${oldPlan} → ${sData.plan} pour le profil ${profileDoc.id}`);
 
+          // Abonnement ÉQUIPE (B2B) : un seul abonnement pour le chef d'équipe ET tous les comptes de l'équipe.
+          if (sData.scope === 'team') {
+            const memberIds = Array.isArray(profileDoc.data().teamMembers) ? profileDoc.data().teamMembers : [];
+            await Promise.allSettled(memberIds.map(async (mid) => {
+              const mRef = db.collection('profiles').doc(mid);
+              const mDoc = await mRef.get();
+              if (!mDoc.exists) return;
+              await mRef.update({ plan: sData.plan, updatedAt: new Date() });
+              if (mDoc.data().firebaseUid) await db.collection('users').doc(mDoc.data().firebaseUid).set({ plan: sData.plan }, { merge: true });
+            }));
+            console.log(`✅ Plan ${sData.plan} appliqué à ${memberIds.length} compte(s) de l'équipe de ${profileDoc.id}`);
+          }
+
           // Génération de la facture PDF pour abonnement
           let invoicePdfBase64 = null;
           try {

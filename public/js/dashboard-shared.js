@@ -6,7 +6,8 @@
 import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { renderUserSidebar } from './user-sidebar.js';
+import { renderUserSidebar, applyPublicLink } from './user-sidebar.js';
+export { applyPublicLink };
 import { getFirestore, doc, getDoc }
                             from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
@@ -84,23 +85,6 @@ export function promptDialog(message, { defaultValue = '', okLabel = 'Enregistre
     cancelBtn.onclick = () => cleanup(null);
     el.onclick = (e) => { if (e.target === el) cleanup(null); };
   });
-}
-
-// ── Lien public opaque (/p/<slug>) ───────────────────────────────────────────
-// L'identifiant de connexion n'apparaît jamais dans une URL : tous les liens « profil public »
-// (balise portant data-public-link) sont renseignés avec le lien opaque dès qu'il est connu.
-export function applyPublicLink(url) {
-  window.__publicUrl = url;
-  document.querySelectorAll('[data-public-link]').forEach(a => { a.href = url; });
-  document.dispatchEvent(new CustomEvent('public-link-ready', { detail: url }));
-}
-async function loadPublicLink(user, lwId) {
-  try {
-    const token = await user.getIdToken();
-    const r = await fetch(`/api/profile/${encodeURIComponent(lwId)}?action=public-link`, { headers: { Authorization: 'Bearer ' + token } });
-    const d = await r.json();
-    if (d.success && d.url) applyPublicLink(d.url);
-  } catch (e) { console.warn('[public-link]', e.message); }
 }
 
 // ── Code public (masqué) ─────────────────────────────────────────────────────
@@ -184,8 +168,7 @@ export function initDashboardAuth(onReady) {
     document.getElementById('sb-av').textContent   = (p.firstName || '?')[0];
     document.getElementById('sb-name').textContent = (p.firstName || '') + ' ' + (p.lastName || '');
     document.getElementById('sb-plan').textContent = planFinal.toUpperCase();
-    renderUserSidebar({ lwId, plan: planFinal, isTeamOwner: !!p.isTeamOwner });
-    loadPublicLink(user, lwId);
+    renderUserSidebar({ lwId, plan: planFinal, isTeamOwner: !!p.isTeamOwner, user });
 
     let currentLoginEmail = user.email;
     try {

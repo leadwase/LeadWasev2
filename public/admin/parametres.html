@@ -132,13 +132,13 @@
               </div>
               <div class="settings-body">
                 <div class="settings-info-box">
-                  <strong>💡 Prix annuel par carte employé</strong>
-                  Affichés dans la liste « Forfait souhaité » de la page Commander (carte B2B) et sur la page Tarifs pour les entreprises. Le montant total est calculé automatiquement selon le nombre de cartes.
+                  <strong>💡 Un seul abonnement annuel pour toute l'équipe</strong>
+                  Prix annuel payé une fois par le chef d'équipe, valable pour l'équipe entière et le chef d'équipe (quel que soit le nombre de cartes). Affiché dans la liste « Forfait souhaité » de la page Commander et sur la page Tarifs des comptes entreprises.
                 </div>
                 <div class="price-row">
                   <div class="price-info">
                     <div class="price-name">Pro — entreprise</div>
-                    <div class="price-desc">Abonnement annuel par carte employé</div>
+                    <div class="price-desc">Abonnement annuel — équipe entière + chef d'équipe</div>
                   </div>
                   <div class="price-input-wrap">
                     <input type="number" id="price-b2b-pro" class="price-input" placeholder="5500" min="0" step="100">
@@ -148,7 +148,7 @@
                 <div class="price-row">
                   <div class="price-info">
                     <div class="price-name">Business — entreprise</div>
-                    <div class="price-desc">Abonnement annuel par carte employé</div>
+                    <div class="price-desc">Abonnement annuel — équipe entière + chef d'équipe</div>
                   </div>
                   <div class="price-input-wrap">
                     <input type="number" id="price-b2b-business" class="price-input" placeholder="7500" min="0" step="100">
@@ -218,7 +218,7 @@ function updatePricesPreview(prices) {
   const r = prices.pro      ? fmtNum(prices.pro)       : '3 500';
   const b = prices.business ? fmtNum(prices.business)  : '9 900';
   p.innerHTML = `Classique : <strong>${c} FCFA</strong> &nbsp;|&nbsp; Pro : <strong>${r} FCFA/mois</strong> &nbsp;|&nbsp; Business : <strong>${b} FCFA/mois</strong>` +
-    `<br>B2B (par carte) : Pro <strong>${fmtNum(prices.b2bPro || 5500)} FCFA/an</strong> &nbsp;|&nbsp; Business <strong>${fmtNum(prices.b2bBusiness || 7500)} FCFA/an</strong>`;
+    `<br>B2B (équipe entière) : Pro <strong>${fmtNum(prices.b2bPro || 5500)} FCFA/an</strong> &nbsp;|&nbsp; Business <strong>${fmtNum(prices.b2bBusiness || 7500)} FCFA/an</strong>`;
   // Ces labels vivent sur la page Tableau de bord : on les met à jour seulement s'ils sont présents.
   const proLabel = document.getElementById('sub-pro-price-label');
   const bizLabel = document.getElementById('sub-business-price-label');

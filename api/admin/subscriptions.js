@@ -35,6 +35,16 @@ async function checkExpirations(req, res) {
           const profileDoc = profileQuery.docs[0];
           const p = profileDoc.data();
           await profileDoc.ref.update({ plan: 'free', updatedAt: now });
+          // Abonnement ÉQUIPE expiré : le chef d'équipe et tous les comptes de l'équipe repassent en Free.
+          if (s.scope === 'team' && Array.isArray(p.teamMembers)) {
+            for (const mid of p.teamMembers) {
+              const mRef = db.collection('profiles').doc(mid);
+              const mDoc = await mRef.get();
+              if (!mDoc.exists) continue;
+              await mRef.update({ plan: 'free', updatedAt: now });
+              if (mDoc.data().firebaseUid) await db.collection('users').doc(mDoc.data().firebaseUid).set({ plan: 'free' }, { merge: true });
+            }
+          }
           if (p.email) {
             await notifySubscriptionExpired({ email: p.email, firstName: p.firstName, plan: s.plan });
           }
