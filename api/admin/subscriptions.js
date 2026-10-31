@@ -1,6 +1,7 @@
 // api/admin/subscriptions.js — GET /api/admin/subscriptions (authentifié admin)
 //                                GET /api/admin/subscriptions?action=check-expirations
 //                                    (tâche cron externe, sécurisée par CRON_SECRET)
+import { handleDelete, cascadePayments } from '../../lib/adminDelete.js';
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
 
 // ── Tâche cron : rappels J-3 + rétrogradation des abonnements expirés ─────────
@@ -84,7 +85,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    await verifyAdmin(req);
+    const decoded = await verifyAdmin(req);
+    if (req.method === 'POST' && req.query.action === 'delete-subscriptions') return await handleDelete(req, res, decoded, 'subscriptions', cascadePayments('subscriptionId'));
     const snap = await db.collection('subscriptions')
       .orderBy('createdAt', 'desc').limit(200).get();
     const subscriptions = snap.docs.map(d => ({ id: d.id, ...d.data() }));

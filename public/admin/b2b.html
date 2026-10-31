@@ -99,6 +99,7 @@
 </div>
 
 <script type="module">
+import { attachBulkDelete } from './js/bulk-delete.js';
 import { esc, initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow, confirmDialog, promptDialog, toast } from './js/admin-shared.js';
 
 let allB2B = [];
@@ -111,7 +112,7 @@ function renderB2BTable(rows) {
     const action = o.teamProvisioned
       ? `<span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);font-weight:700">✓ ${esc(o.chefLeadwaseId)}</span>`
       : `<button class="act-btn btn-gen" data-prov="${esc(o.id)}" data-qty="${esc(o.quantity || '')}">Créer l'équipe</button>`;
-    return `<tr>
+    return `<tr data-id="${esc(o.id)}" data-status="${esc(o.status || '')}">
     <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">#${esc(o.id.slice(-6).toUpperCase())}</td>
     <td style="font-weight:600">${esc(o.company||'—')}</td>
     <td>${esc(o.firstName||'—')}</td>
@@ -193,6 +194,15 @@ window.loadB2B = async () => {
 
 document.getElementById('filter-search').addEventListener('input', applyB2BFilters);
 document.getElementById('filter-status').addEventListener('change', applyB2BFilters);
+
+attachBulkDelete({
+  tbody: document.getElementById('b2b-body'),
+  route: 'orders?action=delete-orders',
+  deletable: ['b2b_pending'],                       // « En cours » ; les demandes traitées (équipe créée) sont protégées
+  purges: [{ status: 'b2b_pending', label: 'En cours' }],
+  reload: () => window.loadB2B(),
+  noun: 'demande', fem: true,
+});
 
 initAuth(() => window.loadB2B());
 

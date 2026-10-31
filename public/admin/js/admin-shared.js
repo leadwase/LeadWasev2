@@ -122,7 +122,7 @@ export function orderRow(o, showId) {
       ? `<button class="act-btn btn-gen" onclick="generateAccess('${o.id}')">Générer accès</button>`
       : `<span style="color:var(--gray4);font-size:13px">—</span>`;
   const idCell = showId ? `<td style="font-family:'Space Mono',monospace;color:var(--green);font-size:13px">${esc(o.leadwaseId || '—')}</td>` : '';
-  return `<tr>
+  return `<tr data-id="${esc(o.id || '')}" data-status="${esc(o.status || '')}">
     <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray4)">${shortId_}</td>
     <td style="font-weight:600">${esc(`${o.firstName || ''} ${o.lastName || ''}`)}</td>
     <td>${o.cardType === 'b2b' ? 'B2B' : 'Classique'}</td>

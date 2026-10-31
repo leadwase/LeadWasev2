@@ -136,7 +136,8 @@
 </div>
 
 <script type="module">
-import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
+import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow, esc } from './js/admin-shared.js';
+import { attachBulkDelete } from './js/bulk-delete.js';
 
 window.loadSubs = async () => {
   const tbody = document.getElementById('subs-body');
@@ -166,7 +167,7 @@ window.loadSubs = async () => {
         : `<span class="badge b-pending">${(s.plan||'—').toUpperCase()}</span>`;
       const uid = s.uid ? `<span style="font-size:12px;font-family:'Space Mono',monospace;color:var(--gray4)">${s.uid.slice(0,12)}…</span>` : '—';
       const dur = s.durationMonths === 12 ? '1 an' : s.durationMonths === 1 || !s.durationMonths ? '1 mois' : `${s.durationMonths} mois`;
-      return `<tr>
+      return `<tr data-id="${esc(s.id)}" data-status="${esc(s.status || '')}">
         <td style="font-size:14px;color:var(--gray4)">${fmtDateTime(s.createdAt)}</td>
         <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--gray3)">${shortId(s.id)}</td>
         <td>${uid}</td>
@@ -188,6 +189,15 @@ window.loadSubs = async () => {
     tbody.innerHTML = `<tr class="empty-row"><td colspan="8" style="color:var(--red)">Erreur : ${e.message}</td></tr>`;
   }
 };
+
+attachBulkDelete({
+  tbody: document.getElementById('subs-body'),
+  route: 'subscriptions?action=delete-subscriptions',
+  deletable: ['pending', 'gateway_error', 'cancelled'],
+  purges: [{ status: 'pending', label: 'En attente' }, { status: 'gateway_error', label: 'Erreur' }, { status: 'cancelled', label: 'Annulé' }],
+  reload: () => window.loadSubs(),
+  noun: 'abonnement',
+});
 
 initAuth(() => window.loadSubs());
 

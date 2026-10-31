@@ -3,8 +3,10 @@
 //                        POST /api/admin/orders?action=generate-credentials  { orderId }
 //                        GET  /api/admin/orders?action=notifications          (centre de notifications admin)
 //                        POST /api/admin/orders?action=mark-notifications-read
+//                        POST /api/admin/orders?action=delete-orders  { ids: [...] } ou { status: 'pending' } (suppression en masse)
 // Regroupées dans un seul fichier (cycle de vie d'une commande) pour rester
 // sous la limite de 12 fonctions serverless du plan Vercel Hobby.
+import { handleDelete, cascadePayments } from '../../lib/adminDelete.js';
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
 
 function genId()  { return 'LW-' + Math.floor(10000 + Math.random() * 90000); }
@@ -265,6 +267,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST' && action === 'provision-b2b-team') return await provisionB2BTeam(req, res);
     if (req.method === 'GET'  && action === 'notifications') return await getNotifications(req, res, decoded);
     if (req.method === 'POST' && action === 'mark-notifications-read') return await markNotificationsRead(req, res, decoded);
+    if (req.method === 'POST' && action === 'delete-orders') return await handleDelete(req, res, decoded, 'orders', cascadePayments('orderId'));
 
     res.status(400).json({ success: false, error: 'Requête invalide' });
   } catch (e) {

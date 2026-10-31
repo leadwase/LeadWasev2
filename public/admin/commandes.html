@@ -107,6 +107,7 @@
 
 <script type="module">
 import { initAuth, api, fmtDate, fmtDateTime, fmtNum, badge, shortId, orderRow } from './js/admin-shared.js';
+import { attachBulkDelete } from './js/bulk-delete.js';
 
 let allOrders = [];
 
@@ -148,6 +149,16 @@ window.loadAllOrders = async () => {
 document.getElementById('filter-search').addEventListener('input', applyOrderFilters);
 document.getElementById('filter-status').addEventListener('change', applyOrderFilters);
 document.getElementById('filter-type').addEventListener('change', applyOrderFilters);
+
+attachBulkDelete({
+  tbody: document.getElementById('all-orders-body'),
+  route: 'orders?action=delete-orders',
+  deletable: ['pending', 'b2b_pending', 'payment_failed', 'gateway_error', 'failed', 'cancelled'],
+  purges: [{ status: 'pending', label: 'En attente' }, { status: 'b2b_pending', label: 'En cours' },
+           { status: 'payment_failed', label: 'Échoué' }, { status: 'gateway_error', label: 'Erreur' }],
+  reload: () => window.loadAllOrders(),
+  noun: 'commande', fem: true,
+});
 
 initAuth(() => window.loadAllOrders());
 document.addEventListener('admin:orders-updated', () => window.loadAllOrders());

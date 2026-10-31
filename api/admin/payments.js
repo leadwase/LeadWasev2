@@ -2,6 +2,7 @@
 //                          GET /api/admin/payments?action=stats (agrégats globaux)
 // Regroupées dans un seul fichier pour rester sous la limite de 12 fonctions
 // serverless du plan Vercel Hobby (stats est un simple agrégat, peu coûteux).
+import { handleDelete } from '../../lib/adminDelete.js';
 import { db, verifyAdmin, setCors } from '../../lib/firebaseAdmin.js';
 
 async function listPayments(req, res) {
@@ -62,7 +63,8 @@ export default async function handler(req, res) {
   setCors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
-    await verifyAdmin(req);
+    const decoded = await verifyAdmin(req);
+    if (req.method === 'POST' && req.query.action === 'delete-payments') return await handleDelete(req, res, decoded, 'payments', null);
     if (req.query.action === 'stats') return stats(req, res);
     return listPayments(req, res);
   } catch (e) {
